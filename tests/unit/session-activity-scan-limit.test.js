@@ -1,7 +1,7 @@
 /**
  * SessionActivityTracker.getUnreflectedSessions SCAN 순회 상한 회귀 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-06-16
  *
  * 회귀 경위:

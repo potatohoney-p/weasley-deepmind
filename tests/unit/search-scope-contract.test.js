@@ -1,7 +1,7 @@
 /**
  * SearchScope contract 회귀 가드
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-05-13
  *
  * 정적 가드: _executeSearch 후처리 필터 4블록 잔존 0 검증.

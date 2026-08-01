@@ -1,7 +1,7 @@
 /**
  * ContextBuilder 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-05
  *
  * recall을 mock하여 ContextBuilder.build()의 Core/WM/Anchor 조합,
@@ -163,16 +163,16 @@ describe("ContextBuilder.build()", () => {
     assert.equal(typeof result.count, "number");
   });
 
-  it("파편이 비어 있으면 _memento_hint에 empty_context 포함", async () => {
+  it("파편이 비어 있으면 _weasley_deepmind_hint에 empty_context 포함", async () => {
     recallMock = mock.fn(async () => ({ fragments: [] }));
     builder    = new ContextBuilder({ recall: recallMock, store: storeMock, index: indexMock, getPool: () => null });
 
     const result = await builder.build({});
-    assert.ok(result._memento_hint);
-    assert.equal(result._memento_hint.signal, "empty_context");
+    assert.ok(result._weasley_deepmind_hint);
+    assert.equal(result._weasley_deepmind_hint.signal, "empty_context");
   });
 
-  it("error 파편 존재 시 _memento_hint에 active_errors 포함", async () => {
+  it("error 파편 존재 시 _weasley_deepmind_hint에 active_errors 포함", async () => {
     recallMock = mock.fn(async (params) => {
       if (params.topic === "session_reflect") return { fragments: [] };
       if (params.type === "error") {
@@ -183,7 +183,7 @@ describe("ContextBuilder.build()", () => {
     builder = new ContextBuilder({ recall: recallMock, store: storeMock, index: indexMock, getPool: () => null });
 
     const result = await builder.build({});
-    assert.ok(result._memento_hint);
-    assert.equal(result._memento_hint.signal, "active_errors");
+    assert.ok(result._weasley_deepmind_hint);
+    assert.equal(result._weasley_deepmind_hint.signal, "active_errors");
   });
 });

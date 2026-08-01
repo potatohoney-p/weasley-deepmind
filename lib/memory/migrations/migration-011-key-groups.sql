@@ -1,5 +1,5 @@
 -- Migration 011: API 키 그룹 (N:M 매핑)
--- 작성자: 최진호 / 2026-03-15
+-- 작성자: Weasley Open Source / 2026-03-15
 
 
 CREATE TABLE IF NOT EXISTS agent_memory.api_key_groups (

@@ -1,7 +1,7 @@
 /**
  * Admin 라우트 계약 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-03-26
  *
  * handleAdminApi의 라우팅, 인증, 응답 형태 계약을 검증한다.
@@ -404,7 +404,7 @@ describe("GET /activity — returns array", () => {
   it("인증 성공 시 배열 반환", async () => {
     const mockRows = [
       { id: "1", topic: "test", type: "fact", agent_id: "a1", key_id: null, created_at: "2026-03-26", preview: "hello", key_name: null, key_prefix: null },
-      { id: "2", topic: "test2", type: "error", agent_id: "a2", key_id: "k1", created_at: "2026-03-25", preview: "world", key_name: "mykey", key_prefix: "mmcp_abc" },
+      { id: "2", topic: "test2", type: "error", agent_id: "a2", key_id: "k1", created_at: "2026-03-25", preview: "world", key_name: "mykey", key_prefix: "wdm_abc" },
     ];
     const mockPool = {
       query: async () => ({ rows: mockRows })

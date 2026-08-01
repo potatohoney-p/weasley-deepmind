@@ -5,7 +5,7 @@
  * export.js / import.js의 usage export, JSON parse 에러 핸들링,
  * --dry-run 동작, --idempotent 중복 스킵 로직을 테스트한다.
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-20
  */
 
@@ -14,10 +14,11 @@ import assert from "node:assert/strict";
 import fs     from "node:fs";
 import path   from "node:path";
 import os     from "node:os";
+import { fileURLToPath } from "node:url";
 
 /** ---- 헬퍼: 임시 JSONL 파일 ---- */
 function writeTempJsonl(rows) {
-  const file = path.join(os.tmpdir(), `memento-test-${Date.now()}-${Math.random().toString(36).slice(2)}.jsonl`);
+  const file = path.join(os.tmpdir(), `weasley_deepmind-test-${Date.now()}-${Math.random().toString(36).slice(2)}.jsonl`);
   const lines = rows.map(r => JSON.stringify(r)).join("\n") + "\n";
   fs.writeFileSync(file, lines, "utf8");
   return file;
@@ -45,7 +46,7 @@ describe("M6: export.js", () => {
 
   it("JSONL 출력 필드 목록이 소스에 포함됨", async () => {
     const src = fs.readFileSync(
-      new URL("../../lib/cli/export.js", import.meta.url).pathname,
+      fileURLToPath(new URL("../../lib/cli/export.js", import.meta.url)),
       "utf8"
     );
     const requiredFields = [
@@ -78,7 +79,7 @@ describe("M6: import.js", () => {
 
   it("JSON parse 에러 처리 — 소스 내 에러 핸들링 확인", async () => {
     const src = fs.readFileSync(
-      new URL("../../lib/cli/import.js", import.meta.url).pathname,
+      fileURLToPath(new URL("../../lib/cli/import.js", import.meta.url)),
       "utf8"
     );
     assert.ok(src.includes("JSON parse error"), "JSON parse 에러 메시지가 소스에 있어야 함");
@@ -87,7 +88,7 @@ describe("M6: import.js", () => {
 
   it("--dry-run 플래그 처리 — INSERT 없이 검증만", async () => {
     const src = fs.readFileSync(
-      new URL("../../lib/cli/import.js", import.meta.url).pathname,
+      fileURLToPath(new URL("../../lib/cli/import.js", import.meta.url)),
       "utf8"
     );
     assert.ok(src.includes("dryRun"), "dry-run 처리 로직이 있어야 함");
@@ -96,7 +97,7 @@ describe("M6: import.js", () => {
 
   it("--idempotent 플래그 — ON CONFLICT DO NOTHING 사용", async () => {
     const src = fs.readFileSync(
-      new URL("../../lib/cli/import.js", import.meta.url).pathname,
+      fileURLToPath(new URL("../../lib/cli/import.js", import.meta.url)),
       "utf8"
     );
     assert.ok(src.includes("ON CONFLICT (id) DO NOTHING"), "idempotent 모드에 ON CONFLICT DO NOTHING이 있어야 함");
@@ -121,11 +122,11 @@ describe("M6: import.js", () => {
   });
 });
 
-/** ---- bin/memento.js 등록 확인 ---- */
-describe("M6: bin/memento.js COMMANDS 등록", () => {
+/** ---- bin/weasley-deepmind.js 등록 확인 ---- */
+describe("M6: bin/weasley-deepmind.js COMMANDS 등록", () => {
   it("export와 import가 COMMANDS에 등록됨", async () => {
     const src = fs.readFileSync(
-      new URL("../../bin/memento.js", import.meta.url).pathname,
+      fileURLToPath(new URL("../../bin/weasley-deepmind.js", import.meta.url)),
       "utf8"
     );
     assert.ok(src.includes("export:"), "COMMANDS에 export가 등록돼야 함");
@@ -136,7 +137,7 @@ describe("M6: bin/memento.js COMMANDS 등록", () => {
 
   it("export/import가 LOCAL_ONLY_COMMANDS에 포함됨", async () => {
     const src = fs.readFileSync(
-      new URL("../../bin/memento.js", import.meta.url).pathname,
+      fileURLToPath(new URL("../../bin/weasley-deepmind.js", import.meta.url)),
       "utf8"
     );
     /** LOCAL_ONLY_COMMANDS Set 라인 추출 */

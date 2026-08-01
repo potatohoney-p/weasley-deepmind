@@ -1,7 +1,7 @@
 /**
  * QuotaChecker.check() 캐시 재사용 + 임박 시에만 FOR UPDATE
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-16
  */
 

@@ -1,10 +1,10 @@
 /**
  * Atomic Remember + PolicyRules Hard Gate 회귀 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-05-13
  *
- * MEMENTO_REMEMBER_ATOMIC=true 경로에서 PolicyRules hard gate가 우회되던 버그의 회귀 가드.
+ * WEASLEY_DEEPMIND_REMEMBER_ATOMIC=true 경로에서 PolicyRules hard gate가 우회되던 버그의 회귀 가드.
  * remember() 본문이 atomic 분기 진입 이전에 _runPolicyGate를 호출하므로,
  * hard gate 키에서는 _rememberAtomic 트랜잭션을 시작하지 않고 throw해야 한다.
  *
@@ -23,7 +23,7 @@ async function makeManager(opts = {}) {
   const { MemoryManager } = await import("../../lib/memory/MemoryManager.js");
 
   /** atomic 분기를 강제 활성화 */
-  process.env.MEMENTO_REMEMBER_ATOMIC = "true";
+  process.env.WEASLEY_DEEPMIND_REMEMBER_ATOMIC = "true";
 
   const mm = new MemoryManager();
 

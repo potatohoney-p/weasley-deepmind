@@ -1,7 +1,7 @@
 /**
  * FragmentSearch fallback noise 회귀 가드 (P0)
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-05-14
  *
  * L1 fallback(getRecent 20건)이 reranker와 RRF를 통과한 뒤

@@ -1,7 +1,7 @@
 /**
  * admin-metrics-flow 통합 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-20
  *
  * 시나리오:
@@ -238,11 +238,11 @@ describe("시나리오 2: 인증 가드", () => {
       t.skip("handleMetricsSummary export 없음 — Team A 통합 후 PASS");
       return;
     }
-    const masterKey = process.env.MEMENTO_ACCESS_KEY ?? "test-master-key";
+    const masterKey = process.env.WEASLEY_DEEPMIND_ACCESS_KEY ?? "test-master-key";
     const req       = makeReq(`Bearer ${masterKey}`);
     const res       = fakeRes();
 
-    process.env.MEMENTO_ACCESS_KEY = masterKey;
+    process.env.WEASLEY_DEEPMIND_ACCESS_KEY = masterKey;
     await handleMetricsSummary(req, res);
 
     assert.ok([200, 401, 403].includes(res.statusCode),
@@ -328,7 +328,7 @@ describe("시나리오 4: rate 계산 (Counter delta)", () => {
     await callSummary({ windowSec: 5 });
 
     /* Counter 증가 */
-    const authCounter = prometheus.register.getSingleMetric("memento_auth_denied_total");
+    const authCounter = prometheus.register.getSingleMetric("weasley_deepmind_auth_denied_total");
     if (authCounter) {
       authCounter.inc();
       authCounter.inc();

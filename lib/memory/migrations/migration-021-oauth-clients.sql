@@ -1,7 +1,7 @@
 -- migration-021-oauth-clients.sql
 -- Dynamic Client Registration (RFC 7591) 지원
 --
--- 작성자: 최진호
+-- 작성자: Weasley Open Source
 -- 작성일: 2026-04-02
 
 CREATE TABLE IF NOT EXISTS agent_memory.oauth_clients (

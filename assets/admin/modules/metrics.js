@@ -1,7 +1,7 @@
 /**
- * Memento MCP Admin Console — Metrics 뷰 렌더러
+ * Weasley DeepMind Admin Console — Metrics 뷰 렌더러
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-20
  * 수정일: 2026-04-20 (Phase 2: SVG sparkline + 시간 범위 토글)
  */

@@ -1,6 +1,6 @@
 # 통합 테스트 실행 가이드
 
-작성자: 최진호
+작성자: Weasley Open Source
 작성일: 2026-04-18
 수정일: 2026-04-29 (v3.2.0 Phase 1~7 신규 통합 테스트 4건 추가)
 
@@ -33,7 +33,7 @@ v3.2.0부터 Phase 1~7 구현 검증용 통합 테스트 4건이 추가되었다
 | `llm-chain-real.test.js` | `E2E_LLM_CHAIN=1` | LLM_PRIMARY, LLM_FALLBACKS |
 | `morpheme-llm-real.test.js` | `E2E_MORPHEME=1` | LLM CLI 인증, PostgreSQL |
 | `local-embedding.test.js` | `E2E_LOCAL_EMBED=1` | @huggingface/transformers 설치 |
-| `toctou-remember-concurrency.test.js` | `MEMENTO_REMEMBER_ATOMIC=true` (결과 검증 분기) | PostgreSQL |
+| `toctou-remember-concurrency.test.js` | `WEASLEY_DEEPMIND_REMEMBER_ATOMIC=true` (결과 검증 분기) | PostgreSQL |
 
 LLM provider 설정(LLM_PRIMARY, LLM_FALLBACKS, circuit breaker 등) 상세는
 [docs/operations/llm-providers.md](../../docs/operations/llm-providers.md)를 참조한다.
@@ -82,8 +82,8 @@ node --test tests/integration/db-pool-isolation.test.js
 ## 전제 조건
 
 ### session-token-reuse.test.js
-- memento-mcp 서버가 `127.0.0.1:${PORT}` (기본 57332)에서 실행 중이어야 한다.
-- `MEMENTO_ACCESS_KEY` 환경변수가 설정되어 있어야 한다.
+- weasley-deepmind 서버가 `127.0.0.1:${PORT}` (기본 57332)에서 실행 중이어야 한다.
+- `WEASLEY_DEEPMIND_ACCESS_KEY` 환경변수가 설정되어 있어야 한다.
 - Redis가 기동 중이고 `REDIS_ENABLED=true`여야 한다 (미연결 시 토큰 바인딩이 stub으로 동작하여 재사용 검증 불가).
 - DB 연결은 서버 기동에 필요하지만 테스트 자체에서 직접 접근하지 않는다.
 
@@ -107,7 +107,7 @@ node --test tests/integration/db-pool-isolation.test.js
 
 ### reflect-large-payload.test.js
 - DB, Redis, EMBEDDING_API_KEY 모두 불필요. 모든 외부 의존성을 stub으로 격리.
-- v3.2.0 Phase 1+2 회귀 가드(R12 TDZ 버그). `MEMENTO_REMEMBER_ATOMIC=true` 경로 검증.
+- v3.2.0 Phase 1+2 회귀 가드(R12 TDZ 버그). `WEASLEY_DEEPMIND_REMEMBER_ATOMIC=true` 경로 검증.
 
 ### embedding-worker-batch.test.js
 - DB, Redis, EMBEDDING_API_KEY 불필요. EmbeddingWorker의 API 호출을 stub으로 대체.
@@ -151,7 +151,7 @@ node --test tests/integration/db-pool-isolation.test.js
 ```bash
 # 세션 토큰 재사용 E2E 단독 실행
 E2E_SESSION_REUSE=1 \
-  MEMENTO_ACCESS_KEY=<key> \
+  WEASLEY_DEEPMIND_ACCESS_KEY=<key> \
   REDIS_ENABLED=true \
   node --test tests/integration/session-token-reuse.test.js
 ```
@@ -222,7 +222,7 @@ PostgreSQL에 형태소 캐시가 저장되고 재조회 시 동일 결과를 �
 `getBatchPool()`이 `getPrimaryPool()`과 별개 객체임을 검증한다.
 batchPool의 `options.max`가 primaryPool 대비 30% 이하로 제한되는지,
 `getPoolStats()`에 batch/primary 통계가 모두 포함되는지,
-`BATCH_DATABASE_URL` 미설정 환경에서 `application_name`이 `'memento-mcp:batch'`인지,
+`BATCH_DATABASE_URL` 미설정 환경에서 `application_name`이 `'weasley-deepmind:batch'`인지,
 `shutdownPool()` 호출 시 두 풀이 모두 종료되는지를 포함한다.
 DB 연결 없이 Pool 인스턴스 속성만으로 검증 가능한 케이스는 DB 없는 환경에서도 실행된다.
 
@@ -234,7 +234,7 @@ DATABASE_URL 미설정 또는 DB TCP 접속 불가 시 전체 skip.
 
 ### reflect-large-payload.test.js (Phase 1+2)
 
-R12 TDZ 회귀 가드 테스트. `MEMENTO_REMEMBER_ATOMIC=true` 경로에서
+R12 TDZ 회귀 가드 테스트. `WEASLEY_DEEPMIND_REMEMBER_ATOMIC=true` 경로에서
 다건 summary와 긴 narrative_summary를 포함한 reflect 페이로드가 ReferenceError 없이
 완료되는지 검증한다. DB/Redis/EMBEDDING_API_KEY 불필요. 항상 실행 가능.
 

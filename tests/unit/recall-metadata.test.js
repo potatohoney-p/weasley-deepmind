@@ -1,7 +1,7 @@
 /**
  * Phase C recall 메타데이터 확장 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-03-28
  *
  * Task 4-1: confidence 계산, age_days 계산

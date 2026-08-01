@@ -1,7 +1,7 @@
 /**
  * stale-warning 단위 테스트 — computeStale fail-open 검증
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-06-09
  */
 

@@ -1,11 +1,11 @@
 ---
 name: Bug Report
-about: Report a bug in Memento MCP
+about: Report a bug in Weasley DeepMind
 labels: bug
 ---
 
 ## Environment
-- Memento version:
+- Weasley DeepMind version:
 - Node.js version:
 - PostgreSQL version:
 - OS:

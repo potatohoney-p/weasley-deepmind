@@ -1,7 +1,7 @@
 -- migration-006-superseded-by-constraint.sql
 -- fragment_links relation_type CHECK 제약 조건에 'superseded_by' 추가
 --
--- 작성자: 최진호
+-- 작성자: Weasley Open Source
 -- 작성일: 2026-03-08
 --
 -- 실행: psql $DATABASE_URL -f lib/memory/migration-006-superseded-by-constraint.sql

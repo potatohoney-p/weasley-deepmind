@@ -1,7 +1,7 @@
 /**
  * CaseEventStore 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-19
  *
  * CaseEventStore의 공개 메서드를 DB 없이 검증한다.

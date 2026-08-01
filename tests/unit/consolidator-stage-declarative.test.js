@@ -1,7 +1,7 @@
 /**
  * Consolidator stage 선언형화 회귀 가드
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-05-13
  *
  * `_runConsolidationCycle`이 `TOTAL_STAGES = <리터럴>`로 고정된 진행률을 송출하던 회귀를 차단한다.

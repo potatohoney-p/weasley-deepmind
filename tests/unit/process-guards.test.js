@@ -1,7 +1,7 @@
 /**
  * process-guards 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-14
  */
 import { test } from "node:test";

@@ -1,13 +1,13 @@
 /**
  * R12 TDZ 회귀 가드 (2026-04-20).
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-20
  *
  * 배경:
  *   v2.9.0에서 MemoryManager.remember 본문의 atomic 분기
  *   (return this._rememberAtomic(fragment, …))가 const fragment = this.factory.create(…)
- *   선언보다 앞에 놓여, MEMENTO_REMEMBER_ATOMIC=true && keyId != null 경로에서
+ *   선언보다 앞에 놓여, WEASLEY_DEEPMIND_REMEMBER_ATOMIC=true && keyId != null 경로에서
  *   ReferenceError: Cannot access 'fragment' before initialization 발생.
  *
  * 2026-04-20 핫픽스로 atomic 분기를 fragment 생성 뒤로 이동 + quotaChecker.check를

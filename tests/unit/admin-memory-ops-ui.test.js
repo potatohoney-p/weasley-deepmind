@@ -1,7 +1,7 @@
 /**
  * admin.js -- Memory Operations 렌더러 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-03-26
  * 수정일: 2026-04-19 (ESM 모듈 직접 import 방식으로 전환)
  */
@@ -197,14 +197,14 @@ describe("renderRecentEventsChart", () => {
   test("pathDistribution 실데이터가 행으로 렌더링된다", () => {
     const panel = renderRecentEventsChart({
       pathDistribution: [{ search_path: "L1", cnt: 30 }, { search_path: "L2", cnt: 10 }],
-      topKeywords: [{ kw: "memento", cnt: 5 }]
+      topKeywords: [{ kw: "weasley_deepmind", cnt: 5 }]
     });
     const all = [];
     function walk(n) { all.push(n); (n.children ?? []).forEach(walk); }
     walk(panel);
     assert.ok(all.some(n => (n.textContent ?? "") === "L1"));
     assert.ok(all.some(n => (n.textContent ?? "") === "30"));
-    assert.ok(all.some(n => (n.textContent ?? "") === "memento"));
+    assert.ok(all.some(n => (n.textContent ?? "") === "weasley_deepmind"));
   });
 });
 

@@ -1,7 +1,7 @@
 /**
- * Memento MCP Server (HTTP) — Streamable HTTP / SSE / OAuth 2.0 엔드포인트.
+ * Weasley DeepMind Server (HTTP) — Streamable HTTP / SSE / OAuth 2.0 엔드포인트.
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-01-30
  * 수정일: 2026-05-26
  *
@@ -14,14 +14,14 @@
  *   - GET  /.well-known/oauth-* : OAuth 2.0 메타데이터 / 동적 클라이언트 등록
  *
  * 인증:
- *   - Authorization: Bearer <MEMENTO_ACCESS_KEY> 헤더
+ *   - Authorization: Bearer <WEASLEY_DEEPMIND_ACCESS_KEY> 헤더
  *   - 또는 initialize 시 환경 변수 ACCESS_KEY 일치
  */
 
 import http from "http";
 
 /** 설정 */
-import { PORT, ACCESS_KEY, AUTH_DISABLED, SESSION_TTL_MS, LOG_DIR, RATE_LIMIT_WINDOW_MS, RATE_LIMIT_PER_IP, RATE_LIMIT_PER_KEY, detectPgvectorSchema, PGVECTOR_SCHEMA, ENABLE_OPENAPI } from "./lib/config.js";
+import { HOST, PORT, ACCESS_KEY, AUTH_DISABLED, SESSION_TTL_MS, LOG_DIR, RATE_LIMIT_WINDOW_MS, RATE_LIMIT_PER_IP, RATE_LIMIT_PER_KEY, detectPgvectorSchema, PGVECTOR_SCHEMA, ENABLE_OPENAPI } from "./lib/config.js";
 import { MEMORY_CONFIG }          from "./config/memory.js";
 import { validateMemoryConfig }   from "./config/validate-memory-config.js";
 
@@ -57,6 +57,7 @@ import { preloadReranker } from "./lib/memory/read/Reranker.js";
 import { warmup as warmupMorpheme } from "./lib/memory/embedding/MorphemeTokenizer.js";
 import { logInfo, logWarn, logError } from "./lib/logger.js";
 import { installProcessGuards }     from "./lib/process-guards.js";
+import { assertSafeAuthBinding }    from "./lib/network-safety.js";
 
 /** 임베딩 차원 일관성 검증 */
 import { checkEmbeddingConsistency } from "./scripts/check-embedding-consistency.js";
@@ -87,6 +88,8 @@ import {
   getAllowedOrigin,
   setWorkerRefs
 } from "./lib/http-handlers.js";
+
+assertSafeAuthBinding({ host: HOST, accessKey: ACCESS_KEY, authDisabled: AUTH_DISABLED });
 
 /** Rate Limiter 인스턴스 (IP/API 키 이중 제한) */
 const rateLimiter = new DualRateLimiter({
@@ -270,7 +273,7 @@ const server = http.createServer(async (req, res) => {
     res.statusCode = 204;
     res.setHeader("Access-Control-Allow-Origin", getAllowedOrigin(req));
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, MCP-Session-Id, memento-access-key");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, MCP-Session-Id, weasley_deepmind-access-key");
     res.setHeader("Access-Control-Expose-Headers", "MCP-Session-Id");
     res.setHeader("Access-Control-Max-Age", "86400");
     res.end();
@@ -293,16 +296,18 @@ server.on("connection", (socket) => {
   socket.setNoDelay(true);
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, HOST, () => {
   validateMemoryConfig(MEMORY_CONFIG);
-  console.log(`Memento MCP HTTP server listening on port ${PORT}`);
+  console.log(`Weasley DeepMind HTTP server listening on http://${HOST}:${PORT}`);
   console.log("Streamable HTTP endpoints: POST/GET/DELETE /mcp");
   console.log("Legacy SSE endpoints: GET /sse, POST /message");
 
   if (ACCESS_KEY) {
     console.log("Authentication: ENABLED");
+  } else if (AUTH_DISABLED) {
+    console.warn("Authentication: EXPLICITLY DISABLED for local development");
   } else {
-    console.log("Authentication: DISABLED (set MEMENTO_ACCESS_KEY to enable)");
+    console.warn("Authentication: NOT CONFIGURED; protected requests will be denied");
   }
 
   console.log(`Session TTL: ${SESSION_TTL_MS / 60000} minutes`);

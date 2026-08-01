@@ -1,7 +1,7 @@
 /**
  * 형태소 토크나이저 지연·메모리 벤치마크
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-05-22
  */
 
@@ -9,7 +9,7 @@ import { MorphemeIndex } from "../lib/memory/embedding/MorphemeIndex.js";
 
 const idx     = new MorphemeIndex();
 const samples = [
-  "memento-mcp 서버의 L3 형태소 분석기를 마이그레이션하여 OpenAI 임베딩 비용을 절감했다",
+  "weasley-deepmind 서버의 L3 형태소 분석기를 마이그레이션하여 OpenAI 임베딩 비용을 절감했다",
   "embedding workers caching morphemes efficiently",
 ];
 

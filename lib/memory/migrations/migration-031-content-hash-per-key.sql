@@ -1,5 +1,5 @@
 -- migration-031-content-hash-per-key.sql
--- 작성자: 최진호
+-- 작성자: Weasley Open Source
 -- 작성일: 2026-04-10
 -- 목적: content_hash 전역 UNIQUE 인덱스(idx_frag_hash)를 drop하고
 --       partial unique index 2개로 전환하여 크로스 테넌트 ON CONFLICT 경로 차단.

@@ -1,7 +1,7 @@
 /**
  * P2a 회귀 방지: 스케줄러가 MorphemeBackfill을 등록해야 한다.
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-16
  */
 import { test } from "node:test";

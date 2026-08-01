@@ -1,7 +1,7 @@
 /**
  * H3: CLI 서브명령별 --help — usage export 존재 검증
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-20
  */
 import { describe, it } from "node:test";

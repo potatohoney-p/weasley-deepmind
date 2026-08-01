@@ -1,7 +1,7 @@
 /**
  * timeRange 파라미터 파싱 및 검증 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-03-28
  */
 import { test, describe } from "node:test";

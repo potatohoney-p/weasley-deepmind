@@ -2,7 +2,7 @@
  * search-path-perf.test.js
  * getPathPerformance() 반환 구조 및 순수 함수 계약 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-03-31
  *
  * DB 의존성 없이 getPathPerformance의 반환 형태와

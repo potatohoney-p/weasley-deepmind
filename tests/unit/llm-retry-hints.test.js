@@ -4,7 +4,7 @@
  * extractRetryHintMs / computeCooldown 의 힌트 추출 + 쿨다운 산출 로직 검증.
  * 실제 HTTP 호출 없음. Response 객체를 mock 으로 구성.
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-24
  */
 

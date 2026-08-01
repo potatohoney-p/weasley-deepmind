@@ -3,7 +3,7 @@
  *
  * M3: QuotaChecker.getUsage + 인메모리 캐시 동작 검증
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-20
  */
 

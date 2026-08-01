@@ -1,7 +1,7 @@
 /**
  * 슬롯 보장 절단 검증
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-27
  *
  * 이슈 #30: _trimToTokenBudget이 단순 prefix 절단(첫 초과 시 break)만 수행하여

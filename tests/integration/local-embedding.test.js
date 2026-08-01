@@ -1,7 +1,7 @@
 /**
  * 로컬 transformers.js 임베딩 provider 통합 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-18
  *
  * 실행:

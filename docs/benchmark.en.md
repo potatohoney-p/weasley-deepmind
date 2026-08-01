@@ -1,6 +1,6 @@
-﻿# Benchmark Report
+# Benchmark Report
 
-Based on [LongMemEval-S](https://arxiv.org/abs/2407.15460) benchmark. Full evaluation code: [longmemeval-memento](https://github.com/potatohoney-p/longmemeval-memento)
+Based on [LongMemEval-S](https://arxiv.org/abs/2407.15460) benchmark. Full evaluation code: [longmemeval-weasley_deepmind](https://github.com/potatohoney-p/longmemeval-weasley_deepmind)
 
 Date: 2026-03-29
 Evaluator: Jinho Choi
@@ -12,7 +12,7 @@ Evaluator: Jinho Choi
 | Dataset | LongMemEval_S (500 questions, 6 types + abstention) |
 | Ingestion | round_direct (turn-pair verbatim, 300 char truncation) |
 | Storage | PostgreSQL bulk INSERT, pgvector embeddings via OpenAI text-embedding-3-small |
-| Retrieval | memento-mcp recall API (3-layer cascade: L1 Redis, L2 PostgreSQL GIN, L3 pgvector HNSW) |
+| Retrieval | weasley-deepmind recall API (3-layer cascade: L1 Redis, L2 PostgreSQL GIN, L3 pgvector HNSW) |
 | Top-K | 5 |
 | Reader | Gemini 2.5 Flash (direct method, no chain-of-thought) |
 | Judge | Gemini 2.5 Flash (LongMemEval official prompts ported verbatim) |

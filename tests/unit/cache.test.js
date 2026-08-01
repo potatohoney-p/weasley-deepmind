@@ -9,7 +9,7 @@ describe("UpdateCache", () => {
   let TEST_DIR;
 
   beforeEach(async () => {
-    TEST_DIR = path.join(os.tmpdir(), `.memento-mcp-test-${Date.now()}`);
+    TEST_DIR = path.join(os.tmpdir(), `.weasley-deepmind-test-${Date.now()}`);
     fs.mkdirSync(TEST_DIR, { recursive: true });
     const mod = await import("../../lib/updater/cache.js");
     UpdateCache = mod.UpdateCache;

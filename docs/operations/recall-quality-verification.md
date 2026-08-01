@@ -1,6 +1,6 @@
 # Recall 품질 검증 절차
 
-작성자: 최진호
+작성자: Weasley Open Source
 작성일: 2026-07-16
 
 ## 1. text recall 0건 회복 (P1)

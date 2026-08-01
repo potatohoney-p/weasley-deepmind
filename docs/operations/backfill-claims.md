@@ -1,15 +1,15 @@
 # backfill-claims
 
-작성자: 최진호
+작성자: Weasley Open Source
 작성일: 2026-04-16
 
 ## Purpose
 
-기존 파편에 대해 ClaimExtractor를 소급 실행하여 `fragment_claims` 테이블을 채운다. Shadow mode(`MEMENTO_SYMBOLIC_SHADOW=true`) 진입 후 `MEMENTO_SYMBOLIC_EXPLAIN=true` 활성화 전에 반드시 선행해야 한다.
+기존 파편에 대해 ClaimExtractor를 소급 실행하여 `fragment_claims` 테이블을 채운다. Shadow mode(`WEASLEY_DEEPMIND_SYMBOLIC_SHADOW=true`) 진입 후 `WEASLEY_DEEPMIND_SYMBOLIC_EXPLAIN=true` 활성화 전에 반드시 선행해야 한다.
 
 - 실행 시점 이후 새로 들어오는 파편은 `RememberPostProcessor`의 8단계 hook에서 실시간 추출된다.
 - 이 스크립트는 `fragment_claims`가 비어 있는 기존 코퍼스 전용이다.
-- `MEMENTO_SYMBOLIC_ENABLED` 등 런타임 플래그와 무관하게 스크립트 자체가 동작을 결정한다.
+- `WEASLEY_DEEPMIND_SYMBOLIC_ENABLED` 등 런타임 플래그와 무관하게 스크립트 자체가 동작을 결정한다.
 
 ## CLI Options
 
@@ -39,11 +39,11 @@ DATABASE_URL    PostgreSQL 연결 문자열 (필수)
      --dry-run --verbose --limit 100
    ```
 
-2. 특정 테넌트 격리 검증: `--tenant-key mmcp_xxx --dry-run`
+2. 특정 테넌트 격리 검증: `--tenant-key wdm_xxx --dry-run`
 
    ```bash
    DATABASE_URL=postgresql://... node scripts/backfill-claims.js \
-     --tenant-key mmcp_xxx --dry-run --verbose
+     --tenant-key wdm_xxx --dry-run --verbose
    ```
 
    master 단독 처리:
@@ -60,14 +60,14 @@ DATABASE_URL    PostgreSQL 연결 문자열 (필수)
      --batch-size 500 --rate-limit-ms 200
    ```
 
-4. 진행률 확인: Prometheus 메트릭 `memento_symbolic_claim_total` 모니터링
+4. 진행률 확인: Prometheus 메트릭 `weasley_deepmind_symbolic_claim_total` 모니터링
 
 ## Prometheus Metrics
 
 | 메트릭 | 설명 |
 |--------|------|
-| `memento_symbolic_claim_total` | 누적 claim 삽입 건수 (backfill 중 실시간 증가) |
-| `memento_symbolic_gate_blocked_total{phase=cbr}` | CBR 필터에 의한 차단 건수 |
+| `weasley_deepmind_symbolic_claim_total` | 누적 claim 삽입 건수 (backfill 중 실시간 증가) |
+| `weasley_deepmind_symbolic_gate_blocked_total{phase=cbr}` | CBR 필터에 의한 차단 건수 |
 
 ## Output Summary
 

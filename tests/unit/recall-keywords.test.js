@@ -1,7 +1,7 @@
 /**
  * recall includeKeywords 옵션 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-03-28
  *
  * includeKeywords=true 시 파편 응답에 keywords 배열 포함 여부 검증.

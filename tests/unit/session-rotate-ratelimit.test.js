@@ -1,7 +1,7 @@
 /**
  * Rate-limit 헬퍼(_rotate-ratelimit.js) 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-20
  *
  * 검증 대상:
@@ -9,7 +9,7 @@
  *  2. 6번째 요청 → allowed=false, retryAfter > 0
  *  3. 윈도우 만료 후 카운터 리셋 → 다시 allowed=true
  *  4. Retry-After 헤더값이 양의 정수
- *  5. MEMENTO_ROTATE_RATE_LIMIT_PER_MIN 환경변수 오버라이드
+ *  5. WEASLEY_DEEPMIND_ROTATE_RATE_LIMIT_PER_MIN 환경변수 오버라이드
  */
 
 import { describe, it, before, beforeEach, after } from "node:test";
@@ -75,9 +75,9 @@ describe("checkRotateRateLimit", () => {
     assert.strictEqual(result.allowed, true, "윈도우 만료 후 첫 요청이 blocked됨");
   });
 
-  it("MEMENTO_ROTATE_RATE_LIMIT_PER_MIN=2 오버라이드 시 3번째 요청이 거부됨", () => {
-    const original = process.env.MEMENTO_ROTATE_RATE_LIMIT_PER_MIN;
-    process.env.MEMENTO_ROTATE_RATE_LIMIT_PER_MIN = "2";
+  it("WEASLEY_DEEPMIND_ROTATE_RATE_LIMIT_PER_MIN=2 오버라이드 시 3번째 요청이 거부됨", () => {
+    const original = process.env.WEASLEY_DEEPMIND_ROTATE_RATE_LIMIT_PER_MIN;
+    process.env.WEASLEY_DEEPMIND_ROTATE_RATE_LIMIT_PER_MIN = "2";
 
     try {
       const req = fakeReq({ ip: "10.0.0.5" });
@@ -88,9 +88,9 @@ describe("checkRotateRateLimit", () => {
       assert.ok(r3.retryAfter > 0);
     } finally {
       if (original === undefined) {
-        delete process.env.MEMENTO_ROTATE_RATE_LIMIT_PER_MIN;
+        delete process.env.WEASLEY_DEEPMIND_ROTATE_RATE_LIMIT_PER_MIN;
       } else {
-        process.env.MEMENTO_ROTATE_RATE_LIMIT_PER_MIN = original;
+        process.env.WEASLEY_DEEPMIND_ROTATE_RATE_LIMIT_PER_MIN = original;
       }
     }
   });

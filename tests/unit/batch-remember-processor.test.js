@@ -1,7 +1,7 @@
 /**
  * BatchRememberProcessor 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-05
  * 수정일: 2026-04-19 (Phase B quota 재검증, session_id 전파, 부분 할당량 케이스 추가)
  *

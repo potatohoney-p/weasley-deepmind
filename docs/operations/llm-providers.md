@@ -1,11 +1,11 @@
 # LLM Provider Fallback 운영 가이드
 
-작성자: 최진호
+작성자: Weasley Open Source
 작성일: 2026-04-16
 
 ## 개요
 
-memento-mcp는 내부 LLM 호출(AutoReflect, MorphemeIndex, ConsolidatorGC, ContradictionDetector, MemoryEvaluator)에 16개 provider fallback chain을 지원한다. 기본값은 Gemini CLI 단독 사용으로 기존 동작 완전 보존.
+weasley-deepmind는 내부 LLM 호출(AutoReflect, MorphemeIndex, ConsolidatorGC, ContradictionDetector, MemoryEvaluator)에 16개 provider fallback chain을 지원한다. 기본값은 Gemini CLI 단독 사용으로 기존 동작 완전 보존.
 
 ## 활성화
 
@@ -89,17 +89,17 @@ Prometheus 쿼리 예시:
 
 ```promql
 # provider별 성공률
-sum(rate(memento_llm_provider_calls_total{outcome="success"}[5m])) by (provider)
-  / sum(rate(memento_llm_provider_calls_total{outcome="attempt"}[5m])) by (provider)
+sum(rate(weasley_deepmind_llm_provider_calls_total{outcome="success"}[5m])) by (provider)
+  / sum(rate(weasley_deepmind_llm_provider_calls_total{outcome="attempt"}[5m])) by (provider)
 
 # fallback 발동 빈도
-rate(memento_llm_fallback_triggered_total[5m])
+rate(weasley_deepmind_llm_fallback_triggered_total[5m])
 
 # provider별 p95 레이턴시
-histogram_quantile(0.95, rate(memento_llm_provider_latency_ms_bucket[5m]))
+histogram_quantile(0.95, rate(weasley_deepmind_llm_provider_latency_ms_bucket[5m]))
 
 # 토큰 사용량
-rate(memento_llm_token_usage_total{direction="input"}[1h])
+rate(weasley_deepmind_llm_token_usage_total{direction="input"}[1h])
 ```
 
 ## 보안
@@ -221,7 +221,7 @@ OpenAICompatibleProvider를 상속하면 callText 구현이 자동으로 제공�
 POST /v1/chat/completions 호환 엔드포인트를 가진 서비스에 연결하는 경우:
 
 ```javascript
-import { OpenAICompatibleProvider } from "memento-mcp/lib/llm/providers/OpenAICompatibleProvider.js";
+import { OpenAICompatibleProvider } from "weasley-deepmind/lib/llm/providers/OpenAICompatibleProvider.js";
 
 export class MyApiProvider extends OpenAICompatibleProvider {
   constructor(config) {
@@ -237,8 +237,8 @@ export class MyApiProvider extends OpenAICompatibleProvider {
 고유 HTTP 스키마를 가진 서비스에 연결하는 경우:
 
 ```javascript
-import { LlmProvider }      from "memento-mcp/lib/llm/LlmProvider.js";
-import { fetchWithTimeout } from "memento-mcp/lib/llm/util/fetch-with-timeout.js";
+import { LlmProvider }      from "weasley-deepmind/lib/llm/LlmProvider.js";
+import { fetchWithTimeout } from "weasley-deepmind/lib/llm/util/fetch-with-timeout.js";
 
 export class MyCustomProvider extends LlmProvider {
   constructor(config) {
@@ -299,8 +299,8 @@ export class MyCustomProvider extends LlmProvider {
 
 | 변수 | 설명 |
 |-|-|
-| `MEMENTO_SPLIT_LLM_PRIMARY` | split 단계 주 provider 이름 (예: `xai`, `opencode-cli`, `gemini-cli`). 미설정 시 전역 체인 사용. |
-| `MEMENTO_SPLIT_LLM_FALLBACKS` | JSON 배열. `LLM_FALLBACKS`와 동일한 원소 형태. 예: `[{"provider":"gemini-cli"}]` |
+| `WEASLEY_DEEPMIND_SPLIT_LLM_PRIMARY` | split 단계 주 provider 이름 (예: `xai`, `opencode-cli`, `gemini-cli`). 미설정 시 전역 체인 사용. |
+| `WEASLEY_DEEPMIND_SPLIT_LLM_FALLBACKS` | JSON 배열. `LLM_FALLBACKS`와 동일한 원소 형태. 예: `[{"provider":"gemini-cli"}]` |
 
 미설정 시 `resolveSplitChainConfig()`는 `null`을 반환하고 `splitLongFragments`는 전역 체인을 그대로 사용한다.
 
@@ -321,7 +321,7 @@ export class MyCustomProvider extends LlmProvider {
 | `codex-cli` / `copilot-cli` / `qwen-cli` | 해당 CLI 바이너리가 `PATH`에 존재 | 바이너리 없음 → 체인에서 제외 |
 | API providers (`anthropic`, `openai`, …) | 엔트리에 provider API 키 | 키 없음 → 체인에서 제외 |
 
-**주의:** split 단계 체인(`MEMENTO_SPLIT_LLM_PRIMARY`/`MEMENTO_SPLIT_LLM_FALLBACKS`)이 설정됐으나 모든 provider의 의존성이 충족되지 않으면, 체인이 비어 파편마다 `no LLM provider available` 예외가 발생한다. `splitLongFragments`는 이를 파편별 catch로 처리하여 `memento_consolidate_split_skipped_total{reason="provider_error"}`를 증가시키고 `logWarn`을 남기며, `split_attempt_failed_at`을 기록하여 `failureBackoffHours` 동안 재시도를 차단한다. `provider_error` 시리즈가 지속적으로 0이 아니면 split 단계가 잘못 설정된 provider로 인해 사실상 비활성화된 것이다.
+**주의:** split 단계 체인(`WEASLEY_DEEPMIND_SPLIT_LLM_PRIMARY`/`WEASLEY_DEEPMIND_SPLIT_LLM_FALLBACKS`)이 설정됐으나 모든 provider의 의존성이 충족되지 않으면, 체인이 비어 파편마다 `no LLM provider available` 예외가 발생한다. `splitLongFragments`는 이를 파편별 catch로 처리하여 `weasley_deepmind_consolidate_split_skipped_total{reason="provider_error"}`를 증가시키고 `logWarn`을 남기며, `split_attempt_failed_at`을 기록하여 `failureBackoffHours` 동안 재시도를 차단한다. `provider_error` 시리즈가 지속적으로 0이 아니면 split 단계가 잘못 설정된 provider로 인해 사실상 비활성화된 것이다.
 
 ### 품질 게이트 설정 (`config/memory.js` → `fragmentSplit`)
 
@@ -331,7 +331,7 @@ export class MyCustomProvider extends LlmProvider {
 | `excludeMetaTopics` | `["session_reflect","consolidation","reflection"]` | 분할 제외 topic 목록 |
 | `failureBackoffHours` | 24 | 분할 실패 후 재선정 제외 시간 (무한 재분할 루프 차단) |
 
-### `memento_consolidate_split_skipped_total` 카운터
+### `weasley_deepmind_consolidate_split_skipped_total` 카운터
 
 split skip 건수를 `reason` 라벨별로 측정한다.
 

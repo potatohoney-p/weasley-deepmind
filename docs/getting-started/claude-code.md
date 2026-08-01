@@ -6,9 +6,9 @@ updated: 2026-04-20
 
 # Claude Code Configuration
 
-이 문서는 Claude Code에서 Memento MCP를 HTTP 기반 MCP 서버로 등록하는 방법을 설명한다.
+이 문서는 Claude Code에서 Weasley DeepMind를 HTTP 기반 MCP 서버로 등록하는 방법을 설명한다.
 
-- memento 서버만 직접 실행할 경우: 이 설정은 필요 없다.
+- weasley_deepmind 서버만 직접 실행할 경우: 이 설정은 필요 없다.
 - Claude Code가 `remember`, `recall`, `context` 같은 도구를 직접 쓰게 하려면: MCP 서버 등록이 필요하다.
 
 ## 핵심 주의사항
@@ -22,32 +22,32 @@ HTTP 타입 MCP 서버는 `~/.claude/settings.json`의 `mcpServers` 블록에 �
 ## 방법 A: `claude mcp add` CLI (권장)
 
 ```bash
-claude mcp add memento http://localhost:57332/mcp \
+claude mcp add weasley_deepmind http://localhost:57332/mcp \
   --transport http \
   --scope user \
-  --header "Authorization: Bearer YOUR_MEMENTO_ACCESS_KEY"
+  --header "Authorization: Bearer YOUR_WEASLEY_DEEPMIND_ACCESS_KEY"
 ```
 
 옵션 설명:
 - `--transport http` — Streamable HTTP 전송 명시 (필수, 기본값은 stdio)
-- `--scope user` — 사용자 전역 범위. 모든 프로젝트에서 동일 memento 사용 시 사용. `local`은 현재 디렉터리 한정, `project`는 `.mcp.json` 저장
+- `--scope user` — 사용자 전역 범위. 모든 프로젝트에서 동일 weasley_deepmind 사용 시 사용. `local`은 현재 디렉터리 한정, `project`는 `.mcp.json` 저장
 - `--header` — 요청 헤더 전달. access key 노출이 우려되면 환경 변수로 주입한다
 
 등록 후 확인:
 
 ```bash
 claude mcp list
-# memento: http://localhost:57332/mcp (HTTP) - ✓ Connected
+# weasley_deepmind: http://localhost:57332/mcp (HTTP) - ✓ Connected
 
-claude mcp get memento
+claude mcp get weasley_deepmind
 ```
 
-`claude mcp list`에 `memento`가 보이고 `Connected` 상태면 정상. 이후 Claude Code 세션을 재시작하면 18개 MCP 도구가 로드된다.
+`claude mcp list`에 `weasley_deepmind`가 보이고 `Connected` 상태면 정상. 이후 Claude Code 세션을 재시작하면 18개 MCP 도구가 로드된다.
 
 등록 제거:
 
 ```bash
-claude mcp remove memento --scope user
+claude mcp remove weasley_deepmind --scope user
 ```
 
 ## 방법 B: `.mcp.json` 프로젝트 단위
@@ -57,11 +57,11 @@ claude mcp remove memento --scope user
 ```json
 {
   "mcpServers": {
-    "memento": {
+    "weasley_deepmind": {
       "type": "http",
       "url": "http://localhost:57332/mcp",
       "headers": {
-        "Authorization": "Bearer YOUR_MEMENTO_ACCESS_KEY"
+        "Authorization": "Bearer YOUR_WEASLEY_DEEPMIND_ACCESS_KEY"
       }
     }
   }
@@ -110,7 +110,7 @@ access key를 커밋하지 않도록 `.gitignore`에 추가하거나 환경 변�
 
 ```powershell
 $headers = @{
-  Authorization   = "Bearer $env:MEMENTO_ACCESS_KEY"
+  Authorization   = "Bearer $env:WEASLEY_DEEPMIND_ACCESS_KEY"
   "Content-Type"  = "application/json"
   "mcp-session-id" = "test-session"
 }
@@ -130,12 +130,12 @@ Invoke-RestMethod -Method Post -Uri "http://localhost:57332/mcp" -Headers $heade
 
 ## 트러블슈팅
 
-**`claude mcp list`에 memento가 보이지 않는다**
+**`claude mcp list`에 weasley_deepmind가 보이지 않는다**
 - `settings.json`의 `mcpServers` 블록에 기재한 것은 아닌지 확인. 그 경로는 인식되지 않는다. 방법 A 또는 B를 사용한다.
-- `~/.claude.json`을 직접 열어 `mcpServers.memento` 항목이 실제 저장됐는지 확인한다.
+- `~/.claude.json`을 직접 열어 `mcpServers.weasley_deepmind` 항목이 실제 저장됐는지 확인한다.
 
 **`Connected` 대신 에러가 표시된다**
-- memento 서버가 실제 실행 중인지 확인: `curl http://localhost:57332/health` → `{"status":"healthy"}` 기대
+- weasley_deepmind 서버가 실제 실행 중인지 확인: `curl http://localhost:57332/health` → `{"status":"healthy"}` 기대
 - access key가 유효한지 확인 (Admin UI에서 재발급 또는 상태 확인)
 - 방화벽·포트포워딩 점검
 
@@ -144,7 +144,7 @@ Invoke-RestMethod -Method Post -Uri "http://localhost:57332/mcp" -Headers $heade
 - `start.sh` 래퍼로 nvm Node.js 경로를 명시하고 `.env`를 수동 로드한다:
   ```bash
   #!/bin/bash
-  cd /path/to/memento-mcp
+  cd /path/to/weasley-deepmind
   export $(grep -v '^#' .env | grep '=' | xargs)
   exec /home/USER/.nvm/versions/node/vXX.XX.X/bin/node server.js
   ```

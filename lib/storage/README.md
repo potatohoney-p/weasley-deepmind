@@ -1,6 +1,6 @@
 # lib/storage — 스토리지 어댑터 계층
 
-작성자: 최진호
+작성자: Weasley Open Source
 작성일: 2026-05-13
 
 ## 목적
@@ -29,7 +29,7 @@
 - `PgVectorStore.js` — PostgreSQL + pgvector 어댑터 (완성)
 - `SqliteVecStore.js` — SQLite + sqlite-vec 어댑터 stub (v4.1 구현 예정)
 
-## 환경변수 MEMENTO_STORAGE
+## 환경변수 WEASLEY_DEEPMIND_STORAGE
 
 | 값 | 선택 어댑터 | 상태 |
 |-|-|-|

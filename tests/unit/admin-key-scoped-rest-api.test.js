@@ -1,7 +1,7 @@
 /**
  * Admin key-scoped REST API 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-15
  *
  * 신설 엔드포인트 검증 (DB·MemoryManager는 mock):

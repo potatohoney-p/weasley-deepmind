@@ -38,7 +38,7 @@ describe("runOpenCodeCLI", () => {
     spawnMock.mock.mockImplementationOnce(() => createProcess("{\"ok\":true}"));
 
     const result = await runOpenCodeCLI("payload", {
-      cwd    : "/tmp/memento",
+      cwd    : "/tmp/weasley_deepmind",
       model  : "github-copilot/claude-sonnet-4.5",
       agent  : "general",
       variant: "high"
@@ -50,7 +50,7 @@ describe("runOpenCodeCLI", () => {
     assert.deepEqual(args, [
       "run",
       "--format", "default",
-      "--dir", "/tmp/memento",
+      "--dir", "/tmp/weasley_deepmind",
       "--pure",
       "--model", "github-copilot/claude-sonnet-4.5",
       "--agent", "general",

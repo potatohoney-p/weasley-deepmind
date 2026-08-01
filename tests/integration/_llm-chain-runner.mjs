@@ -1,7 +1,7 @@
 /**
  * LLM Chain Runner — 서브프로세스 실행 전용 스크립트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-18
  *
  * llm-chain-real.test.js 에서 child_process.spawn 으로 호출된다.

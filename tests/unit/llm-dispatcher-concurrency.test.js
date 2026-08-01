@@ -1,7 +1,7 @@
 /**
  * Unit tests: LLM Dispatcher — Provider-level Concurrency Control
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-24
  * 수정일: 2026-05-13
  *

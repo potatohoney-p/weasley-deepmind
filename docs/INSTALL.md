@@ -1,4 +1,4 @@
-﻿# 설치 가이드
+# 설치 가이드
 
 > [!TIP]
 > 직접 설치할 자신이 없다면 [AI에게 맡기기](#ai에게-맡기기) 섹션부터 보면 된다. 한 줄 프롬프트로 환경 점검·의존성·`.env`·MCP 등록·헬스 체크까지 AI가 진행한다.
@@ -17,28 +17,28 @@
 > 2. `npm install` 및 `bash setup.sh`로 의존성·.env 생성
 > 3. PostgreSQL과 Redis 미설치 시 설치 또는 Docker Compose 권장 구성 제시
 > 4. 마이그레이션(`npm run migrate`) 실행
-> 5. `node bin/memento.js health`로 헬스 체크 통과 확인
-> 6. 현재 사용 중인 AI 클라이언트(Claude Code/Cursor/Codex)의 MCP 설정에 memento-mcp 등록
-> 7. `mcp__memento__memory_stats` 호출로 동작 검증
+> 5. `node bin/weasley-deepmind.js health`로 헬스 체크 통과 확인
+> 6. 현재 사용 중인 AI 클라이언트(Claude Code/Cursor/Codex)의 MCP 설정에 weasley-deepmind 등록
+> 7. `mcp__weasley_deepmind__memory_stats` 호출로 동작 검증
 >
 > 각 단계 결과를 표로 보고하고, 실패 시 `docs/getting-started/troubleshooting.md` 참고해서 자동 복구를 시도해 줘."
 
 **기존 Claude Code 환경 통합**
 
-> "내 `~/.claude.json`에 memento-mcp MCP 서버를 추가하고 싶다. `docs/getting-started/claude-code.md`를 참고해서 다음을 진행해 줘:
+> "내 `~/.claude.json`에 weasley-deepmind MCP 서버를 추가하고 싶다. `docs/getting-started/claude-code.md`를 참고해서 다음을 진행해 줘:
 >
 > 1. 현재 `~/.claude.json` 백업
-> 2. memento-mcp 항목을 mcpServers 섹션에 추가 (URL, ACCESS_KEY)
+> 2. weasley-deepmind 항목을 mcpServers 섹션에 추가 (URL, ACCESS_KEY)
 > 3. Claude Code 재시작 안내
-> 4. 도구 목록에 mcp__memento__remember 등이 표시되는지 확인 절차 제시"
+> 4. 도구 목록에 mcp__weasley_deepmind__remember 등이 표시되는지 확인 절차 제시"
 
 ### AI가 수행할 작업 체크리스트
 
 위 프롬프트를 받은 AI가 정상적으로 처리했다면 다음이 모두 충족되어야 한다.
 
-- `.env` 파일이 생성되고 `MEMENTO_ACCESS_KEY`·`POSTGRES_*`·`REDIS_*` 키가 모두 채워져 있다
+- `.env` 파일이 생성되고 `WEASLEY_DEEPMIND_ACCESS_KEY`·`POSTGRES_*`·`REDIS_*` 키가 모두 채워져 있다
 - `npm run migrate`가 `migration-037`까지 통과한다
-- `node bin/memento.js health`가 DB/Redis/임베딩 제공자 모두 OK를 반환한다
+- `node bin/weasley-deepmind.js health`가 DB/Redis/임베딩 제공자 모두 OK를 반환한다
 - AI 클라이언트 도구 목록에 `mcp__*__remember`·`recall`·`reflect`가 노출된다
 - `memory_stats` 호출이 0건이라도 정상 응답을 반환한다
 
@@ -189,7 +189,7 @@ npm run migrate
 #    DATABASE_URL=$DATABASE_URL node scripts/backfill-embeddings.js
 
 # 4. .env 항목 확인
-#    MEMENTO_CLI_REMOTE, MEMENTO_CLI_KEY 추가 여부 검토 (원격 CLI 경유 사용 시)
+#    WEASLEY_DEEPMIND_CLI_REMOTE, WEASLEY_DEEPMIND_CLI_KEY 추가 여부 검토 (원격 CLI 경유 사용 시)
 
 # 5. 서버 재시작
 node server.js
@@ -240,7 +240,7 @@ migration-034-v2.16.0-bundle 인덱스 적용 확인:
 
 > **migration-009, 010**: co_retrieved 링크 타입이 없으면 Hebbian 링킹이 DB 제약 에러로 조용히 실패하고, ema_activation 컬럼이 없으면 incrementAccess SQL 오류가 발생한다. 반드시 실행 후 서버를 시작해야 한다.
 
-> **MEMENTO_ACCESS_KEY**: 설정하지 않으면 서버가 시작 시 경고를 출력하며 인증 없이 동작한다. 개발/테스트 환경에서 의도적으로 인증을 비활성화하려면 `.env`에 `MEMENTO_AUTH_DISABLED=true`를 추가한다.
+> **WEASLEY_DEEPMIND_ACCESS_KEY**: 설정하지 않으면 서버는 기본적으로 요청을 거부한다. 루프백 개발/테스트 환경에서 의도적으로 인증을 비활성화하려는 경우에만 `.env`에 `WEASLEY_DEEPMIND_AUTH_DISABLED=true`를 추가한다.
 
 ```bash
 # 기본 임베딩(1536차원) 사용 시: migration-007 불필요
@@ -269,7 +269,7 @@ cp .env.example.minimal .env
 
 ```bash
 cp .env.example .env
-# .env 파일에서 DATABASE_URL, MEMENTO_ACCESS_KEY 등 필수 값 입력
+# .env 파일에서 DATABASE_URL, WEASLEY_DEEPMIND_ACCESS_KEY 등 필수 값 입력
 ```
 
 추가 환경 변수:
@@ -284,9 +284,9 @@ ALLOWED_ORIGINS               - CORS 허용 Origin 목록 (쉼표 구분)
 RERANKER_MODEL                - in-process ONNX 모델 선택: minilm (기본, 영어 전용) 또는 bge-m3 (다국어, 비영어권 권장)
 LLM_PRIMARY                   - 주 LLM provider (기본: gemini-cli). gemini-cli, codex, copilot, anthropic 등
 LLM_FALLBACKS                 - JSON 배열. 각 원소: {"provider":"anthropic","apiKey":"...","model":"claude-opus-4-6"}
-MEMENTO_REMEMBER_ATOMIC       - true로 설정 시 remember() quota 체크+INSERT를 단일 트랜잭션으로 원자화 (기본: false)
-MEMENTO_CASE_BACKPROP_ENABLED - true로 설정 시 CaseRewardBackprop 활성화 — case_id 단위 reward 역전파 (기본: false)
-MEMENTO_STORAGE               - 스토리지 어댑터 선택. pgvector (기본) 지원. 추가 어댑터는 lib/storage/ 참조
+WEASLEY_DEEPMIND_REMEMBER_ATOMIC       - true로 설정 시 remember() quota 체크+INSERT를 단일 트랜잭션으로 원자화 (기본: false)
+WEASLEY_DEEPMIND_CASE_BACKPROP_ENABLED - true로 설정 시 CaseRewardBackprop 활성화 — case_id 단위 reward 역전파 (기본: false)
+WEASLEY_DEEPMIND_STORAGE               - 스토리지 어댑터 선택. pgvector (기본) 지원. 추가 어댑터는 lib/storage/ 참조
 MIGRATION_LINT_FROM           - lint:migrations가 검사를 시작하는 마이그레이션 번호 하한. 미설정 시 현존 파일 최대값+1
 ```
 
@@ -297,6 +297,13 @@ MIGRATION_LINT_FROM           - lint:migrations가 검사를 시작하는 마이
 ## 로컬 임베딩 모드 (OpenAI API 키 없는 환경)
 
 OpenAI API 키 없이 `@huggingface/transformers` 기반 로컬 모델로 임베딩을 생성할 수 있다.
+
+이 기능은 선택 의존성이다. 기본 서버 설치에서 네이티브 이미지 처리 체인을 제외하기 위해, 활성화 전에 애플리케이션 루트에서 보안 수정된 `sharp` 버전을 고정해 설치한다.
+
+```bash
+npm pkg set overrides.sharp="^0.35.3"
+npm install @huggingface/transformers
+```
 
 ### .env 설정
 
@@ -377,7 +384,7 @@ curl -s http://localhost:57332/health | jq .status
 # 불일치: EMBEDDING_DIMENSIONS 재검토 후 migration-007 재실행
 
 # 3. CLI 진단
-node bin/memento.js health
+node bin/weasley-deepmind.js health
 ```
 
 `consistency check result: PASS` 로그가 출력되면 임베딩 차원과 DB 벡터가 일치하는 상태다. `FAIL`이 출력되면 `EMBEDDING_DIMENSIONS` 설정과 실제 DB 차원 불일치 — `scripts/post-migrate-flexible-embedding-dims.js`를 재실행한 뒤 서버를 재시작한다.
@@ -388,11 +395,11 @@ node bin/memento.js health
 # 환경변수 로드 후 사용
 export $(grep -v '^#' .env | grep '=' | xargs)
 
-node bin/memento.js stats     # 파편 통계
-node bin/memento.js health    # 연결 진단
-node bin/memento.js recall "검색어" --topic my-topic --limit 5
-node bin/memento.js remember "기억할 내용" --topic my-topic --type fact
-node bin/memento.js inspect frag-xxxx
+node bin/weasley-deepmind.js stats     # 파편 통계
+node bin/weasley-deepmind.js health    # 연결 진단
+node bin/weasley-deepmind.js recall "검색어" --topic my-topic --limit 5
+node bin/weasley-deepmind.js remember "기억할 내용" --topic my-topic --type fact
+node bin/weasley-deepmind.js inspect frag-xxxx
 ```
 
 ## 서버 실행
@@ -407,7 +414,7 @@ node server.js
 
 ## 훅 기반 Context 자동 로드
 
-memento-mcp는 `initialize` 응답의 `instructions` 필드에서 AI에게 기억 도구를 적극 사용하도록 권장하지만, 이것만으로는 세션 시작 시 과거 기억이 자동으로 주입되지 않는다. Claude Code 훅을 이용하면 AI가 매 세션마다 관련 기억을 능동적으로 불러오도록 강제할 수 있다.
+weasley-deepmind는 `initialize` 응답의 `instructions` 필드에서 AI에게 기억 도구를 적극 사용하도록 권장하지만, 이것만으로는 세션 시작 시 과거 기억이 자동으로 주입되지 않는다. Claude Code 훅을 이용하면 AI가 매 세션마다 관련 기억을 능동적으로 불러오도록 강제할 수 있다.
 
 **세션 시작 시 Core Memory 자동 로드** (`~/.claude/settings.json`):
 

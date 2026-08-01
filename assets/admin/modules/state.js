@@ -1,7 +1,7 @@
 /**
- * Memento MCP Admin Console — 상태 관리 및 라우터
+ * Weasley DeepMind Admin Console — 상태 관리 및 라우터
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-07
  *
  * 순환 의존을 방지하기 위해 뷰 렌더러는 registerView()로,

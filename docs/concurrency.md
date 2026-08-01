@@ -62,10 +62,10 @@ read 경로는 write 경로와 달리 row-level lock을 사용하지 않는다. 
 
 |변수|기본|영향|
 |-|-|-|
-|`MEMENTO_REMEMBER_ATOMIC`|`false`|`true`이면 remember 경로가 atomic 트랜잭션 사용|
-|`MEMENTO_STORAGE`|`pgvector`|스토리지 어댑터 선택. `pgvector`(기본, 프로덕션) 또는 `sqlite-vec`(미구현 스텁)|
+|`WEASLEY_DEEPMIND_REMEMBER_ATOMIC`|`false`|`true`이면 remember 경로가 atomic 트랜잭션 사용|
+|`WEASLEY_DEEPMIND_STORAGE`|`pgvector`|스토리지 어댑터 선택. `pgvector`(기본, 프로덕션) 또는 `sqlite-vec`(미구현 스텁)|
 |`LLM_CONCURRENCY_ENABLED`|`true`|`false`이면 dispatcher가 semaphore 없이 chain 호출|
 |`LLM_CONCURRENCY_WAIT_MS`|`30000`|semaphore 슬롯 대기 timeout|
 |`LLM_CONCURRENCY`|JSON|chainKey 또는 provider name 기준 limit override|
 |`LLM_CHAIN_TIMEOUT_MS`|—|chain deadline. `0`이면 무제한|
-|`MEMENTO_METRICS_DEFAULT`|`on`|`off`이면 prom-client 카운터 noop (테스트 환경 권장)|
+|`WEASLEY_DEEPMIND_METRICS_DEFAULT`|`on`|`off`이면 prom-client 카운터 noop (테스트 환경 권장)|

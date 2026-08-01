@@ -1,7 +1,7 @@
 /**
  * Unit tests: redactPrompt — 민감 데이터 마스킹
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-16
  */
 
@@ -26,11 +26,11 @@ describe("redactPrompt — 민감 패턴 마스킹", () => {
     assert.ok(result.includes("****"), "마스킹 표시 포함 필요");
   });
 
-  it("mmcp_ API 키를 마스킹한다", () => {
-    const input  = "api_key=mmcp_AbCd1234Ef56";
+  it("wdm_ API 키를 마스킹한다", () => {
+    const input  = "api_key=wdm_AbCd1234Ef56";
     const result = redactPrompt(input);
-    assert.ok(!result.includes("mmcp_AbCd1234Ef56"), "mmcp_ 키가 노출되어서는 안 됨");
-    assert.ok(result.includes("mmcp_****"), "mmcp_ 마스킹 패턴 포함 필요");
+    assert.ok(!result.includes("wdm_AbCd1234Ef56"), "wdm_ 키가 노출되어서는 안 됨");
+    assert.ok(result.includes("wdm_****"), "wdm_ 마스킹 패턴 포함 필요");
   });
 
   it("sk-ant- Anthropic API 키를 마스킹한다 (EXTRA_LLM_PATTERNS)", () => {
@@ -70,9 +70,9 @@ describe("redactPrompt — 민감 패턴 마스킹", () => {
   });
 
   it("복수의 민감 패턴이 혼재할 때 모두 마스킹된다", () => {
-    const input  = "key1=mmcp_TESTKEY123 and sk-ant-api-somevalue Authorization: Bearer tok123";
+    const input  = "key1=wdm_TESTKEY123 and sk-ant-api-somevalue Authorization: Bearer tok123";
     const result = redactPrompt(input);
-    assert.ok(!result.includes("mmcp_TESTKEY123"),     "mmcp_ 키 노출 금지");
+    assert.ok(!result.includes("wdm_TESTKEY123"),     "wdm_ 키 노출 금지");
     assert.ok(!result.includes("sk-ant-api-somevalue"), "sk-ant- 키 노출 금지");
     assert.ok(!result.includes("tok123"),               "Bearer 토큰 노출 금지");
   });

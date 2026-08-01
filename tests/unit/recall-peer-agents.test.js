@@ -1,7 +1,7 @@
 /**
  * includePeerAgents 옵션 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-14
  *
  * FragmentReader의 agent 격리 필터가 includePeerAgents=true일 때만

@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Troubleshooting"
 date: 2026-03-13
 updated: 2026-04-20
@@ -89,15 +89,15 @@ netstat -ano | findstr 57332
 `/mcp` 호출 시 인증 실패
 
 원인:
-`MEMENTO_ACCESS_KEY`와 요청 헤더의 Bearer 토큰이 일치하지 않는다.
+`WEASLEY_DEEPMIND_ACCESS_KEY`와 요청 헤더의 Bearer 토큰이 일치하지 않는다.
 
 확인 방법:
-- `.env`의 `MEMENTO_ACCESS_KEY`
+- `.env`의 `WEASLEY_DEEPMIND_ACCESS_KEY`
 - 요청 헤더의 `Authorization: Bearer ...`
 
 해결 방법:
 - access key를 다시 맞춘다.
-- 인증을 비활성화하려면 `.env`에서 `MEMENTO_ACCESS_KEY`를 비워 둔다.
+- 인증을 비활성화하려면 `.env`에서 `WEASLEY_DEEPMIND_ACCESS_KEY`를 비워 둔다.
 
 ## 6. Windows quoting 문제
 
@@ -150,7 +150,7 @@ psql "$DATABASE_URL" -c "SELECT 1;"
 ## 9. `ReferenceError: Cannot access 'fragment' before initialization`
 
 문제:
-`remember` 호출 시 TDZ(Temporal Dead Zone) 에러 발생. 원격 서버(`memento.weasley-deepmind.net`)에서도 동일 증상이 보고됐다.
+`remember` 호출 시 TDZ(Temporal Dead Zone) 에러 발생. 원격 서버(`deepmind.example.com`)에서도 동일 증상이 보고됐다.
 
 원인:
 v2.10.0 이하에서 `remember()` 본문의 atomic 분기가 `fragment` 변수 선언보다 앞에 위치하는 TDZ 버그.
@@ -159,7 +159,7 @@ v2.10.0 이하에서 `remember()` 본문의 atomic 분기가 `fragment` 변수 �
 v2.10.1 이상으로 업그레이드한다. R12 핫픽스에서 해당 TDZ가 제거됐다.
 
 ```bash
-npm update memento-mcp
+npm update weasley-deepmind
 # 또는 소스 설치 시
 git pull
 npm install

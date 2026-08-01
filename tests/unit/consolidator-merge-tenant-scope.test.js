@@ -1,7 +1,7 @@
 /**
  * _mergeDuplicates 테넌트/워크스페이스 격리 회귀 가드
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-05-13
  *
  * migration-031 이후 content_hash UNIQUE 범위는 (key_id, content_hash) per-key다.

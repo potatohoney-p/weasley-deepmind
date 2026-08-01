@@ -1,5 +1,5 @@
 -- migration-030-search-param-thresholds-key-text.sql
--- 작성자: 최진호
+-- 작성자: Weasley Open Source
 -- 목적: search_param_thresholds.key_id 타입을 INTEGER에서 TEXT로 변경.
 -- 사유: fragments.key_id는 migration-027부터 TEXT(UUID). SearchParamAdaptor가
 --       런타임에서 INTEGER 캐스팅 실패로 적응형 학습 무력화. UUID 호환을 위해

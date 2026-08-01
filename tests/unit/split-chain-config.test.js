@@ -10,17 +10,17 @@ describe("resolveSplitChainConfig", () => {
     assert.equal(resolveSplitChainConfig({}), null);
   });
 
-  it("returns primary-only chain when only MEMENTO_SPLIT_LLM_PRIMARY is set", () => {
+  it("returns primary-only chain when only WEASLEY_DEEPMIND_SPLIT_LLM_PRIMARY is set", () => {
     assert.deepEqual(
-      resolveSplitChainConfig({ MEMENTO_SPLIT_LLM_PRIMARY: "xai" }),
+      resolveSplitChainConfig({ WEASLEY_DEEPMIND_SPLIT_LLM_PRIMARY: "xai" }),
       [{ provider: "xai" }]
     );
   });
 
   it("merges primary in front of fallbacks", () => {
     const env = {
-      MEMENTO_SPLIT_LLM_PRIMARY  : "opencode-cli",
-      MEMENTO_SPLIT_LLM_FALLBACKS: '[{"provider":"gemini-cli"}]'
+      WEASLEY_DEEPMIND_SPLIT_LLM_PRIMARY  : "opencode-cli",
+      WEASLEY_DEEPMIND_SPLIT_LLM_FALLBACKS: '[{"provider":"gemini-cli"}]'
     };
     assert.deepEqual(resolveSplitChainConfig(env), [
       { provider: "opencode-cli" },
@@ -29,6 +29,6 @@ describe("resolveSplitChainConfig", () => {
   });
 
   it("returns null on malformed fallbacks JSON without throwing", () => {
-    assert.equal(resolveSplitChainConfig({ MEMENTO_SPLIT_LLM_FALLBACKS: "{bad" }), null);
+    assert.equal(resolveSplitChainConfig({ WEASLEY_DEEPMIND_SPLIT_LLM_FALLBACKS: "{bad" }), null);
   });
 });

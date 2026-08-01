@@ -1,7 +1,7 @@
 /**
  * recall/context 경로 includeKeyName 배선 정적 가드
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-15
  */
 

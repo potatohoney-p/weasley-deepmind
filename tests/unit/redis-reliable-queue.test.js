@@ -1,6 +1,6 @@
 /**
  * redis-reliable-queue.test.js
- * 작성자: 최진호 / 작성일: 2026-06-19
+ * 작성자: Weasley Open Source / 작성일: 2026-06-19
  * RPOPLPUSH 기반 신뢰성 큐 헬퍼 검증 (in-memory fake redis).
  */
 import { test, describe, beforeEach, afterEach } from "node:test";

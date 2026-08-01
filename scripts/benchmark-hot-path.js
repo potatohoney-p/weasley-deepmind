@@ -2,7 +2,7 @@
 /**
  * benchmark-hot-path.js — hot path p50/p95/p99 latency 측정
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 수정일: 2026-04-20 (v2.12.0 문서 현행화 반영)
  *
  * 목적: remember/recall/link/reflect 4개 hot path의 p50/p95/p99 latency를 측정하여
@@ -48,7 +48,7 @@ Environment:
   DATABASE_URL       PostgreSQL connection string (required)
 
 Example:
-  DATABASE_URL=postgresql://user:pw@localhost:5432/memento_test \\
+  DATABASE_URL=postgresql://user:pw@localhost:5432/weasley_deepmind_test \\
     node scripts/benchmark-hot-path.js --remember 200
 `);
   process.exit(0);

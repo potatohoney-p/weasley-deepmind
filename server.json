@@ -1,0 +1,51 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.potatohoney-p/weasley-deepmind",
+  "title": "Weasley DeepMind",
+  "description": "Secure, fragment-based long-term memory for MCP-compatible AI agents.",
+  "repository": {
+    "url": "https://github.com/potatohoney-p/weasley-deepmind",
+    "source": "github"
+  },
+  "version": "1.0.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "weasley-deepmind",
+      "version": "1.0.0",
+      "runtimeHint": "npx",
+      "packageArguments": [
+        {
+          "type": "positional",
+          "value": "stdio"
+        }
+      ],
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "DATABASE_URL",
+          "description": "PostgreSQL connection URL for a database with pgvector installed.",
+          "format": "string",
+          "isRequired": true,
+          "isSecret": true
+        },
+        {
+          "name": "WEASLEY_DEEPMIND_AUTO_MIGRATE",
+          "description": "Apply pending database migrations before starting the stdio server.",
+          "format": "boolean",
+          "isRequired": false,
+          "default": "true"
+        },
+        {
+          "name": "EMBEDDING_API_KEY",
+          "description": "Optional embedding provider API key for semantic recall.",
+          "format": "string",
+          "isRequired": false,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}

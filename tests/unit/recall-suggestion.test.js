@@ -1,7 +1,7 @@
 /**
  * RecallSuggestionEngine 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-18
  *
  * 각 테스트는 독립된 pool mock을 사용하여 상태 공유를 방지한다.

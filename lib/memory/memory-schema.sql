@@ -1,11 +1,11 @@
 /**
  * Agent Memory Schema - Fragment-Based Memory System
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-02-23
  * 수정일: 2026-02-25
  *
- * 실행: psql -U postgres -d memento -f memory-schema.sql
+ * 실행: psql -U postgres -d weasley_deepmind -f memory-schema.sql
  */
 
 CREATE SCHEMA IF NOT EXISTS agent_memory;

@@ -1,11 +1,11 @@
-﻿# CLI
+# CLI
 
 ## Overview
 
-`bin/memento.js` is the CLI entry point for operating and querying the memory server directly from the terminal, without a running server instance (for most commands). When installed globally, run it as `weasley-deepmind`; the `memento-mcp` command works identically.
+`bin/weasley-deepmind.js` is the CLI entry point for operating and querying the memory server directly from the terminal, without a running server instance (for most commands). When installed globally, run it as `weasley-deepmind`; the `weasley-deepmind` command works identically.
 
 ```bash
-node bin/memento.js <command> [options]
+node bin/weasley-deepmind.js <command> [options]
 # or
 npm run cli -- <command> [options]
 ```
@@ -14,7 +14,7 @@ All commands read environment variables from the `.env` file (`DATABASE_URL`, et
 
 ```bash
 export $(grep -v '^#' .env | grep '=' | xargs)
-node bin/memento.js stats
+node bin/weasley-deepmind.js stats
 ```
 
 ---
@@ -28,8 +28,8 @@ Flags available for all subcommands.
 | `--help`, `-h` | Print detailed help for the current subcommand |
 | `--format table\|json\|csv` | Output format. Defaults to `table` in TTY, `json` when piped or redirected |
 | `--json` | Alias for `--format json` (backward compatible) |
-| `--remote URL` | Remote MCP server URL. Falls back to `MEMENTO_CLI_REMOTE` env var when not set |
-| `--key KEY` | Bearer API key for remote server authentication. Falls back to `MEMENTO_CLI_KEY` env var |
+| `--remote URL` | Remote MCP server URL. Falls back to `WEASLEY_DEEPMIND_CLI_REMOTE` env var when not set |
+| `--key KEY` | Bearer API key for remote server authentication. Falls back to `WEASLEY_DEEPMIND_CLI_KEY` env var |
 | `--timeout ms` | Remote HTTP request timeout (default: 30000ms) |
 | `--verbose` | Print stack traces on error |
 
@@ -37,8 +37,8 @@ Flags available for all subcommands.
 
 | Variable | Description |
 |----------|-------------|
-| `MEMENTO_CLI_REMOTE` | MCP server URL to use when `--remote` is not specified |
-| `MEMENTO_CLI_KEY` | API key to use when `--key` is not specified |
+| `WEASLEY_DEEPMIND_CLI_REMOTE` | MCP server URL to use when `--remote` is not specified |
+| `WEASLEY_DEEPMIND_CLI_KEY` | API key to use when `--key` is not specified |
 
 ---
 
@@ -82,7 +82,7 @@ Flags available for all subcommands.
 Start the MCP server in the foreground.
 
 ```bash
-node bin/memento.js serve
+node bin/weasley-deepmind.js serve
 # or
 npm start
 ```
@@ -92,7 +92,7 @@ Set the `PORT` environment variable to override the default port (57332).
 Help:
 
 ```bash
-node bin/memento.js serve --help
+node bin/weasley-deepmind.js serve --help
 ```
 
 ### migrate
@@ -100,7 +100,7 @@ node bin/memento.js serve --help
 Run all pending `lib/memory/migrations/migration-*.sql` files in order. Already-applied migrations are skipped.
 
 ```bash
-node bin/memento.js migrate
+node bin/weasley-deepmind.js migrate
 # or
 npm run migrate
 ```
@@ -110,7 +110,7 @@ Applied migrations are tracked in `agent_memory.schema_migrations`.
 Help:
 
 ```bash
-node bin/memento.js migrate --help
+node bin/weasley-deepmind.js migrate --help
 ```
 
 ### cleanup
@@ -118,8 +118,8 @@ node bin/memento.js migrate --help
 Delete noisy fragments that satisfy `util_score`, `importance`, and inactivity conditions.
 
 ```bash
-node bin/memento.js cleanup            # dry-run (preview only)
-node bin/memento.js cleanup --execute  # execute deletions
+node bin/weasley-deepmind.js cleanup            # dry-run (preview only)
+node bin/weasley-deepmind.js cleanup --execute  # execute deletions
 ```
 
 Alternative direct invocation:
@@ -134,7 +134,7 @@ node scripts/cleanup-noise.js --execute
 Generate embeddings for existing fragments that have none. Requires an embedding API key or a local transformers provider.
 
 ```bash
-node bin/memento.js backfill
+node bin/weasley-deepmind.js backfill
 # or
 npm run backfill:embeddings
 ```
@@ -145,19 +145,19 @@ Print fragment count, anchor count, and topic distribution.
 
 ```bash
 # TTY environment -- table format (default)
-node bin/memento.js stats
+node bin/weasley-deepmind.js stats
 
 # JSON format
-node bin/memento.js stats --format json
+node bin/weasley-deepmind.js stats --format json
 
 # CSV format
-node bin/memento.js stats --format csv
+node bin/weasley-deepmind.js stats --format csv
 
 # --json alias (same as --format json)
-node bin/memento.js stats --json
+node bin/weasley-deepmind.js stats --json
 
 # Remote server query
-node bin/memento.js stats --remote https://memento.weasley-deepmind.net/mcp --key mmcp_xxx
+node bin/weasley-deepmind.js stats --remote https://deepmind.example.com/mcp --key wdm_xxx
 ```
 
 Example output (`--format table`):
@@ -177,7 +177,7 @@ Example output (`--format json`):
 Help:
 
 ```bash
-node bin/memento.js stats --help
+node bin/weasley-deepmind.js stats --help
 ```
 
 ### health
@@ -185,8 +185,8 @@ node bin/memento.js stats --help
 Diagnose DB connectivity, Redis status, and embedding provider availability.
 
 ```bash
-node bin/memento.js health
-node bin/memento.js health --format json
+node bin/weasley-deepmind.js health
+node bin/weasley-deepmind.js health --format json
 ```
 
 ### recall
@@ -195,25 +195,25 @@ Search fragments from the terminal. Works directly against the local DB without 
 
 ```bash
 # Basic search
-node bin/memento.js recall "search query"
+node bin/weasley-deepmind.js recall "search query"
 
 # With options
-node bin/memento.js recall "nginx error" --topic my-project --limit 5
+node bin/weasley-deepmind.js recall "nginx error" --topic my-project --limit 5
 
 # Time range filter
-node bin/memento.js recall "recent entries" --time-range 2026-01-01,2026-12-31
+node bin/weasley-deepmind.js recall "recent entries" --time-range 2026-01-01,2026-12-31
 
 # Output format
-node bin/memento.js recall "query" --format table
-node bin/memento.js recall "query" --format json
-node bin/memento.js recall "query" --format csv
+node bin/weasley-deepmind.js recall "query" --format table
+node bin/weasley-deepmind.js recall "query" --format json
+node bin/weasley-deepmind.js recall "query" --format csv
 
 # Remote server
-node bin/memento.js recall "query" --remote https://memento.weasley-deepmind.net/mcp --key mmcp_xxx
+node bin/weasley-deepmind.js recall "query" --remote https://deepmind.example.com/mcp --key wdm_xxx
 
 # Via environment variables
-MEMENTO_CLI_REMOTE=https://memento.weasley-deepmind.net/mcp MEMENTO_CLI_KEY=mmcp_xxx \
-  node bin/memento.js recall "query"
+WEASLEY_DEEPMIND_CLI_REMOTE=https://deepmind.example.com/mcp WEASLEY_DEEPMIND_CLI_KEY=wdm_xxx \
+  node bin/weasley-deepmind.js recall "query"
 ```
 
 Options:
@@ -228,7 +228,7 @@ Options:
 Help:
 
 ```bash
-node bin/memento.js recall --help
+node bin/weasley-deepmind.js recall --help
 ```
 
 ### remember
@@ -237,18 +237,18 @@ Store a fragment from the terminal. Use `--remote` to store on a remote server.
 
 ```bash
 # Basic store
-node bin/memento.js remember "pg_hba.conf must be configured for remote connections" --topic infra --type fact
+node bin/weasley-deepmind.js remember "pg_hba.conf must be configured for remote connections" --topic infra --type fact
 
 # Procedure store
-node bin/memento.js remember "deployment complete" --topic deploy-2026 --type procedure
+node bin/weasley-deepmind.js remember "deployment complete" --topic deploy-2026 --type procedure
 
 # With idempotency key (prevents duplicate storage)
-node bin/memento.js remember "nginx restart, port 443 healthy" --topic infra --type fact \
+node bin/weasley-deepmind.js remember "nginx restart, port 443 healthy" --topic infra --type fact \
   --idempotency-key "infra-nginx-restart-2026-04-20"
 
 # Remote server
-node bin/memento.js remember "deployment complete" --topic deploy-2026 --type procedure \
-  --remote https://memento.weasley-deepmind.net/mcp --key mmcp_xxx
+node bin/weasley-deepmind.js remember "deployment complete" --topic deploy-2026 --type procedure \
+  --remote https://deepmind.example.com/mcp --key wdm_xxx
 ```
 
 Options:
@@ -263,7 +263,7 @@ Options:
 Help:
 
 ```bash
-node bin/memento.js remember --help
+node bin/weasley-deepmind.js remember --help
 ```
 
 ### inspect
@@ -271,38 +271,38 @@ node bin/memento.js remember --help
 Print full metadata and 1-hop links for a fragment by ID.
 
 ```bash
-node bin/memento.js inspect frag-00abc123
-node bin/memento.js inspect frag-00abc123 --format json
-node bin/memento.js inspect frag-00abc123 --format table
+node bin/weasley-deepmind.js inspect frag-00abc123
+node bin/weasley-deepmind.js inspect frag-00abc123 --format json
+node bin/weasley-deepmind.js inspect frag-00abc123 --format table
 
 # Remote server
-node bin/memento.js inspect frag-00abc123 --remote https://memento.weasley-deepmind.net/mcp --key mmcp_xxx
+node bin/weasley-deepmind.js inspect frag-00abc123 --remote https://deepmind.example.com/mcp --key wdm_xxx
 ```
 
 Help:
 
 ```bash
-node bin/memento.js inspect --help
+node bin/weasley-deepmind.js inspect --help
 ```
 
 ### session
 
-Inspects active sessions, force-closes them, or rotates their IDs. All subcommands require the master key (`MEMENTO_ACCESS_KEY`). In remote mode (`--remote` / `--key`) the CLI calls the Admin HTTP API directly.
+Inspects active sessions, force-closes them, or rotates their IDs. All subcommands require the master key (`WEASLEY_DEEPMIND_ACCESS_KEY`). In remote mode (`--remote` / `--key`) the CLI calls the Admin HTTP API directly.
 
 Four subcommands.
 
 ```bash
 # Active session list (default limit 50)
-memento-mcp session list [--limit N] [--workspace X] [--format table|json|csv]
+weasley-deepmind session list [--limit N] [--workspace X] [--format table|json|csv]
 
 # Single session detail (keyId, createdAt, lastAccessedAt, expiresAt, heartbeat)
-memento-mcp session show <sessionId>
+weasley-deepmind session show <sessionId>
 
 # Force-close a session (autoReflect included)
-memento-mcp session delete <sessionId>
+weasley-deepmind session delete <sessionId>
 
 # Rotate session ID (session fixation defense)
-memento-mcp session rotate <sessionId> [--reason "suspected_leak"]
+weasley-deepmind session rotate <sessionId> [--reason "suspected_leak"]
 ```
 
 `session rotate` rebinds only the ID while preserving the Redis-stored session state. In-progress work and memory fragments are unaffected. `reason` is up to 128 chars of audit-log text (default `explicit_rotate`).
@@ -312,7 +312,7 @@ Rotate endpoint policy:
 - HTTP: `POST /session/rotate` (body: `{ "reason": "..." }`)
 - Auth: `Authorization: Bearer <API key or master key>` plus `Mcp-Session-Id` header for target session
 - CSRF guard: `Origin` header mandatory; missing Origin returns 403
-- Rate limit: `MEMENTO_ROTATE_RATE_LIMIT_PER_MIN` per IP per minute (default 5); exceeding returns 429
+- Rate limit: `WEASLEY_DEEPMIND_ROTATE_RATE_LIMIT_PER_MIN` per IP per minute (default 5); exceeding returns 429
 - Metric: `mcp_session_rotation_total` (label: `reason`)
 
 The CLI surfaces `HTTP 429` on stderr when the rate limit is exceeded. The same limit applies to remote mode.
@@ -323,15 +323,15 @@ Example output (list, table format):
 SESSION ID                       KEY ID    WORKSPACE  CREATED              LAST ACCESSED        TTL (min)
 ----------------------------------------------------------------------------------------------------------
 aabbcc11-2233-4455-6677-8899ddee  default   paysvc     2026-04-21T10:12:03  2026-04-21T12:34:56  41520
-bbccdd22-3344-5566-7788-99aaeeff  mmcp_xx   -          2026-04-21T11:00:00  2026-04-21T12:30:00  41500
+bbccdd22-3344-5566-7788-99aaeeff  wdm_xx   -          2026-04-21T11:00:00  2026-04-21T12:30:00  41500
 ```
 
 Use `--help` to inspect subcommand-level options.
 
 ```bash
-memento-mcp session --help
-memento-mcp session list --help
-memento-mcp session rotate --help
+weasley-deepmind session --help
+weasley-deepmind session list --help
+weasley-deepmind session rotate --help
 ```
 
 ### update
@@ -339,15 +339,15 @@ memento-mcp session rotate --help
 Check for and optionally apply server updates.
 
 ```bash
-node bin/memento.js update              # dry-run: check available updates
-node bin/memento.js update --execute    # apply the update
-node bin/memento.js update --redetect   # re-detect install type, then update
+node bin/weasley-deepmind.js update              # dry-run: check available updates
+node bin/weasley-deepmind.js update --execute    # apply the update
+node bin/weasley-deepmind.js update --redetect   # re-detect install type, then update
 ```
 
 Help:
 
 ```bash
-node bin/memento.js update --help
+node bin/weasley-deepmind.js update --help
 ```
 
 ### export
@@ -355,9 +355,9 @@ node bin/memento.js update --help
 Dump fragments as JSONL (one fragment per line) for backup or migration.
 
 ```bash
-node bin/memento.js export --topic memento-mcp --type fact > out.jsonl
-node bin/memento.js export --since 2026-04-01 --output backup.jsonl
-node bin/memento.js export --key mmcp_xxx --limit 500
+node bin/weasley-deepmind.js export --topic weasley-deepmind --type fact > out.jsonl
+node bin/weasley-deepmind.js export --since 2026-04-01 --output backup.jsonl
+node bin/weasley-deepmind.js export --key wdm_xxx --limit 500
 ```
 
 Main options: `--topic`, `--type`, `--since <ISO>`, `--limit <n>`, `--output <FILE>`, `--json` (emit array).
@@ -365,7 +365,7 @@ Main options: `--topic`, `--type`, `--since <ISO>`, `--limit <n>`, `--output <FI
 Help:
 
 ```bash
-node bin/memento.js export --help
+node bin/weasley-deepmind.js export --help
 ```
 
 ### import
@@ -373,9 +373,9 @@ node bin/memento.js export --help
 Read fragments from a JSONL file or stdin and insert them into the `fragments` table.
 
 ```bash
-node bin/memento.js import --input out.jsonl
-cat out.jsonl | node bin/memento.js import
-node bin/memento.js import --input out.jsonl --idempotent --dry-run
+node bin/weasley-deepmind.js import --input out.jsonl
+cat out.jsonl | node bin/weasley-deepmind.js import
+node bin/weasley-deepmind.js import --input out.jsonl --idempotent --dry-run
 ```
 
 `--idempotent` skips inserts that collide with an existing `idempotency_key` or `id`. `--dry-run` validates only.
@@ -383,7 +383,7 @@ node bin/memento.js import --input out.jsonl --idempotent --dry-run
 Help:
 
 ```bash
-node bin/memento.js import --help
+node bin/weasley-deepmind.js import --help
 ```
 
 ### completion
@@ -391,9 +391,9 @@ node bin/memento.js import --help
 Print a bash/zsh completion script to stdout.
 
 ```bash
-node bin/memento.js completion bash >> ~/.bashrc
-node bin/memento.js completion zsh  >> ~/.zshrc
-source <(node bin/memento.js completion bash)
+node bin/weasley-deepmind.js completion bash >> ~/.bashrc
+node bin/weasley-deepmind.js completion zsh  >> ~/.zshrc
+source <(node bin/weasley-deepmind.js completion bash)
 ```
 
 Supported shells: `bash`, `zsh` (bash-compat mode).
@@ -401,7 +401,7 @@ Supported shells: `bash`, `zsh` (bash-compat mode).
 Help:
 
 ```bash
-node bin/memento.js completion --help
+node bin/weasley-deepmind.js completion --help
 ```
 
 ---
@@ -412,16 +412,16 @@ Specify `--remote` and `--key` directly, or set environment variables.
 
 ```bash
 # Direct flags
-node bin/memento.js recall "deployment history" \
-  --remote https://memento.weasley-deepmind.net/mcp \
-  --key mmcp_xxx
+node bin/weasley-deepmind.js recall "deployment history" \
+  --remote https://deepmind.example.com/mcp \
+  --key wdm_xxx
 
 # Via environment variables
-export MEMENTO_CLI_REMOTE=https://memento.weasley-deepmind.net/mcp
-export MEMENTO_CLI_KEY=mmcp_xxx
-node bin/memento.js recall "deployment history"
-node bin/memento.js stats
-node bin/memento.js remember "deployment complete" --topic deploy --type procedure
+export WEASLEY_DEEPMIND_CLI_REMOTE=https://deepmind.example.com/mcp
+export WEASLEY_DEEPMIND_CLI_KEY=wdm_xxx
+node bin/weasley-deepmind.js recall "deployment history"
+node bin/weasley-deepmind.js stats
+node bin/weasley-deepmind.js remember "deployment complete" --topic deploy --type procedure
 ```
 
 Using `--remote` with `serve`, `migrate`, `cleanup`, `backfill`, `health`, or `update` returns an error.
@@ -453,7 +453,7 @@ frag-00def456,procedure,deploy-2026,0.70,"deployment complete"
 | Script | What it runs |
 |--------|-------------|
 | `npm start` | `node server.js` (start server) |
-| `npm run cli -- <args>` | `node bin/memento.js <args>` |
+| `npm run cli -- <args>` | `node bin/weasley-deepmind.js <args>` |
 | `npm run migrate` | `node scripts/migrate.js` |
 | `npm run backfill:embeddings` | `node scripts/backfill-embeddings.js` |
 | `npm test` | node:test unit tests |

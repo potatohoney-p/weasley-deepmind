@@ -1,7 +1,7 @@
 /**
  * MorphemeIndex — 실제 LLM 체인 관통 tokenize 통합 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-18
  *
  * 실행 방법:

@@ -1,7 +1,7 @@
 /**
  * non-API-key OAuth 거부 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-17
  *
  * 검증 대상:
@@ -69,7 +69,7 @@ describe("OAuth 분기 — is_api_key=true (API 키 기반 토큰)", () => {
   it("DB API 키 유효 → valid: true, keyId 반환", () => {
     const result = simulateOAuthBranch({
       isApiKey        : true,
-      clientId        : "mmcp_test_key_1234",
+      clientId        : "wdm_test_key_1234",
       apiKeyValid     : true,
       apiKeyId        : 42,
       rejectNonApiKey : true,
@@ -85,7 +85,7 @@ describe("OAuth 분기 — is_api_key=true (API 키 기반 토큰)", () => {
   it("DB API 키 유효 → client_id 필드 없음 (keyId로 격리)", () => {
     const result = simulateOAuthBranch({
       isApiKey        : true,
-      clientId        : "mmcp_test_key_1234",
+      clientId        : "wdm_test_key_1234",
       apiKeyValid     : true,
       apiKeyId        : 7,
       rejectNonApiKey : true,
@@ -250,7 +250,7 @@ describe("OAuth 분기 — is_api_key=true + DB 조회 실패 (예외 경로)", 
      */
     const result = simulateOAuthBranch({
       isApiKey        : true,
-      clientId        : "mmcp_invalid_key",
+      clientId        : "wdm_invalid_key",
       apiKeyValid     : false,  /* DB throw → catch → apiKeyValid=false */
       apiKeyId        : null,
       rejectNonApiKey : true,

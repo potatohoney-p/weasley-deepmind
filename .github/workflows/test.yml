@@ -29,9 +29,9 @@ jobs:
       postgres:
         image: pgvector/pgvector:pg15
         env:
-          POSTGRES_DB:       memento_test
-          POSTGRES_USER:     memento
-          POSTGRES_PASSWORD: memento_test
+          POSTGRES_DB:       weasley_deepmind_test
+          POSTGRES_USER:     weasley_deepmind
+          POSTGRES_PASSWORD: weasley_deepmind_test
         ports:
           - 35433:5432
         options: >-
@@ -42,13 +42,13 @@ jobs:
     env:
       POSTGRES_HOST:      localhost
       POSTGRES_PORT:      35433
-      POSTGRES_DB:        memento_test
-      POSTGRES_USER:      memento
-      POSTGRES_PASSWORD:  memento_test
-      DATABASE_URL:       postgresql://memento:memento_test@localhost:35433/memento_test
+      POSTGRES_DB:        weasley_deepmind_test
+      POSTGRES_USER:      weasley_deepmind
+      POSTGRES_PASSWORD:  weasley_deepmind_test
+      DATABASE_URL:       postgresql://weasley_deepmind:weasley_deepmind_test@localhost:35433/weasley_deepmind_test
       REDIS_ENABLED:      "false"
       EMBEDDING_ENABLED:  "false"
-      MEMENTO_ACCESS_KEY: ci-test-key
+      WEASLEY_DEEPMIND_ACCESS_KEY: ci-test-key
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
@@ -58,7 +58,7 @@ jobs:
       - run: npm ci
       - name: Initialize schema and run migrations
         run: |
-          DB_URL="postgresql://memento:memento_test@localhost:35433/memento_test"
+          DB_URL="postgresql://weasley_deepmind:weasley_deepmind_test@localhost:35433/weasley_deepmind_test"
           psql "$DB_URL" -c "CREATE EXTENSION IF NOT EXISTS vector;"
           psql "$DB_URL" -f lib/memory/memory-schema.sql
           npm run migrate

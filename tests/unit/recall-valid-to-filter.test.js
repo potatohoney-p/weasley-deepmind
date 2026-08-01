@@ -1,7 +1,7 @@
 /**
  * recall valid_to IS NULL 기본 필터 + includeSuperseded 옵션 검증
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-03-08
  */
 

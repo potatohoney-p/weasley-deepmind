@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Quick Start"
 date: 2026-03-13
 updated: 2026-04-20
@@ -6,7 +6,7 @@ updated: 2026-04-20
 
 # Quick Start
 
-이 문서는 최소 구성으로 Memento MCP를 실행하는 경로다. 기준은 다음과 같다.
+이 문서는 최소 구성으로 Weasley DeepMind를 실행하는 경로다. 기준은 다음과 같다.
 
 - 필수: Node.js 20+, PostgreSQL, `vector` extension
 - 선택: Redis
@@ -35,14 +35,14 @@ cp .env.example.minimal .env
 ```env
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
-POSTGRES_DB=memento
+POSTGRES_DB=weasley_deepmind
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=change-me
-DATABASE_URL=postgresql://postgres:change-me@localhost:5432/memento
-MEMENTO_ACCESS_KEY=change-me
+DATABASE_URL=postgresql://postgres:change-me@localhost:5432/weasley_deepmind
+WEASLEY_DEEPMIND_ACCESS_KEY=change-me
 ```
 
-> v2.7.0부터 `MEMENTO_ACCESS_KEY`가 필수다. 개발/테스트 환경에서 인증을 비활성화하려면 `.env`에 `MEMENTO_AUTH_DISABLED=true`를 추가한다.
+> v2.7.0부터 `WEASLEY_DEEPMIND_ACCESS_KEY`가 필수다. 개발/테스트 환경에서 인증을 비활성화하려면 `.env`에 `WEASLEY_DEEPMIND_AUTH_DISABLED=true`를 추가한다.
 
 ## 3. 의존성 설치
 
@@ -91,7 +91,7 @@ node server.js
 정상 기동 시 다음과 비슷한 로그가 보인다.
 
 ```text
-Memento MCP HTTP server listening on port 57332
+Weasley DeepMind HTTP server listening on port 57332
 Streamable HTTP endpoints: POST/GET/DELETE /mcp
 Authentication: ENABLED
 ```
@@ -158,28 +158,28 @@ curl -s -X POST http://localhost:57332/mcp \
 
 ```bash
 # 서브명령별 도움말
-node bin/memento.js recall --help
-node bin/memento.js remember --help
+node bin/weasley-deepmind.js recall --help
+node bin/weasley-deepmind.js remember --help
 
 # TTY에서는 table 포맷이 기본
-node bin/memento.js stats
+node bin/weasley-deepmind.js stats
 
 # JSON 포맷 명시
-node bin/memento.js stats --format json
+node bin/weasley-deepmind.js stats --format json
 
 # idempotencyKey로 중복 저장 방지
-node bin/memento.js remember "Quick Start 완료" --topic onboarding --type fact \
+node bin/weasley-deepmind.js remember "Quick Start 완료" --topic onboarding --type fact \
   --idempotency-key "quickstart-done-2026-04-20"
 
 # 원격 서버 조회 (v2.12.0 M1)
-node bin/memento.js recall "onboarding" \
-  --remote https://memento.weasley-deepmind.net/mcp \
-  --key mmcp_xxx
+node bin/weasley-deepmind.js recall "onboarding" \
+  --remote https://deepmind.example.com/mcp \
+  --key wdm_xxx
 
 # 환경변수로 원격 설정
-export MEMENTO_CLI_REMOTE=https://memento.weasley-deepmind.net/mcp
-export MEMENTO_CLI_KEY=mmcp_xxx
-node bin/memento.js stats
+export WEASLEY_DEEPMIND_CLI_REMOTE=https://deepmind.example.com/mcp
+export WEASLEY_DEEPMIND_CLI_KEY=wdm_xxx
+node bin/weasley-deepmind.js stats
 ```
 
 상세 CLI 사용법: [docs/cli.md](../cli.md)

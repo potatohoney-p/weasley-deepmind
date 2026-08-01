@@ -1,7 +1,7 @@
 /**
  * keywords-only 쿼리 L3 시맨틱 보조 경로 검증
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-26
  *
  * text 없는 keywords 쿼리에서 L2가 놓친 content 매칭 파편을

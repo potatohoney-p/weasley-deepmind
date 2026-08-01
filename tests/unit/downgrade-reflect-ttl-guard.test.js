@@ -1,7 +1,7 @@
 /**
  * P5b 안전장치: TTL 강등 스크립트가 dryRun 기본 + 앵커 제외여야 한다.
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-16
  */
 import { test } from "node:test";

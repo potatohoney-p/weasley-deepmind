@@ -1,7 +1,7 @@
 /**
  * Lifecycle 회귀 가드 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-20
  *
  * assertCleanShutdown 헬퍼 자체의 동작과 단위 테스트 파일이
@@ -10,10 +10,10 @@
  * Case 1: 기본 import만 한 빈 테스트 — clean shutdown
  * Case 2: setInterval + unref() → unref는 event loop를 block하지 않으므로 clean
  * Case 3: setInterval + unref 없음 → assertCleanShutdown이 누수 감지 (negative case)
- * Case 4: lib/sessions.js import + after 훅 정리 → clean (CP2 MEMENTO_METRICS_DEFAULT=off 의존)
+ * Case 4: lib/sessions.js import + after 훅 정리 → clean (CP2 WEASLEY_DEEPMIND_METRICS_DEFAULT=off 의존)
  * Case 5: lib/memory/processors/ReflectProcessor.js import + after 훅 정리 → clean
  *
- * 환경: MEMENTO_METRICS_DEFAULT=off (npm test 에서 주입됨)
+ * 환경: WEASLEY_DEEPMIND_METRICS_DEFAULT=off (npm test 에서 주입됨)
  */
 
 import { describe, it, after } from "node:test";
@@ -78,7 +78,7 @@ describe("Case 3: setInterval(no unref) — 누수 감지 (negative case)", () =
 /* ── Case 4: lib/sessions.js import + after 훅 정리 ── */
 describe("Case 4: lib/sessions.js import + cleanup → clean shutdown", () => {
   /**
-   * CP2(MEMENTO_METRICS_DEFAULT=off) 적용 후 sessions.js → metrics.js 경로에서
+   * CP2(WEASLEY_DEEPMIND_METRICS_DEFAULT=off) 적용 후 sessions.js → metrics.js 경로에서
    * collectDefaultMetrics가 실행되지 않아야 한다. 만약 이 테스트가 assertCleanShutdown에서
    * Timeout handle을 감지한다면 CP2가 적용되지 않은 것이다.
    */

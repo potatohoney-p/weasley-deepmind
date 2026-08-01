@@ -1,7 +1,7 @@
 /**
  * ClaimExtractor 골든셋 정확도 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-15
  *
  * 20개 골든셋을 ClaimExtractor 로 돌려 polarity 일치율 >= 0.7 을 요구한다.

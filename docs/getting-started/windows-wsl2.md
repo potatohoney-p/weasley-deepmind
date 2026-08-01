@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Windows WSL2 Setup"
 date: 2026-03-13
 updated: 2026-04-20
@@ -40,7 +40,7 @@ Node.js는 20 이상을 사용한다. 설치 방법은 팀 표준 방식에 맞�
 ```bash
 cd ~
 git clone <repository-url>
-cd memento-mcp
+cd weasley-deepmind
 ```
 
 WSL 파일 시스템 내부 경로를 권장한다. `/mnt/c/...` 아래에서 개발하면 I/O 성능이 떨어질 수 있다.
@@ -56,11 +56,11 @@ cp .env.example.minimal .env
 ```env
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
-POSTGRES_DB=memento
+POSTGRES_DB=weasley_deepmind
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=change-me
-DATABASE_URL=postgresql://postgres:change-me@localhost:5432/memento
-MEMENTO_ACCESS_KEY=change-me
+DATABASE_URL=postgresql://postgres:change-me@localhost:5432/weasley_deepmind
+WEASLEY_DEEPMIND_ACCESS_KEY=change-me
 ```
 
 Windows 호스트의 PostgreSQL을 사용할 수도 있고, WSL 내부 PostgreSQL을 사용할 수도 있다.
@@ -83,7 +83,7 @@ node server.js
 
 ## 7. Windows와 WSL의 경계
 
-- memento 서버는 WSL 안에서 실행된다.
+- weasley_deepmind 서버는 WSL 안에서 실행된다.
 - Claude Code 설정 파일은 Windows 사용자 홈에 있을 수 있다.
 - 일반적으로 `http://localhost:57332/mcp`로 연결 가능하다.
 
@@ -111,16 +111,16 @@ WSL 환경에서는 Bash 문법으로 환경변수를 설정한다.
 
 ```bash
 # 환경변수 설정 (현재 셸)
-export MEMENTO_CLI_REMOTE=https://memento.weasley-deepmind.net/mcp
-export MEMENTO_CLI_KEY=mmcp_xxx
+export WEASLEY_DEEPMIND_CLI_REMOTE=https://deepmind.example.com/mcp
+export WEASLEY_DEEPMIND_CLI_KEY=wdm_xxx
 
 # 설정 후 CLI 사용
-node bin/memento.js stats
-node bin/memento.js recall "검색어"
+node bin/weasley-deepmind.js stats
+node bin/weasley-deepmind.js recall "검색어"
 
 # 일회성 실행
-MEMENTO_CLI_REMOTE=https://memento.weasley-deepmind.net/mcp MEMENTO_CLI_KEY=mmcp_xxx \
-  node bin/memento.js stats --format json
+WEASLEY_DEEPMIND_CLI_REMOTE=https://deepmind.example.com/mcp WEASLEY_DEEPMIND_CLI_KEY=wdm_xxx \
+  node bin/weasley-deepmind.js stats --format json
 ```
 
 WSL 안에서 실행하는 CLI는 Linux Bash 문법을 그대로 사용한다. Windows PowerShell 문법(`$env:`)은 WSL 터미널에서 사용하지 않는다.

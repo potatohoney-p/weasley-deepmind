@@ -1,4 +1,4 @@
-﻿# Configuration
+# Configuration
 
 ---
 
@@ -8,9 +8,10 @@
 
 | Variable | Default | Description |
 |----------|---------|-------------|
+| WEASLEY_DEEPMIND_HOST | 127.0.0.1 | HTTP listen address. Set `0.0.0.0` only when intentionally exposing the server through a protected network boundary (`HOST` remains a compatibility fallback) |
 | PORT | 57332 | HTTP listen port |
-| MEMENTO_ACCESS_KEY | (none) | Bearer authentication key. When unset, the server logs "Authentication: DISABLED" and processes all requests with master privileges. Set `MEMENTO_AUTH_DISABLED=true` alongside for an explicit opt-out declaration |
-| MEMENTO_AUTH_DISABLED | false | When `true`, completely disables authentication and processes all requests with master privileges. Development/testing only. Only effective when `MEMENTO_ACCESS_KEY` is unset |
+| WEASLEY_DEEPMIND_ACCESS_KEY | (none) | Bearer authentication key. When unset, requests are denied unless `WEASLEY_DEEPMIND_AUTH_DISABLED=true` is explicitly set |
+| WEASLEY_DEEPMIND_AUTH_DISABLED | false | When `true`, disables authentication for loopback-only development/testing. Startup rejects this setting on a non-loopback listener unless `WEASLEY_DEEPMIND_ACCESS_KEY` is configured |
 | SESSION_TTL_MINUTES | 43200 | Session TTL (minutes). Default 30 days. Sliding window: TTL resets on every tool call |
 | LOG_DIR | ./logs | Winston log file directory |
 | ALLOWED_ORIGINS | (none) | Allowed Origins list. Comma-separated. When unset, all Origins are allowed (MCP client compatibility takes precedence) |
@@ -42,15 +43,15 @@
 | ENABLE_RECONSOLIDATION | false | Enable ReconsolidationEngine. When true, tool_feedback and contradicts detection dynamically update fragment_links weight/confidence |
 | ENABLE_SPREADING_ACTIVATION | false | Enable SpreadingActivation. When true, the contextText parameter in recall proactively activates related fragments. Recommended to measure latency impact before enabling |
 | ENABLE_PATTERN_ABSTRACTION | false | Enable pattern abstraction. Planned for activation after sufficient data accumulation (not yet implemented) |
-| MEMENTO_REMEMBER_ATOMIC | false | When true, atomizes the quota check + INSERT in remember() into a single transaction. Sequence: BEGIN → api_keys FOR UPDATE (quota re-validation) → INSERT → COMMIT, fully eliminating TOCTOU. false (default) performs only a pre-check and is appropriate for environments with low concurrent request volume |
-| MEMENTO_CASE_BACKPROP_ENABLED | false | When true, enables CaseRewardBackprop, which back-propagates tool_feedback reward signals along case_id fragment chains. Adjust importance scores of cause fragments based on outcome quality |
-| MEMENTO_STORAGE | pgvector | Storage adapter selection. `pgvector` (default, PostgreSQL + pgvector). Additional adapters can be registered in `lib/storage/`. Changing this value requires all fragments to be re-indexed in the target backend |
-| MEMENTO_KEYWORD_SEMANTIC_FALLBACK | true | Set `false` to disable the L3 semantic supplement for keywords-only recall queries without text. When active, one embedding of the normalized keywords text runs in parallel with L2, recovering fragments whose stored keywords lack the query terms via content matching |
-| MEMENTO_KEYWORD_FALLBACK_TIMEOUT_MS | 1500 | Upper bound (ms, clamped 100-60000) for the keyword-supplement L3 run. On timeout it resolves to an empty result and leaves `L3kw:timeout` in searchPath |
-| MEMENTO_CONTEXT_ANCHOR_LIMIT | 10 | Maximum number of anchor (isAnchor) fragments always included in context responses. Clamped to 1-30; falls back to 10 on parse failure. Anchors are not trimmed by tokenBudget, so this count cap is the only injection limit |
-| MEMENTO_RECALL_MIN_SIM_FLOOR | (unset) | Opt-in floor for the adaptive similarity threshold returned by `SearchParamAdaptor.getMinSimilarity`. Example: when set to `0.45`, the returned value is clamped to at least 0.45 even if the learned value is lower. Unset preserves the existing behavior |
-| MEMENTO_MORPHEME_TOKENIZER | local | Morpheme tokenizer path. `local` (default): routes to per-language CPU analyzers — garu-ko (Korean), natural PorterStemmer (English), @node-rs/jieba (Chinese), kuromoji (Japanese). `llm`: falls back to the LLM subprocess path (`MorphemeIndex._tokenizeViaLLM()`). |
-| MEMENTO_ENABLE_KUROMOJI | true | When `false`, skips loading the kuromoji Japanese analyzer, saving ~269MB resident memory. Useful for deployments with no Japanese fragments. Synced with `config/memory.js` `morphemeIndex.enableKuromoji`. |
+| WEASLEY_DEEPMIND_REMEMBER_ATOMIC | false | When true, atomizes the quota check + INSERT in remember() into a single transaction. Sequence: BEGIN → api_keys FOR UPDATE (quota re-validation) → INSERT → COMMIT, fully eliminating TOCTOU. false (default) performs only a pre-check and is appropriate for environments with low concurrent request volume |
+| WEASLEY_DEEPMIND_CASE_BACKPROP_ENABLED | false | When true, enables CaseRewardBackprop, which back-propagates tool_feedback reward signals along case_id fragment chains. Adjust importance scores of cause fragments based on outcome quality |
+| WEASLEY_DEEPMIND_STORAGE | pgvector | Storage adapter selection. `pgvector` (default, PostgreSQL + pgvector). Additional adapters can be registered in `lib/storage/`. Changing this value requires all fragments to be re-indexed in the target backend |
+| WEASLEY_DEEPMIND_KEYWORD_SEMANTIC_FALLBACK | true | Set `false` to disable the L3 semantic supplement for keywords-only recall queries without text. When active, one embedding of the normalized keywords text runs in parallel with L2, recovering fragments whose stored keywords lack the query terms via content matching |
+| WEASLEY_DEEPMIND_KEYWORD_FALLBACK_TIMEOUT_MS | 1500 | Upper bound (ms, clamped 100-60000) for the keyword-supplement L3 run. On timeout it resolves to an empty result and leaves `L3kw:timeout` in searchPath |
+| WEASLEY_DEEPMIND_CONTEXT_ANCHOR_LIMIT | 10 | Maximum number of anchor (isAnchor) fragments always included in context responses. Clamped to 1-30; falls back to 10 on parse failure. Anchors are not trimmed by tokenBudget, so this count cap is the only injection limit |
+| WEASLEY_DEEPMIND_RECALL_MIN_SIM_FLOOR | (unset) | Opt-in floor for the adaptive similarity threshold returned by `SearchParamAdaptor.getMinSimilarity`. Example: when set to `0.45`, the returned value is clamped to at least 0.45 even if the learned value is lower. Unset preserves the existing behavior |
+| WEASLEY_DEEPMIND_MORPHEME_TOKENIZER | local | Morpheme tokenizer path. `local` (default): routes to per-language CPU analyzers — garu-ko (Korean), natural PorterStemmer (English), @node-rs/jieba (Chinese), kuromoji (Japanese). `llm`: falls back to the LLM subprocess path (`MorphemeIndex._tokenizeViaLLM()`). |
+| WEASLEY_DEEPMIND_ENABLE_KUROMOJI | true | When `false`, skips loading the kuromoji Japanese analyzer, saving ~269MB resident memory. Useful for deployments with no Japanese fragments. Synced with `config/memory.js` `morphemeIndex.enableKuromoji`. |
 
 #### Migration Linting
 
@@ -62,8 +63,8 @@
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| MEMENTO_CLI_REMOTE | (none) | Remote MCP server URL used when the CLI `--remote` flag is not specified. Example: `https://memento.weasley-deepmind.net/mcp` |
-| MEMENTO_CLI_KEY | (none) | API key for remote server authentication, used when the CLI `--key` flag is not specified |
+| WEASLEY_DEEPMIND_CLI_REMOTE | (none) | Remote MCP server URL used when the CLI `--remote` flag is not specified. Example: `https://deepmind.example.com/mcp` |
+| WEASLEY_DEEPMIND_CLI_KEY | (none) | API key for remote server authentication, used when the CLI `--key` flag is not specified |
 
 #### Symbolic Memory (opt-in)
 
@@ -71,18 +72,18 @@ All flags default to `false` / noop. For phased activation, follow the recommend
 
 | Variable | Default | Phase | Description |
 |----------|---------|-------|-------------|
-| MEMENTO_SYMBOLIC_ENABLED | false | 0 | Master kill switch for the entire symbolic subsystem |
-| MEMENTO_SYMBOLIC_SHADOW | false | 1 | Shadow mode: symbolic results are recorded but not applied |
-| MEMENTO_SYMBOLIC_CLAIM_EXTRACTION | false | 1 | Enables ClaimExtractor call in RememberPostProcessor |
-| MEMENTO_SYMBOLIC_EXPLAIN | false | 2 | Includes `explanations: [{code, detail, ruleVersion}]` field in recall response fragments (only when explanations exist) |
-| MEMENTO_SYMBOLIC_LINK_CHECK | false | 3 | Enables LinkIntegrityChecker advisory path |
-| MEMENTO_SYMBOLIC_POLARITY_CONFLICT | false | 3 | Records ClaimConflictDetector advisory warnings |
-| MEMENTO_SYMBOLIC_POLICY_RULES | false | 4 | PolicyRules soft gating — `remember` response includes `validation_warnings: string[]` (only when violations present), persisted to DB |
-| MEMENTO_SYMBOLIC_CBR_FILTER | false | 5 | Applies symbolic filter to CaseRecall |
-| MEMENTO_SYMBOLIC_PROACTIVE_GATE | false | 6 | ProactiveRecall polarity gate |
-| MEMENTO_SYMBOLIC_RULE_VERSION | v1 | - | Rule package version identifier (fragment_claims.rule_version column) |
-| MEMENTO_SYMBOLIC_TIMEOUT_MS | 50 | - | SymbolicOrchestrator single call timeout (ms) |
-| MEMENTO_SYMBOLIC_MAX_CANDIDATES | 32 | - | Candidate count cap for symbolic processing |
+| WEASLEY_DEEPMIND_SYMBOLIC_ENABLED | false | 0 | Master kill switch for the entire symbolic subsystem |
+| WEASLEY_DEEPMIND_SYMBOLIC_SHADOW | false | 1 | Shadow mode: symbolic results are recorded but not applied |
+| WEASLEY_DEEPMIND_SYMBOLIC_CLAIM_EXTRACTION | false | 1 | Enables ClaimExtractor call in RememberPostProcessor |
+| WEASLEY_DEEPMIND_SYMBOLIC_EXPLAIN | false | 2 | Includes `explanations: [{code, detail, ruleVersion}]` field in recall response fragments (only when explanations exist) |
+| WEASLEY_DEEPMIND_SYMBOLIC_LINK_CHECK | false | 3 | Enables LinkIntegrityChecker advisory path |
+| WEASLEY_DEEPMIND_SYMBOLIC_POLARITY_CONFLICT | false | 3 | Records ClaimConflictDetector advisory warnings |
+| WEASLEY_DEEPMIND_SYMBOLIC_POLICY_RULES | false | 4 | PolicyRules soft gating — `remember` response includes `validation_warnings: string[]` (only when violations present), persisted to DB |
+| WEASLEY_DEEPMIND_SYMBOLIC_CBR_FILTER | false | 5 | Applies symbolic filter to CaseRecall |
+| WEASLEY_DEEPMIND_SYMBOLIC_PROACTIVE_GATE | false | 6 | ProactiveRecall polarity gate |
+| WEASLEY_DEEPMIND_SYMBOLIC_RULE_VERSION | v1 | - | Rule package version identifier (fragment_claims.rule_version column) |
+| WEASLEY_DEEPMIND_SYMBOLIC_TIMEOUT_MS | 50 | - | SymbolicOrchestrator single call timeout (ms) |
+| WEASLEY_DEEPMIND_SYMBOLIC_MAX_CANDIDATES | 32 | - | Candidate count cap for symbolic processing |
 
 The `api_keys.symbolic_hard_gate` column (migration-033) enables per-key hard gate switching. Defaults to false. When set to true, PolicyRules violations cause the remember() call to be rejected with a JSON-RPC **protocol-level** error `-32003` (not an MCP tool error — `error.data.violations: string[]` included). Master keys (keyId=NULL) are excluded. Cache TTL is 30 seconds.
 
@@ -161,7 +162,7 @@ gemini-cli, anthropic, openai, google-gemini-api, groq, openrouter, xai, ollama,
 
 **geminiTimeoutMs**: The `morphemeIndex.geminiTimeoutMs` value in `config/memory.js` defaults to **60000ms**. In Gemini CLI and Ollama Cloud environments, response latency can reach 20-40s, so this value is set high enough to avoid "all LLM providers failed" errors.
 
-This value is passed to the `geminiCLIJson(userPrompt, { timeoutMs: cfg.geminiTimeoutMs })` call inside `MorphemeIndex._tokenizeViaLLM()`, which is invoked only when `MEMENTO_MORPHEME_TOKENIZER=llm`. With the default setting (`MEMENTO_MORPHEME_TOKENIZER=local`), the local analyzer (MorphemeTokenizer) is used and this value is not referenced. When the LLM path fails, no morphemes are extracted and the L3 morpheme search path degrades gracefully via `_fallbackTokenize`.
+This value is passed to the `geminiCLIJson(userPrompt, { timeoutMs: cfg.geminiTimeoutMs })` call inside `MorphemeIndex._tokenizeViaLLM()`, which is invoked only when `WEASLEY_DEEPMIND_MORPHEME_TOKENIZER=llm`. With the default setting (`WEASLEY_DEEPMIND_MORPHEME_TOKENIZER=local`), the local analyzer (MorphemeTokenizer) is used and this value is not referenced. When the LLM path fails, no morphemes are extracted and the L3 morpheme search path degrades gracefully via `_fallbackTokenize`.
 
 **buildChain ordering logic** (`lib/llm/index.js:38–68`): An entries array is constructed from `LLM_PRIMARY` followed by `LLM_FALLBACKS` in declaration order. A `seen` Set removes duplicate providers, and each provider's `isAvailable()` check determines whether it is included in the chain. If `LLM_PRIMARY` also appears in `LLM_FALLBACKS`, the fallback config object takes precedence. A provider that fails `isAvailable()` is excluded from the chain and the next provider is tried immediately. The resulting chain order corresponds 1:1 with the env variable declaration order.
 
@@ -202,15 +203,15 @@ POSTGRES_* prefixes take precedence over DB_* prefixes. Both formats can be mixe
 | DB_IDLE_TIMEOUT_MS | Idle connection return timeout ms. Default 30000 |
 | DB_CONN_TIMEOUT_MS | Connection acquisition timeout ms. Default 10000 |
 | DB_QUERY_TIMEOUT | Query timeout ms. Default 30000 |
-| BATCH_DATABASE_URL | (none, optional) Dedicated PostgreSQL URL for batchPool. Falls back to the primary `DATABASE_URL` when unset. batchPool handles heavy transactions (multi-row INSERTs) in a dedicated pool to prevent starvation of recall requests. Pool size is `primaryMax × 0.3` (minimum 2). `application_name='memento-mcp:batch'` is set for pg_stat_activity monitoring. Pool size and application_name are determined internally and cannot be overridden via environment variables. |
+| BATCH_DATABASE_URL | (none, optional) Dedicated PostgreSQL URL for batchPool. Falls back to the primary `DATABASE_URL` when unset. batchPool handles heavy transactions (multi-row INSERTs) in a dedicated pool to prevent starvation of recall requests. Pool size is `primaryMax × 0.3` (minimum 2). `application_name='weasley-deepmind:batch'` is set for pg_stat_activity monitoring. Pool size and application_name are determined internally and cannot be overridden via environment variables. |
 
 ### batch_remember Async Mode
 
-`batch_remember` tool requests with `async=true` are processed asynchronously through a Redis queue (`memento:batch_remember_queue`).
+`batch_remember` tool requests with `async=true` are processed asynchronously through a Redis queue (`weasley_deepmind:batch_remember_queue`).
 
 | Item | Value |
 |-|-|
-| Queue key | `memento:batch_remember_queue` |
+| Queue key | `weasley_deepmind:batch_remember_queue` |
 | Worker polling interval | 1000ms |
 | Fallback when Redis disabled | Automatically falls back to synchronous mode |
 | Automatic retry | None (no retry on queue loss) |
@@ -310,7 +311,7 @@ export const MEMORY_CONFIG = {
     intervalMs     : 5000,    // Polling interval (ms)
     retryLimit     : 3,       // Retry count on failure
     retryDelayMs   : 2000,    // Retry interval (ms)
-    queueKey       : "memento:embedding_queue"
+    queueKey       : "weasley_deepmind:embedding_queue"
   },
   contextInjection: {
     maxCoreFragments   : 15,     // Core Memory max fragment count
@@ -351,8 +352,8 @@ export const MEMORY_CONFIG = {
   semanticSearch: {
     minSimilarity  : 0.4,        // L3 pgvector search minimum similarity (default 0.4)
     limit          : 30,         // L3 max return count
-    keywordFallback: true,       // Run L3 semantic supplement for keywords-only queries without text (disable with MEMENTO_KEYWORD_SEMANTIC_FALLBACK=false)
-    keywordFallbackTimeoutMs: 1500 // Upper bound for the keyword-supplement L3 run (env MEMENTO_KEYWORD_FALLBACK_TIMEOUT_MS)
+    keywordFallback: true,       // Run L3 semantic supplement for keywords-only queries without text (disable with WEASLEY_DEEPMIND_KEYWORD_SEMANTIC_FALLBACK=false)
+    keywordFallbackTimeoutMs: 1500 // Upper bound for the keyword-supplement L3 run (env WEASLEY_DEEPMIND_KEYWORD_FALLBACK_TIMEOUT_MS)
   },
   temperatureBoost: {
     warmWindowDays     : 7,      // Apply warmBoost to fragments accessed within this window
@@ -372,14 +373,14 @@ Post-processing settings for the automatic link creation that runs immediately a
 
 | Key | ENV | Default | Description |
 |-|-|-|-|
-| `mode` | `MEMENTO_PROACTIVE_RECALL_MODE` | `"auto"` | `"auto"`: runs automatically when conditions are met. `"off"`: disabled |
-| `keywordOverlapMin` | `MEMENTO_PROACTIVE_KW_OVERLAP_MIN` | `0.5` | Minimum keyword overlap ratio. The ratio of common keywords between the stored fragment and a candidate must reach this threshold for a link to be created |
+| `mode` | `WEASLEY_DEEPMIND_PROACTIVE_RECALL_MODE` | `"auto"` | `"auto"`: runs automatically when conditions are met. `"off"`: disabled |
+| `keywordOverlapMin` | `WEASLEY_DEEPMIND_PROACTIVE_KW_OVERLAP_MIN` | `0.5` | Minimum keyword overlap ratio. The ratio of common keywords between the stored fragment and a candidate must reach this threshold for a link to be created |
 | `requireSameWorkspace` | — | `true` | Fragments from a different workspace are excluded from ProactiveRecall |
-| `caseIdPolicy` | `MEMENTO_PROACTIVE_CASE_POLICY` | `"strict-or-adjacent"` | `"both-required"`: both fragments must share the same case_id. `"strict-or-adjacent"`: same case_id or a different case within adjacencyWindowMs. `"loose"`: case_id mismatches are allowed |
+| `caseIdPolicy` | `WEASLEY_DEEPMIND_PROACTIVE_CASE_POLICY` | `"strict-or-adjacent"` | `"both-required"`: both fragments must share the same case_id. `"strict-or-adjacent"`: same case_id or a different case within adjacencyWindowMs. `"loose"`: case_id mismatches are allowed |
 | `adjacencyWindowMs` | — | `86400000` (24h) | Time window (ms) within which a different case is considered adjacent under the `"strict-or-adjacent"` policy |
 | `requireSameTopicOrType` | — | `false` | When true, only fragments sharing the same topic or type are eligible for linking |
 
-The `proactive-gate.js` symbolic gate evaluates `workspace_mismatch` and `case_policy` block reasons. Activated by `MEMENTO_SYMBOLIC_PROACTIVE_GATE=true`.
+The `proactive-gate.js` symbolic gate evaluates `workspace_mismatch` and `case_policy` block reasons. Activated by `WEASLEY_DEEPMIND_SYMBOLIC_PROACTIVE_GATE=true`.
 
 ### consolidate.schemaFit
 
@@ -390,7 +391,7 @@ Gate conditions that evaluate whether sufficient changes have accumulated before
 | `pendingCaseFragmentsMin` | `5` | Condition met when unprocessed case fragments reach this count |
 | `recentRelatedLinksMin` | `20` | Condition met when recently created related links reach this count |
 | `fragmentsSinceLastRunMin` | `30` | Condition met when new fragments since the last run reach this count |
-| `mode` | `"any"` | `"any"`: run if at least 1 of 3 conditions is met. `"all"`: run only if all 3 are met. `"off"`: disable gate (always run). ENV: `MEMENTO_CONSOLIDATE_GATE_MODE` |
+| `mode` | `"any"` | `"any"`: run if at least 1 of 3 conditions is met. `"all"`: run only if all 3 are met. `"off"`: disable gate (always run). ENV: `WEASLEY_DEEPMIND_CONSOLIDATE_GATE_MODE` |
 
 Each time the consolidateIntervalMs timer fires (default 6h = 21600000ms), this gate is evaluated. When the gate is not passed, that run cycle is skipped. `consolidateIntervalMs` is controlled by the `CONSOLIDATE_INTERVAL_MS` environment variable.
 
@@ -400,9 +401,9 @@ Individual activation flags for the 3 stages that involve LLM rewriting and can 
 
 | Key | ENV | Default | Stage | Description |
 |-|-|-|-|-|
-| `splitLongFragments` | `MEMENTO_CONSOLIDATE_SPLIT_LONG` | `true` | stage 5 | Splits long fragments into 2–3 atomic fragments. LLM determines split boundaries |
-| `detectContradictions` | `MEMENTO_CONSOLIDATE_DETECT_CONTRADICT` | `true` | stage 14 | NLI + LLM hybrid contradiction detection and contradicts link creation |
-| `compressOldFragments` | `MEMENTO_CONSOLIDATE_COMPRESS_OLD` | `false` | stage 8 | LLM-based compression summary of old fragment groups. Disabled by default |
+| `splitLongFragments` | `WEASLEY_DEEPMIND_CONSOLIDATE_SPLIT_LONG` | `true` | stage 5 | Splits long fragments into 2–3 atomic fragments. LLM determines split boundaries |
+| `detectContradictions` | `WEASLEY_DEEPMIND_CONSOLIDATE_DETECT_CONTRADICT` | `true` | stage 14 | NLI + LLM hybrid contradiction detection and contradicts link creation |
+| `compressOldFragments` | `WEASLEY_DEEPMIND_CONSOLIDATE_COMPRESS_OLD` | `false` | stage 8 | LLM-based compression summary of old fragment groups. Disabled by default |
 
 A stage with its flag set to `false` emits `status: "skipped"` and proceeds to the next stage. `compressOldFragments` defaults to `false` because it modifies original fragment content.
 
@@ -825,7 +826,7 @@ Run `npm run migrate` to execute unapplied migrations in order. History is manag
 
 Locks the session operation scope to a preset. Three configuration paths are available, applied in the following priority order:
 
-1. **Per-request header** (highest priority): `X-Memento-Mode: <preset>`
+1. **Per-request header** (highest priority): `X-Weasley DeepMind-Mode: <preset>`
 2. **initialize parameter**: `{ "method": "initialize", "params": { "mode": "<preset>" } }`
 3. **Per-key default** (admin console): `api_keys.default_mode` column (migration-034)
 

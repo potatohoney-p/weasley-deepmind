@@ -1,7 +1,7 @@
 -- migration-005-gc-columns.sql
 -- GC 정책 강화를 위한 인덱스 추가
 --
--- 작성자: 최진호
+-- 작성자: Weasley Open Source
 -- 작성일: 2026-03-07
 --
 -- 실행: psql $DATABASE_URL -f lib/memory/migration-005-gc-columns.sql

@@ -1,7 +1,7 @@
 /**
  * contradiction_pending 힌트 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-14
  *
  * buildRecallHint 우선순위(no_results > contradiction_pending > stale_results)와

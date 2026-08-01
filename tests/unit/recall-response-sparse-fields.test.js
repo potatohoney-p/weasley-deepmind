@@ -1,7 +1,7 @@
 /**
  * recall 응답 계층 sparse fields·key 필드 게이팅 정적 가드
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-16
  *
  * buildRecallResponse가 fields 최종 선택과 key_id/key_name 게이팅을 수행하고,

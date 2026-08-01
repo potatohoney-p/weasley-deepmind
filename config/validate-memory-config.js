@@ -2,7 +2,7 @@
  * MEMORY_CONFIG 런타임 검증
  * 서버 시작 시 1회 호출. 실패 시 Error throw로 프로세스 시작 중단.
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-04
  */
 

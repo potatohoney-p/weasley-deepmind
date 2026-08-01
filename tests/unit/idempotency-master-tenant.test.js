@@ -1,7 +1,7 @@
 /**
  * idempotency-master-tenant 단위 테스트 (migration-034-v2.16.0-bundle)
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-20
  *
  * 검증 항목:

@@ -1,9 +1,9 @@
-﻿/**
+/**
  * 단위 테스트: lib/cli/_mcpClient.js
  *
  * mock HTTP 서버(node:http)를 임의 포트에 띄워서 McpClient 왕복 검증.
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-20
  */
 
@@ -112,7 +112,7 @@ function createMockServer(handler) {
 describe("McpClient", () => {
   describe("URL 파싱", () => {
     it("https URL로 McpClient 인스턴스 생성 성공", () => {
-      const client = new McpClient("https://memento.weasley-deepmind.net/mcp", "key-abc");
+      const client = new McpClient("https://deepmind.example.com/mcp", "key-abc");
       assert.ok(client instanceof McpClient);
     });
 

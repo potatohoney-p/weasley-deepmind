@@ -1,7 +1,7 @@
 /**
  * MCP Origin 헤더 차단 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-17
  *
  * 검증 대상 (MCP 2025-06-18 스펙 준수 — DNS rebinding 방어):

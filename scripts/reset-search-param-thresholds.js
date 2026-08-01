@@ -1,7 +1,7 @@
 /**
  * reset-search-param-thresholds.js — P1 버그로 하향 학습된 min_similarity 리셋.
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-16
  *
  * 사용: node scripts/reset-search-param-thresholds.js [--execute]

@@ -1,7 +1,7 @@
 /**
  * E2E Test - 그룹 키 격리 회귀
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-06-09
  *
  * 동일 그룹의 다른 key_id로 저장된 파편을 graph_explore, search_traces,
@@ -24,6 +24,7 @@ const KEY_C = "00000000-0000-0000-0000-00000000cccc";
 const TOPIC = "keyiso-test";
 
 let mgr, recaller, dbOk = true;
+let createdKeyIds = [];
 
 before(async () => {
   mgr      = MemoryManager.getInstance();
@@ -36,15 +37,46 @@ before(async () => {
     dbOk = false;
     console.warn("[e2e/group-key-isolation] DB unreachable or schema missing — all tests skipped");
   }
+
+  if (!dbOk) return;
+
+  await getPrimaryPool().query(
+    "DELETE FROM agent_memory.fragments WHERE topic = $1",
+    [TOPIC]
+  );
+
+  const { rows } = await getPrimaryPool().query(
+    `INSERT INTO agent_memory.api_keys (id, name, key_hash, key_prefix)
+     VALUES ($1, $2, $3, $4), ($5, $6, $7, $8)
+     ON CONFLICT (id) DO NOTHING
+     RETURNING id`,
+    [
+      KEY_A,
+      "e2e-group-key-isolation-a",
+      "456a0cd2a9d6b8e17209a61bfe9339a69a9817eafd7a79a42d1152aef7ae211d",
+      "wdm_groupe2a_0",
+      KEY_B,
+      "e2e-group-key-isolation-b",
+      "f2bf1e3e2ad90656bc9435909ebae6ff43b532beb8bf477955bb3be93f6e975b",
+      "wdm_groupe2b_0"
+    ]
+  );
+  createdKeyIds = rows.map((row) => row.id);
 });
 
 after(async () => {
   if (!dbOk) return;
   try {
     await getPrimaryPool().query(
-      "UPDATE agent_memory.fragments SET valid_to = now() WHERE topic = $1 OR key_id = ANY($2::text[])",
-      [TOPIC, [KEY_A, KEY_B, KEY_C]]
+      "DELETE FROM agent_memory.fragments WHERE topic = $1",
+      [TOPIC]
     );
+    if (createdKeyIds.length > 0) {
+      await getPrimaryPool().query(
+        "DELETE FROM agent_memory.api_keys WHERE id = ANY($1::text[])",
+        [createdKeyIds]
+      );
+    }
   } catch (err) {
     console.warn("[e2e/group-key-isolation] teardown 실패:", err.message);
   }
@@ -58,7 +90,7 @@ after(async () => {
  */
 async function seedRcaChainUnderKey(key) {
   const err = await mgr.remember({
-    content     : "테스트 RCA 에러: 그룹 키 격리 검증용 원인 파편",
+    content     : `테스트 RCA 에러: 그룹 키 격리 검증용 원인 파편 (${key})`,
     topic       : TOPIC,
     type        : "error",
     importance  : 0.6,
@@ -66,7 +98,7 @@ async function seedRcaChainUnderKey(key) {
     _groupKeyIds: [key]
   });
   const fix = await mgr.remember({
-    content     : "테스트 RCA 해결: 그룹 키 격리 검증용 해결 파편",
+    content     : `테스트 RCA 해결: 그룹 키 격리 검증용 해결 파편 (${key})`,
     topic       : TOPIC,
     type        : "procedure",
     importance  : 0.6,
@@ -92,7 +124,7 @@ async function seedRcaChainUnderKey(key) {
 async function seedTraceUnderKey(key) {
   const caseId = "feat-keyiso-2026-06-09";
   await mgr.remember({
-    content     : "테스트 트레이스: 그룹 키 case_id 조회 검증용 파편",
+    content     : `테스트 트레이스: 그룹 키 case_id 조회 검증용 파편 (${key})`,
     topic       : TOPIC,
     type        : "fact",
     importance  : 0.6,

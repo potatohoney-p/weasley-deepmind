@@ -3,7 +3,7 @@
 -- ema_activation   : 지수 이동 평균 기반 ACT-R 기저 활성화 근사값
 -- ema_last_updated : 마지막 EMA 갱신 시각 (incrementAccess 호출 시 갱신)
 --
--- 작성자: 최진호
+-- 작성자: Weasley Open Source
 -- 작성일: 2026-03-11
 --
 -- 실행: psql $DATABASE_URL -f lib/memory/migration-010-ema-activation.sql

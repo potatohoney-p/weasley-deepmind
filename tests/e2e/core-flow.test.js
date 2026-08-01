@@ -1,15 +1,15 @@
 /**
  * E2E Test - 핵심 경로 (remember → recall → amend → forget)
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-03-29
  *
  * MemoryManager를 통한 CRUD 전체 흐름 검증.
  * node:test 내장 모듈 사용, ES Modules.
  *
  * 실행: DATABASE_URL 또는 POSTGRES_* 환경변수 필요 (docker-compose.test.yml 35433 포트)
- *   POSTGRES_HOST=localhost POSTGRES_PORT=35433 POSTGRES_DB=memento_test \
- *   POSTGRES_USER=memento POSTGRES_PASSWORD=memento_test \
+ *   POSTGRES_HOST=localhost POSTGRES_PORT=35433 POSTGRES_DB=weasley_deepmind_test \
+ *   POSTGRES_USER=weasley_deepmind POSTGRES_PASSWORD=weasley_deepmind_test \
  *   node --test tests/e2e/core-flow.test.js
  */
 

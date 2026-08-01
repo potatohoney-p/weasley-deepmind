@@ -5,7 +5,7 @@
  * 순수 함수(classifyQueryType, extractFilterKeys, buildSearchEvent)만 검증.
  * recordSearchEvent(DB 연결 필요)는 테스트하지 않는다.
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-03-25
  * 수정일: 2026-04-19 (Jest → node:test 이주)
  */

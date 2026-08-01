@@ -1,6 +1,6 @@
 # 로컬 임베딩 Provider 사용 가이드
 
-작성자: 최진호
+작성자: Weasley Open Source
 작성일: 2026-04-18
 수정일: 2026-04-29
 
@@ -14,7 +14,14 @@
 - 인터넷 접속이 차단된 네트워크 격리 환경 (초기 모델 다운로드 후 오프라인 동작 가능)
 - 메모리 내용이 외부 API 서버에 전송되지 않아야 하는 개인정보 보호 요건
 
-Reranker 및 NLIClassifier와 동일한 transformers.js ONNX 스택을 재사용하므로 추가 의존성 설치가 불필요하다.
+로컬 모델은 선택 기능이다. 기본 MCP 설치가 불필요한 네이티브 이미지 처리 의존성을 포함하지 않도록 transformers.js를 기본 패키지에서 분리했다. 사용 전에 애플리케이션 루트에서 아래와 같이 보안 수정된 `sharp` 버전을 고정하고 선택 의존성을 설치한다.
+
+```bash
+npm pkg set overrides.sharp="^0.35.3"
+npm install @huggingface/transformers
+```
+
+Reranker 및 NLIClassifier도 설치된 transformers.js ONNX 스택을 재사용한다.
 
 ---
 
@@ -120,13 +127,13 @@ node server.js
 - 캐시 경로 지정을 권장한다:
 
 ```
-HF_HOME=/var/lib/memento/huggingface
+HF_HOME=/var/lib/weasley_deepmind/huggingface
 ```
 
 - Docker 배포 시 볼륨 마운트 예:
 
 ```
--v /var/lib/memento/huggingface:/root/.cache/huggingface
+-v /var/lib/weasley_deepmind/huggingface:/root/.cache/huggingface
 ```
 
 - CPU 기준 임베딩 지연시간 (Q8 quantized):

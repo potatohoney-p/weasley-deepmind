@@ -1,7 +1,7 @@
 /**
  * KeyNameEnricher 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-15
  *
  * attachKeyNames 순수 매핑 로직 검증: 행 매칭, 미매칭 파편 보존, key_name null 처리.

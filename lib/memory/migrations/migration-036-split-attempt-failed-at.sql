@@ -1,6 +1,6 @@
 -- migration-036-split-attempt-failed-at.sql
 --
--- 작성자: 최진호
+-- 작성자: Weasley Open Source
 -- 작성일: 2026-06-09
 --
 -- 목적: 분할 실패 backoff 컬럼 추가.

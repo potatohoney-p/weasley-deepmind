@@ -1,7 +1,7 @@
 /**
  * P1 회귀 방지: rrfSearch.candidateMinImportance 정책값이 명시적으로 존재해야 한다.
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-16
  */
 import { test } from "node:test";

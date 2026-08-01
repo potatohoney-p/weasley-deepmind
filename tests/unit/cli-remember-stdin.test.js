@@ -1,7 +1,7 @@
 /**
  * M2: CLI stdin 파이프 — remember.js stdin 경로 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-20
  */
 

@@ -1,7 +1,7 @@
 /**
  * 단위 테스트 lifecycle 헬퍼
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-20
  *
  * 테스트 종료 후 active handle/request 누수를 검출하는 헬퍼를 제공한다.
@@ -57,7 +57,7 @@ export function defaultIgnore() {
      * 약간 지연되어 process._getActiveHandles()에 잠시 남는 경우가 있다. 이 잔류는
      * event loop를 유지하지 않으며(커넥션이 graceful close 중) node:test가 대기하는
      * "Promise resolution still pending" hang과 무관하다. prom-client default metrics
-     * timer(MEMENTO_METRICS_DEFAULT=off로 이미 차단)가 유일한 hang 원인이었음을 확인.
+     * timer(WEASLEY_DEEPMIND_METRICS_DEFAULT=off로 이미 차단)가 유일한 hang 원인이었음을 확인.
      */
     "Socket",
     "TCPSocketWrap",
@@ -165,7 +165,7 @@ export async function assertCleanShutdown({
     "",
     "Handle 누수가 감지됐습니다. 해당 모듈의 after 훅에서 timer/socket을 정리하세요.",
     "신규 timer를 만드는 import가 있다면 tests/_lifecycle.js ignoreNames에 등록하거나",
-    "MEMENTO_METRICS_DEFAULT=off 환경변수가 설정돼 있는지 확인하세요.",
+    "WEASLEY_DEEPMIND_METRICS_DEFAULT=off 환경변수가 설정돼 있는지 확인하세요.",
   );
 
   throw new Error(lines.join("\n"));

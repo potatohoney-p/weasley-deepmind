@@ -1,11 +1,15 @@
 # Architecture
 
-작성자: 최진호
-수정일: 2026-06-16
-
 ## 시스템 구조
 
-![시스템 아키텍처](../assets/images/memento_architecture.svg)
+```mermaid
+flowchart LR
+    Client["MCP client"] --> Gateway["HTTP / OAuth gateway"]
+    Gateway --> Tools["Memory tools"]
+    Tools --> Store["PostgreSQL + pgvector"]
+    Tools --> Cache["Optional Redis cache"]
+    Tools --> Models["Optional embedding / LLM providers"]
+```
 
 ```
 server.js  (HTTP 서버)
@@ -55,8 +59,8 @@ server.js  (HTTP 서버)
             │   ├── FragmentStore.js      PostgreSQL CRUD 파사드 (FragmentReader + FragmentWriter 위임)
             │   ├── RememberPostProcessor.js remember() 후처리 파이프라인 (임베딩/형태소/링크/assertion/시간링크/평가큐/ProactiveRecall 포함)
             │   ├── ConflictResolver.js   충돌 감지, supersede, autoLinkOnRemember(topic 기반 구조적 링킹)
-            │   ├── BatchRememberProcessor.js batchRemember() 로직 전담. Phase A(검증)→B(INSERT)→C(후처리) 3단계. `async: true` 파라미터로 비동기 opt-in 가능: 선검증 후 Redis 큐(`memento:batch_remember_queue`)에 job을 적재하고 즉시 반환. Redis 미설정 시 동기 경로 폴백. 워커(BatchRememberWorker)가 기존 INSERT 경로로 소비
-            │   └── BatchRememberWorker.js batch_remember 비동기 큐 워커. `memento:batch_remember_queue` Redis 큐 폴링 → BatchRememberProcessor 동기 경로로 실행. `getBatchRememberWorker()` 싱글톤 팩토리. server.js `gracefulShutdown`에서 `stop()` drain 대기로 안전 종료
+            │   ├── BatchRememberProcessor.js batchRemember() 로직 전담. Phase A(검증)→B(INSERT)→C(후처리) 3단계. `async: true` 파라미터로 비동기 opt-in 가능: 선검증 후 Redis 큐(`weasley_deepmind:batch_remember_queue`)에 job을 적재하고 즉시 반환. Redis 미설정 시 동기 경로 폴백. 워커(BatchRememberWorker)가 기존 INSERT 경로로 소비
+            │   └── BatchRememberWorker.js batch_remember 비동기 큐 워커. `weasley_deepmind:batch_remember_queue` Redis 큐 폴링 → BatchRememberProcessor 동기 경로로 실행. `getBatchRememberWorker()` 싱글톤 팩토리. server.js `gracefulShutdown`에서 `stop()` drain 대기로 안전 종료
             ├── link/                     링크 레이어 모듈
             │   ├── ReconsolidationEngine.js fragment_links weight/confidence 동적 갱신 엔진 (reinforce/decay/quarantine/restore/soft_delete + 이력 기록)
             │   ├── GraphLinker.js        임베딩 완료 이벤트 구독 자동 관계 생성 + 소급 링킹 + Hebbian co-retrieval 링킹
@@ -77,10 +81,10 @@ server.js  (HTTP 서버)
             │   ├── EmbeddingWorker.js    Redis 큐 기반 비동기 임베딩 생성 워커 (EventEmitter)
             │   ├── EmbeddingCache.js     쿼리 임베딩 Redis 캐시 (emb:q:{sha256} 키, TTL 1시간, 장애 격리)
             │   ├── MorphemeIndex.js      형태소 기반 L3 폴백 인덱스
-            │   └── MorphemeTokenizer.js  로컬 CPU 형태소 분석기. 유니코드 스크립트 런 분할 후 언어별 라우팅: 한글 garu-ko(filterHangulMorphemes 조사·어미·단음절 필터), 영어 natural PorterStemmer, 중국어 @node-rs/jieba, 일본어 kuromoji(enableKuromoji=false 시 생략). MorphemeIndex.tokenize()가 위임하며 기본 경로(MEMENTO_MORPHEME_TOKENIZER=local)에서 LLM 서브프로세스를 대체한다. 벤치마크: 1.06ms/call, 상주 RSS +28.9MB.
+            │   └── MorphemeTokenizer.js  로컬 CPU 형태소 분석기. 유니코드 스크립트 런 분할 후 언어별 라우팅: 한글 garu-ko(filterHangulMorphemes 조사·어미·단음절 필터), 영어 natural PorterStemmer, 중국어 @node-rs/jieba, 일본어 kuromoji(enableKuromoji=false 시 생략). MorphemeIndex.tokenize()가 위임하며 기본 경로(WEASLEY_DEEPMIND_MORPHEME_TOKENIZER=local)에서 LLM 서브프로세스를 대체한다. 벤치마크: 1.06ms/call, 상주 RSS +28.9MB.
             ├── signals/                  신호 레이어 모듈
             │   ├── SpreadingActivation.js contextText 기반 비동기 활성화 전파 (ACT-R 모델, keywords GIN seed → 1-hop 그래프 확산, 10분 TTL 캐시)
-            │   ├── CaseRewardBackprop.js  case verification 이벤트 → 증거 파편 importance 원자적 역전파. MEMENTO_CASE_BACKPROP_ENABLED 환경변수 미설정 시 즉시 반환
+            │   ├── CaseRewardBackprop.js  case verification 이벤트 → 증거 파편 importance 원자적 역전파. WEASLEY_DEEPMIND_CASE_BACKPROP_ENABLED 환경변수 미설정 시 즉시 반환
             │   ├── NLIClassifier.js       NLI 기반 모순 분류기 (mDeBERTa ONNX, CPU)
             │   ├── MemoryEvaluator.js     비동기 Gemini CLI 품질 평가 워커 (싱글턴)
             │   ├── SearchMetrics.js       L1/L2/L3/total 레이어별 지연 시간 수집 (Redis 원형 버퍼, P50/P90/P99)
@@ -100,15 +104,15 @@ server.js  (HTTP 서버)
 
 ```
 lib/
-├── config.js          환경변수를 상수로 노출. AUTH_DISABLED(MEMENTO_AUTH_DISABLED), OAUTH_TOKEN_TTL_SECONDS, OAUTH_REFRESH_TTL_SECONDS, ENABLE_OPENAPI, SSE_HEARTBEAT_INTERVAL_MS 포함
-├── auth.js            Bearer 토큰 검증. `validateAuthentication(req, msg)` — 실제 진입점. `MEMENTO_ACCESS_KEY` 미설정 시 모든 요청을 master 권한으로 통과시킨다. `resolveAuthConfig(accessKey, authDisabled)` — 인증 설정 해석 순수 함수. `buildAuthDecision(accessKey, authDisabled, bearerToken)` — 테스트 대상 순수 함수 (OAuth/DB API 키 검증 제외)
+├── config.js          환경변수를 상수로 노출. AUTH_DISABLED(WEASLEY_DEEPMIND_AUTH_DISABLED), OAUTH_TOKEN_TTL_SECONDS, OAUTH_REFRESH_TTL_SECONDS, ENABLE_OPENAPI, SSE_HEARTBEAT_INTERVAL_MS 포함
+├── auth.js            Bearer 토큰 검증. `validateAuthentication(req, msg)` — 실제 진입점. `WEASLEY_DEEPMIND_ACCESS_KEY` 미설정 시 로컬 개발용 `WEASLEY_DEEPMIND_AUTH_DISABLED=true`를 명시하지 않는 한 요청을 거부한다. `resolveAuthConfig(accessKey, authDisabled)` — 인증 설정 해석 순수 함수. `buildAuthDecision(accessKey, authDisabled, bearerToken)` — 테스트 대상 순수 함수 (OAuth/DB API 키 검증 제외)
 ├── oauth.js           OAuth 2.0 PKCE 인가/토큰 처리
 ├── sessions.js        Streamable/Legacy SSE 세션 생명주기
 ├── redis.js           ioredis 클라이언트 (Sentinel 지원)
 ├── gemini.js          Google Gemini API/CLI 클라이언트 (geminiCLIJson, isGeminiCLIAvailable)
 ├── compression.js     응답 압축 (gzip/deflate)
-├── metrics.js         Prometheus 메트릭 수집 (prom-client). 거부 경로 전용 카운터 4종: `memento_auth_denied_total{reason}` (인증 거부), `memento_cors_denied_total{reason}` (CORS 거부), `memento_rbac_denied_total{tool,reason}` (RBAC 거부), `memento_tenant_isolation_blocked_total{component}` (테넌트 격리 차단)
-├── logger.js          Winston 로거 (daily rotate). REDACT_PATTERNS 기반 redactor format: Authorization Bearer 토큰, mmcp_ API 키, mmcp_session 쿠키, OAuth code/refresh_token/access_token 자동 마스킹 (6개 패턴). content 필드 200자 초과 시 head 50 + tail 50 트리밍
+├── metrics.js         Prometheus 메트릭 수집 (prom-client). 거부 경로 전용 카운터 4종: `weasley_deepmind_auth_denied_total{reason}` (인증 거부), `weasley_deepmind_cors_denied_total{reason}` (CORS 거부), `weasley_deepmind_rbac_denied_total{tool,reason}` (RBAC 거부), `weasley_deepmind_tenant_isolation_blocked_total{component}` (테넌트 격리 차단)
+├── logger.js          Winston 로거 (daily rotate). REDACT_PATTERNS 기반 redactor format: Authorization Bearer 토큰, wdm_ API 키, wdm_session 쿠키, OAuth code/refresh_token/access_token 자동 마스킹 (6개 패턴). content 필드 200자 초과 시 head 50 + tail 50 트리밍
 ├── openapi.js         OpenAPI 3.1.0 스펙 생성기. `ENABLE_OPENAPI=true` 시 `GET /openapi.json` 활성화. 인증 레벨 기반 도구 목록 필터: master key → 전체 경로(Admin REST API 포함), API key → permissions 기반 도구 목록
 ├── rate-limiter.js    IP 기반 sliding window rate limiter
 ├── rbac.js            RBAC 권한 검사 (read/write/admin 도구 레벨 권한 적용)
@@ -150,7 +154,7 @@ lib/logging/
 
 ```
 lib/storage/
-├── index.js         getStorage() 팩토리 싱글톤. MEMENTO_STORAGE 환경변수로 어댑터 선택
+├── index.js         getStorage() 팩토리 싱글톤. WEASLEY_DEEPMIND_STORAGE 환경변수로 어댑터 선택
 │                    pgvector(기본) → PgVectorStore / sqlite-vec → SqliteVecStore
 │                    알 수 없는 값은 경고 없이 pgvector로 폴백
 ├── PgVectorStore.js PostgreSQL + pgvector 어댑터. lib/tools/db.js의 getPrimaryPool()과
@@ -184,7 +188,7 @@ CLI 진입점과 서브커맨드는 `bin/` 및 `lib/cli/`에 분리되어 있다
 
 ```
 bin/
-└── memento.js          CLI 진입점
+└── weasley_deepmind.js          CLI 진입점
 
 lib/cli/
 ├── parseArgs.js        인자 파서
@@ -436,7 +440,7 @@ erDiagram
 | valid_to | TIMESTAMPTZ | | Temporal 유효 구간 종료. NULL이면 현재 유효 파편 |
 | superseded_by | TEXT | | 이 파편을 대체한 파편의 ID |
 | last_decay_at | TIMESTAMPTZ | | 마지막 감쇠 적용 시각. NULL이면 accessed_at/created_at 기준으로 보정 |
-| key_id | TEXT | FK → api_keys.id, ON DELETE SET NULL | API 키 기반 기억 격리. NULL이면 마스터 키(MEMENTO_ACCESS_KEY)로 저장된 기억. 값이 있으면 해당 API 키로만 조회 가능 |
+| key_id | TEXT | FK → api_keys.id, ON DELETE SET NULL | API 키 기반 기억 격리. NULL이면 마스터 키(WEASLEY_DEEPMIND_ACCESS_KEY)로 저장된 기억. 값이 있으면 해당 API 키로만 조회 가능 |
 | ema_activation | FLOAT | DEFAULT 0.0 | ACT-R 기저 활성화 EMA 근사값. `incrementAccess()` 호출 시 `α * (Δt_sec)^{-0.5} + (1-α) * prev` 수식으로 갱신(α=0.3). L1 fallback 경로에서는 갱신되지 않음(noEma=true). `_computeRankScore()`에서 importance 부스트로 활용 |
 | ema_last_updated | TIMESTAMPTZ | | EMA 마지막 갱신 시각. NULL이면 created_at 기준으로 보정 |
 | quality_verified | BOOLEAN | DEFAULT NULL | MemoryEvaluator 품질 판정 결과. NULL=미평가, TRUE=keep(검증됨), FALSE=downgrade/discard(부정). permanent 승격 Circuit Breaker에 사용됨 |
@@ -598,9 +602,9 @@ CREATE POLICY fragment_isolation_policy ON agent_memory.fragments
 
 ### API 키 기반 기억 격리
 
-`key_id` 컬럼을 통해 API 키 단위의 추가 격리 레이어를 지원한다. 마스터 키(`MEMENTO_ACCESS_KEY`)로 접속한 요청이 저장한 파편은 `key_id = NULL`이며 마스터 키로만 조회 가능하다. DB에 발급된 API 키로 접속한 요청이 저장한 파편은 `key_id = <해당 키 ID>`로 기록되며 그 키만 조회할 수 있다.
+`key_id` 컬럼을 통해 API 키 단위의 추가 격리 레이어를 지원한다. 마스터 키(`WEASLEY_DEEPMIND_ACCESS_KEY`)로 접속한 요청이 저장한 파편은 `key_id = NULL`이며 마스터 키로만 조회 가능하다. DB에 발급된 API 키로 접속한 요청이 저장한 파편은 `key_id = <해당 키 ID>`로 기록되며 그 키만 조회할 수 있다.
 
-이 격리 모델은 다중 에이전트 환경에서 키 단위 메모리 파티셔닝을 구현한다. API 키는 Admin SPA(`/v1/internal/model/nothing`)에서 관리하며, 생성 시 원시 키(`mmcp_<slug>_<32 hex>`)는 응답에서 단 1회만 반환되고 DB에는 SHA-256 해시만 저장된다.
+이 격리 모델은 다중 에이전트 환경에서 키 단위 메모리 파티셔닝을 구현한다. API 키는 Admin SPA(`/v1/internal/model/nothing`)에서 관리하며, 생성 시 원시 키(`wdm_<slug>_<32 hex>`)는 응답에서 단 1회만 반환되고 DB에는 SHA-256 해시만 저장된다.
 
 ### workspace 기반 기억 격리
 
@@ -615,7 +619,7 @@ CREATE POLICY fragment_isolation_policy ON agent_memory.fragments
 **설정 방법**: Admin SPA의 키 편집 화면에서 `default_workspace`를 설정하거나, `PATCH /v1/internal/model/nothing/keys/:id/workspace`로 변경한다.
 
 **사용 시나리오**:
-- 개발자가 여러 프로젝트를 같은 Claude Code 세션에서 전환할 때 (`workspace: "memento-mcp"`, `workspace: "docs-mcp"`)
+- 개발자가 여러 프로젝트를 같은 Claude Code 세션에서 전환할 때 (`workspace: "weasley-deepmind"`, `workspace: "docs-mcp"`)
 - 동일 에이전트가 업무/개인 기억을 분리할 때 (`workspace: "work"`, `workspace: "personal"`)
 - 프리랜서가 클라이언트별 기억을 격리할 때 (`workspace: "client-acme"`, `workspace: "client-xyz"`)
 
@@ -657,7 +661,7 @@ MCP 클라이언트는 RFC 8414/RFC 7591/RFC 7636 기반 OAuth 2.0 흐름으로 
    → lib/auth.js → validateAuthentication()이 토큰 검증 후 keyId 추출
 ```
 
-- **API 키를 OAuth client_id로 사용**: `mmcp_` 접두사 키를 `client_id`로 전달하면 DCR 없이 직접 authorization_code 흐름 진입 가능
+- **API 키를 OAuth client_id로 사용**: `wdm_` 접두사 키를 `client_id`로 전달하면 DCR 없이 직접 authorization_code 흐름 진입 가능
 - **세션 자동 복구**: "Session not found" 오류 발생 시 서버가 재인증 후 keyId/groupKeyIds를 보존하여 새 세션을 자동 생성한다
 - **구현 파일**: `lib/oauth.js`, `lib/admin/OAuthClientStore.js`
 
@@ -763,7 +767,16 @@ Admin REST 엔드포인트:
 
 recall 도구는 비용이 낮은 계층부터 순서대로 검색한다. 앞 계층에서 충분한 결과가 나오면 뒤 계층은 실행하지 않는다.
 
-![검색 흐름](../assets/images/retrieval_flow.svg)
+```mermaid
+flowchart LR
+    Query["Recall query"] --> L1["L1 Redis keywords"]
+    Query --> L2["L2 PostgreSQL GIN"]
+    Query --> L3["L3 pgvector HNSW"]
+    L1 --> Merge["RRF merge + temporal ranking"]
+    L2 --> Merge
+    L3 --> Merge
+    Merge --> Budget["Token-budgeted result"]
+```
 
 **L1: Redis Set 교집합.** 파편이 저장될 때마다 FragmentIndex가 각 키워드를 Redis Set의 키로 사용하여 파편 ID를 저장한다. `keywords:database`라는 Set에는 database를 키워드로 가진 모든 파편의 ID가 들어 있다. 다중 키워드 검색은 여러 Set의 SINTER 연산이다. 교집합 연산의 시간 복잡도는 O(N·K), N은 가장 작은 Set의 크기, K는 키워드 수다. Redis가 인메모리로 처리하므로 수 밀리초 안에 완료된다. L1 결과는 이후 단계에서 L2 결과와 병합된다.
 
@@ -793,7 +806,15 @@ recall에 `includeLinks: true`(기본값)가 설정되어 있으면 결과 파�
 
 파편은 사용 빈도에 따라 hot, warm, cold, permanent 네 개의 티어를 이동한다. MemoryConsolidator가 주기적으로 강등/승격을 처리한다. 다시 참조되면 hot으로 복귀한다.
 
-![파편 생명주기](../assets/images/fragment_lifecycle.svg)
+```mermaid
+stateDiagram-v2
+    [*] --> hot
+    hot --> warm: inactivity
+    warm --> cold: inactivity
+    cold --> hot: recalled
+    hot --> permanent: anchored
+    warm --> permanent: anchored
+```
 
 | Tier | 설명 |
 |------|------|
@@ -862,7 +883,7 @@ recall 도구에 `caseMode: true`를 전달하면 CaseRecall 경로가 활성화
 
 ### CaseRewardBackprop
 
-`lib/memory/signals/CaseRewardBackprop.js`. case_events에 `verification_passed` 또는 `verification_failed` 이벤트가 삽입될 때 fragment_evidence를 통해 증거 파편의 importance를 원자적으로 역전파한다. `MEMENTO_CASE_BACKPROP_ENABLED` 환경변수가 `"true"`가 아니면 호출 즉시 반환된다.
+`lib/memory/signals/CaseRewardBackprop.js`. case_events에 `verification_passed` 또는 `verification_failed` 이벤트가 삽입될 때 fragment_evidence를 통해 증거 파편의 importance를 원자적으로 역전파한다. `WEASLEY_DEEPMIND_CASE_BACKPROP_ENABLED` 환경변수가 `"true"`가 아니면 호출 즉시 반환된다.
 
 - `verification_passed` → 증거 파편 `importance += 0.15` (상한 1.0 클램프)
 - `verification_failed` → 증거 파편 `importance -= 0.10` (하한 0.0 클램프)
@@ -983,10 +1004,10 @@ Rule files (`lib/symbolic/rules/v1/`): `explain.js`, `link-integrity.js`, `claim
 ### Observability
 
 Prometheus 메트릭 4종 (label: `rule`, `phase`):
-- `memento_symbolic_claim_extracted_total` — ClaimExtractor 추출 건수
-- `memento_symbolic_warning_total` — advisory warning 생성 건수
-- `memento_symbolic_gate_blocked_total{phase}` — phase별 block 건수 (phase=cbr|proactive 등)
-- `memento_symbolic_op_latency_ms` — orchestrator 호출 latency histogram
+- `weasley_deepmind_symbolic_claim_extracted_total` — ClaimExtractor 추출 건수
+- `weasley_deepmind_symbolic_warning_total` — advisory warning 생성 건수
+- `weasley_deepmind_symbolic_gate_blocked_total{phase}` — phase별 block 건수 (phase=cbr|proactive 등)
+- `weasley_deepmind_symbolic_op_latency_ms` — orchestrator 호출 latency histogram
 
 ### 단계적 활성화
 
@@ -1005,7 +1026,7 @@ SessionLinker.wouldCreateCycle의 tenant isolation 사각지대가 봉인되어 
 `lib/memory/ModeRegistry.js`. Mode preset JSON을 로드하여 세션별 도구 필터와 skill_guide_override를 적용한다.
 
 - preset 정의 파일: `config/modes/*.json` (recall-only, write-only, onboarding, audit)
-- `X-Memento-Mode` 헤더 또는 `initialize.params.mode`에서 preset 이름을 읽음
+- `X-Weasley DeepMind-Mode` 헤더 또는 `initialize.params.mode`에서 preset 이름을 읽음
 - `api_keys.default_mode` 컬럼(migration-034)으로 키 단위 기본값 설정 가능
 - tools/list 응답을 preset에 따라 필터링하여 허용 도구만 노출
 
@@ -1071,7 +1092,7 @@ llmJson(prompt, options)
             └── 첫 성공 응답 반환 / 전부 실패 시 Error throw
 ```
 
-기존 호출자(AutoReflect, ConsolidatorGC, ContradictionDetector, MemoryEvaluator)는 `llmJson`을 그대로 사용하며 코드 변경 없이 동작한다. MorphemeIndex는 기본 경로(`MEMENTO_MORPHEME_TOKENIZER=local`)에서 LLM chain을 호출하지 않고 MorphemeTokenizer 로컬 분석기를 사용한다. `MEMENTO_MORPHEME_TOKENIZER=llm` 설정 시에만 `_tokenizeViaLLM()`을 통해 chain을 호출한다.
+기존 호출자(AutoReflect, ConsolidatorGC, ContradictionDetector, MemoryEvaluator)는 `llmJson`을 그대로 사용하며 코드 변경 없이 동작한다. MorphemeIndex는 기본 경로(`WEASLEY_DEEPMIND_MORPHEME_TOKENIZER=local`)에서 LLM chain을 호출하지 않고 MorphemeTokenizer 로컬 분석기를 사용한다. `WEASLEY_DEEPMIND_MORPHEME_TOKENIZER=llm` 설정 시에만 `_tokenizeViaLLM()`을 통해 chain을 호출한다.
 
 `codex-cli` provider는 `model` / `timeoutMs` 설정을 실제 CLI 호출까지 전달한다. `qwen-cli` provider도 지원된다.
 
@@ -1223,7 +1244,7 @@ SQL 타입 주의: `fragments.id`는 `frag-{16자 hex}` TEXT 타입이므로 mul
 
 `RememberPostProcessor`는 형태소 등록을 fire-and-forget으로 비동기 처리한다. 등록 완료 시 `fragments.morpheme_indexed = true`로 갱신한다.
 
-형태소 추출은 `MorphemeTokenizer.tokenize()`가 담당한다(기본 `MEMENTO_MORPHEME_TOKENIZER=local`). 유니코드 스크립트 런을 분할하여 언어별 분석기로 라우팅한다: 한글 garu-ko(`filterHangulMorphemes`로 조사·어미·단음절 제거), 영어 natural PorterStemmer, 중국어 @node-rs/jieba, 일본어 kuromoji(`MEMENTO_ENABLE_KUROMOJI=false` 시 생략). `MEMENTO_MORPHEME_TOKENIZER=llm` 설정 시 기존 `_tokenizeViaLLM()` 경로로 전환한다.
+형태소 추출은 `MorphemeTokenizer.tokenize()`가 담당한다(기본 `WEASLEY_DEEPMIND_MORPHEME_TOKENIZER=local`). 유니코드 스크립트 런을 분할하여 언어별 분석기로 라우팅한다: 한글 garu-ko(`filterHangulMorphemes`로 조사·어미·단음절 제거), 영어 natural PorterStemmer, 중국어 @node-rs/jieba, 일본어 kuromoji(`WEASLEY_DEEPMIND_ENABLE_KUROMOJI=false` 시 생략). `WEASLEY_DEEPMIND_MORPHEME_TOKENIZER=llm` 설정 시 기존 `_tokenizeViaLLM()` 경로로 전환한다.
 
 `getOrRegisterEmbeddings`는 누락 형태소 전체를 `generateBatchEmbeddings` 1회 + multi-row INSERT(`ON CONFLICT DO NOTHING`) 1회로 처리한다. 청크: 200건 또는 256KB 누적 중 먼저 도달. 배치 실패 시 `_parseBadIndexes` 정규식으로 문제 항목 격리 후 나머지 재시도, 인덱스 미명시 에러는 `_fallbackSingleRegister` 단건 경로.
 
@@ -1315,7 +1336,7 @@ FragmentSearch는 검색 파이프라인 결과 생성에만 집중하고, 부�
 ```
 Primary Pool (getPrimaryPool)          Batch Pool (getBatchPool)
   max = DB_MAX_CONNECTIONS               max = floor(primaryMax * 0.3), 최소 2
-  application_name = 'memento-mcp'       application_name = 'memento-mcp:batch'
+  application_name = 'weasley-deepmind'       application_name = 'weasley-deepmind:batch'
   DB = DATABASE_URL                      DB = BATCH_DATABASE_URL (없으면 동일 DB)
 ```
 
@@ -1333,7 +1354,7 @@ BatchRememberProcessor는 `_getPool()` 내부에서 `getBatchPool()`을 기본 �
 
 흐름:
 1. 선검증(Phase A) — content null·type 누락 등 거부 항목 즉시 반환
-2. Redis 큐(`memento:batch_remember_queue`) 적재 — job 직렬화 후 `pushToQueue` 호출
+2. Redis 큐(`weasley_deepmind:batch_remember_queue`) 적재 — job 직렬화 후 `pushToQueue` 호출
 3. `{ async: true, accepted, rejected, jobId }` 즉시 반환
 4. BatchRememberWorker가 백그라운드에서 큐 폴링 → BatchRememberProcessor 동기 경로로 INSERT 처리
 
@@ -1355,7 +1376,7 @@ migration SQL: `lib/memory/migrations/migration-035-morpheme-indexed.sql`.
 
 - `_mergeDuplicates`: `GROUP BY key_id, workspace, content_hash`. master 키 파편은 자동 병합 제외, scope 불일치 그룹은 경고 후 건너뜀.
 - `MemoryRememberer._runPolicyGate(fragment, { keyId, mode })`: dryRun·atomic·non-atomic 세 분기에서 PolicyRules 평가를 동일 시점에 수행. mode는 `"dryRun"` 또는 `"production"`.
-- `CaseRewardBackprop`: `MEMENTO_CASE_BACKPROP_ENABLED=true`일 때만 `backprop()`이 fragment_evidence 조회 및 importance 역전파를 수행.
+- `CaseRewardBackprop`: `WEASLEY_DEEPMIND_CASE_BACKPROP_ENABLED=true`일 때만 `backprop()`이 fragment_evidence 조회 및 importance 역전파를 수행.
 - migration body-only 규약: `scripts/migrate.js`는 정규식 재작성을 수행하지 않는다. 마이그레이션 파일은 SET 문과 세미콜론으로 끝나는 순수 SQL만 포함해야 하며 `lint:migrations`가 이를 CI에서 강제한다.
 
 ## 관련 문서

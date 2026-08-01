@@ -1,7 +1,7 @@
 /**
  * Symbolic Memory v2.8.0 환경변수
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-15
  *
  * Phase 0 원칙: 모든 플래그 기본값 false/noop. Phase 별 순차 enable.
@@ -35,16 +35,16 @@ const parseInt10 = (v, def) => {
  * maxCandidates     : symbolic 처리 대상 후보 수 상한 (폭주 방지)
  */
 export const SYMBOLIC_CONFIG = Object.freeze({
-  enabled         : parseBool(process.env.MEMENTO_SYMBOLIC_ENABLED, false),
-  claimExtraction : parseBool(process.env.MEMENTO_SYMBOLIC_CLAIM_EXTRACTION, false),
-  explain         : parseBool(process.env.MEMENTO_SYMBOLIC_EXPLAIN, false),
-  linkCheck       : parseBool(process.env.MEMENTO_SYMBOLIC_LINK_CHECK, false),
-  polarityConflict: parseBool(process.env.MEMENTO_SYMBOLIC_POLARITY_CONFLICT, false),
-  policyRules     : parseBool(process.env.MEMENTO_SYMBOLIC_POLICY_RULES, false),
-  cbrFilter       : parseBool(process.env.MEMENTO_SYMBOLIC_CBR_FILTER, false),
-  proactiveGate   : parseBool(process.env.MEMENTO_SYMBOLIC_PROACTIVE_GATE, false),
-  shadow          : parseBool(process.env.MEMENTO_SYMBOLIC_SHADOW, false),
-  ruleVersion     : process.env.MEMENTO_SYMBOLIC_RULE_VERSION || 'v1',
-  timeoutMs       : parseInt10(process.env.MEMENTO_SYMBOLIC_TIMEOUT_MS, 50),
-  maxCandidates   : parseInt10(process.env.MEMENTO_SYMBOLIC_MAX_CANDIDATES, 32),
+  enabled         : parseBool(process.env.WEASLEY_DEEPMIND_SYMBOLIC_ENABLED, false),
+  claimExtraction : parseBool(process.env.WEASLEY_DEEPMIND_SYMBOLIC_CLAIM_EXTRACTION, false),
+  explain         : parseBool(process.env.WEASLEY_DEEPMIND_SYMBOLIC_EXPLAIN, false),
+  linkCheck       : parseBool(process.env.WEASLEY_DEEPMIND_SYMBOLIC_LINK_CHECK, false),
+  polarityConflict: parseBool(process.env.WEASLEY_DEEPMIND_SYMBOLIC_POLARITY_CONFLICT, false),
+  policyRules     : parseBool(process.env.WEASLEY_DEEPMIND_SYMBOLIC_POLICY_RULES, false),
+  cbrFilter       : parseBool(process.env.WEASLEY_DEEPMIND_SYMBOLIC_CBR_FILTER, false),
+  proactiveGate   : parseBool(process.env.WEASLEY_DEEPMIND_SYMBOLIC_PROACTIVE_GATE, false),
+  shadow          : parseBool(process.env.WEASLEY_DEEPMIND_SYMBOLIC_SHADOW, false),
+  ruleVersion     : process.env.WEASLEY_DEEPMIND_SYMBOLIC_RULE_VERSION || 'v1',
+  timeoutMs       : parseInt10(process.env.WEASLEY_DEEPMIND_SYMBOLIC_TIMEOUT_MS, 50),
+  maxCandidates   : parseInt10(process.env.WEASLEY_DEEPMIND_SYMBOLIC_MAX_CANDIDATES, 32),
 });

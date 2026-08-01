@@ -1,7 +1,7 @@
-﻿/**
- * Memento MCP Admin Console — 인증 (로그인 / 로그아웃)
+/**
+ * Weasley DeepMind Admin Console — 인증 (로그인 / 로그아웃)
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-07
  */
 

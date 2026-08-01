@@ -1,7 +1,7 @@
 /**
  * generateBatchEmbeddings transformers 경로 배치 호출 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-04
  */
 import { test, mock } from "node:test";

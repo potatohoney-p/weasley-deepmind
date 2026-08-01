@@ -1,7 +1,7 @@
 /**
  * _buildReflectPrompts 순수 함수 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-09
  * 수정일: 2026-04-16 (_buildGeminiPrompt → _buildReflectPrompts, {systemPrompt, userPrompt} 반환)
  *

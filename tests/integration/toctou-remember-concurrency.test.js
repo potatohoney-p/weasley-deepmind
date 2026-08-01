@@ -1,7 +1,7 @@
 /**
- * TOCTOU 동시성 통합 테스트 — MEMENTO_REMEMBER_ATOMIC=true 경로 검증
+ * TOCTOU 동시성 통합 테스트 — WEASLEY_DEEPMIND_REMEMBER_ATOMIC=true 경로 검증
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-19
  * 수정일: 2026-04-19 (Phase 3 FragmentWriter.insert 오버로드 완료 — 단언 방향 반전)
  *
@@ -10,17 +10,17 @@
  *   동시 요청 시 fragment_limit 초과 삽입이 이론적으로 가능했다.
  *
  * Phase 3 이후:
- *   MEMENTO_REMEMBER_ATOMIC=true 설정 시 단일 트랜잭션
+ *   WEASLEY_DEEPMIND_REMEMBER_ATOMIC=true 설정 시 단일 트랜잭션
  *   (BEGIN → api_keys FOR UPDATE → INSERT → COMMIT)으로 원자 실행.
- *   이 테스트는 MEMENTO_REMEMBER_ATOMIC=true 환경에서 실제 삽입 수가
+ *   이 테스트는 WEASLEY_DEEPMIND_REMEMBER_ATOMIC=true 환경에서 실제 삽입 수가
  *   fragment_limit을 초과하지 않음을 검증한다.
  *
  * 수동 실행:
- *   MEMENTO_REMEMBER_ATOMIC=true \
+ *   WEASLEY_DEEPMIND_REMEMBER_ATOMIC=true \
  *   DATABASE_URL=postgresql://user:pass@localhost:35432/bee_db \
  *   node --test tests/integration/toctou-remember-concurrency.test.js
  *
- * MEMENTO_REMEMBER_ATOMIC=false(기본) 환경에서는 초과 가능성이 있으므로
+ * WEASLEY_DEEPMIND_REMEMBER_ATOMIC=false(기본) 환경에서는 초과 가능성이 있으므로
  * 해당 환경에서 실행 시 단언이 실패할 수 있다. 이는 의도된 동작이다.
  */
 
@@ -176,22 +176,22 @@ describe("TOCTOU — fragment_limit 동시성 초과 재현", () => {
 
       /**
        * 핵심 단언 (Phase 3 이후):
-       *   MEMENTO_REMEMBER_ATOMIC=true 환경에서 실제 삽입 수 <= fragment_limit.
+       *   WEASLEY_DEEPMIND_REMEMBER_ATOMIC=true 환경에서 실제 삽입 수 <= fragment_limit.
        *   단일 트랜잭션 원자화(api_keys FOR UPDATE + INSERT)가 TOCTOU를 차단한다.
        *
-       *   MEMENTO_REMEMBER_ATOMIC=false(기본) 환경에서는 초과가 가능하므로
+       *   WEASLEY_DEEPMIND_REMEMBER_ATOMIC=false(기본) 환경에서는 초과가 가능하므로
        *   이 단언이 실패할 수 있다. 기본 경로의 TOCTOU 재현은 의도된 동작이다.
        */
-      const atomicEnabled = process.env.MEMENTO_REMEMBER_ATOMIC === "true";
+      const atomicEnabled = process.env.WEASLEY_DEEPMIND_REMEMBER_ATOMIC === "true";
       if (atomicEnabled) {
         assert.ok(
           actualCount <= FRAGMENT_LIMIT,
           `TOCTOU 원자화 실패: db count(${actualCount}) > limit(${FRAGMENT_LIMIT}). ` +
-          `MEMENTO_REMEMBER_ATOMIC=true 경로에서 limit 초과가 발생했다.`
+          `WEASLEY_DEEPMIND_REMEMBER_ATOMIC=true 경로에서 limit 초과가 발생했다.`
         );
       } else {
         console.warn(
-          `[toctou] MEMENTO_REMEMBER_ATOMIC=false: limit 초과 여부=${actualCount > FRAGMENT_LIMIT} ` +
+          `[toctou] WEASLEY_DEEPMIND_REMEMBER_ATOMIC=false: limit 초과 여부=${actualCount > FRAGMENT_LIMIT} ` +
           `(기본 경로는 TOCTOU 보호 없음 — 기대 동작)`
         );
       }

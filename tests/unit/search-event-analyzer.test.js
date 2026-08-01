@@ -5,7 +5,7 @@
  * 순수 함수(computeL1MissRate, computeFilterDistribution)만 검증.
  * getSearchObservability는 DB 연결이 필요하므로 제외.
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-03-25
  * 수정일: 2026-04-19 (Jest → node:test 이주)
  */

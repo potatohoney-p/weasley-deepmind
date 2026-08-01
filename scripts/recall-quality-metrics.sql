@@ -1,5 +1,5 @@
 -- recall-quality-metrics.sql
--- 작성자: 최진호
+-- 작성자: Weasley Open Source
 -- 작성일: 2026-07-16
 -- 사용: psql "$DATABASE_URL" -f scripts/recall-quality-metrics.sql
 

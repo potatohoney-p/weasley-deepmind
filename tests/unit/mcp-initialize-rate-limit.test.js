@@ -1,7 +1,7 @@
 /**
  * initialize 경로 IP rate limit 선차단 (정적 앵커 가드 + 429 동작 검증)
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-16
  */
 

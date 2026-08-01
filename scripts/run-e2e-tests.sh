@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # run-e2e-tests.sh — Docker 기반 E2E 테스트 러너
 #
-# 작성자: 최진호
+# 작성자: Weasley Open Source
 # 수정일: 2026-04-20 (v2.12.0 문서 현행화 반영)
 #
 # 목적: docker-compose.test.yml의 postgres-test 컨테이너를 기동하고
@@ -18,11 +18,11 @@ docker compose -f docker-compose.test.yml up -d postgres-test
 
 echo "[e2e] 헬스체크 대기..."
 docker compose -f docker-compose.test.yml exec postgres-test \
-  pg_isready -U memento -d memento_test
+  pg_isready -U weasley_deepmind -d weasley_deepmind_test
 
 echo "[e2e] 마이그레이션 실행..."
 for f in lib/memory/migrations/migration-*.sql; do
-  psql postgresql://memento:memento_test@localhost:35433/memento_test -f "$f"
+  psql postgresql://weasley_deepmind:weasley_deepmind_test@localhost:35433/weasley_deepmind_test -f "$f"
 done
 
 echo "[e2e] 테스트 실행..."

@@ -1,7 +1,7 @@
 /**
  * RememberPostProcessor — linkedTo 소유권 검증 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-10
  *
  * 검증 범위:

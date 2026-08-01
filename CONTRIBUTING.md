@@ -1,4 +1,4 @@
-# Contributing to Memento MCP
+# Contributing to Weasley DeepMind
 
 ## Development Setup
 
@@ -24,7 +24,7 @@ node server.js
 ### Docker Build
 
 ```bash
-docker build -t memento-mcp .
+docker build -t weasley-deepmind .
 ```
 
 ## Code Style
@@ -74,9 +74,9 @@ after(async () => {
 });
 ```
 
-- prom-client default metrics는 `MEMENTO_METRICS_DEFAULT=off`로 무력화된다.
+- prom-client default metrics는 `WEASLEY_DEEPMIND_METRICS_DEFAULT=off`로 무력화된다.
   `npm test` 스크립트가 이 환경변수를 자동 주입한다.
-  단일 파일 실행 시에도 `MEMENTO_METRICS_DEFAULT=off node --experimental-test-module-mocks --test tests/unit/<file>.test.js`로 실행한다.
+  단일 파일 실행 시에도 `WEASLEY_DEEPMIND_METRICS_DEFAULT=off node --experimental-test-module-mocks --test tests/unit/<file>.test.js`로 실행한다.
 - 회귀 가드: `tests/unit/test-lifecycle-guard.test.js` 5 케이스가 헬퍼 동작을 검증한다.
 - 상세 내용: `tests/README.md` §Lifecycle 가드 참조
 

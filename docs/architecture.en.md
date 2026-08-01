@@ -2,7 +2,14 @@
 
 ## System Architecture
 
-![System Architecture](../assets/images/memento_architecture.en.svg)
+```mermaid
+flowchart LR
+    Client["MCP client"] --> Gateway["HTTP / OAuth gateway"]
+    Gateway --> Tools["Memory tools"]
+    Tools --> Store["PostgreSQL + pgvector"]
+    Tools --> Cache["Optional Redis cache"]
+    Tools --> Models["Optional embedding / LLM providers"]
+```
 
 ```
 server.js  (HTTP server)
@@ -52,8 +59,8 @@ server.js  (HTTP server)
             |   +-- FragmentStore.js      PostgreSQL CRUD facade (delegates to FragmentReader + FragmentWriter)
             |   +-- RememberPostProcessor.js remember() post-processing pipeline (embedding/morpheme/linking/assertion/temporal linking/evaluation queue/ProactiveRecall)
             |   +-- ConflictResolver.js   Conflict detection, supersede, autoLinkOnRemember (topic-based structural linking)
-            |   +-- BatchRememberProcessor.js Dedicated batchRemember() logic. Phase A (validation) -> B (INSERT) -> C (post-processing) 3-stage. Supports async opt-in via `async: true` parameter: after pre-validation, enqueues job to Redis (`memento:batch_remember_queue`) and returns immediately. Falls back to synchronous path when Redis is unavailable. Worker (BatchRememberWorker) consumes the queue via the existing INSERT path
-            |   +-- BatchRememberWorker.js Async queue worker for batch_remember. Polls `memento:batch_remember_queue` Redis queue and processes jobs via the BatchRememberProcessor synchronous path. `getBatchRememberWorker()` singleton factory. `server.js` `gracefulShutdown` awaits `stop()` drain for safe shutdown
+            |   +-- BatchRememberProcessor.js Dedicated batchRemember() logic. Phase A (validation) -> B (INSERT) -> C (post-processing) 3-stage. Supports async opt-in via `async: true` parameter: after pre-validation, enqueues job to Redis (`weasley_deepmind:batch_remember_queue`) and returns immediately. Falls back to synchronous path when Redis is unavailable. Worker (BatchRememberWorker) consumes the queue via the existing INSERT path
+            |   +-- BatchRememberWorker.js Async queue worker for batch_remember. Polls `weasley_deepmind:batch_remember_queue` Redis queue and processes jobs via the BatchRememberProcessor synchronous path. `getBatchRememberWorker()` singleton factory. `server.js` `gracefulShutdown` awaits `stop()` drain for safe shutdown
             +-- link/                     Link layer modules
             |   +-- ReconsolidationEngine.js Dynamic fragment_links weight/confidence update engine (reinforce/decay/quarantine/restore/soft_delete + history recording)
             |   +-- GraphLinker.js        Embedding-ready event subscriber for auto-linking + retroactive linking + Hebbian co-retrieval linking
@@ -74,10 +81,10 @@ server.js  (HTTP server)
             |   +-- EmbeddingWorker.js    Redis queue-based async embedding worker (EventEmitter)
             |   +-- EmbeddingCache.js     Query embedding Redis cache (emb:q:{sha256} key, 1-hour TTL, fault-isolated)
             |   +-- MorphemeIndex.js      Morpheme-based L3 fallback index
-            |   +-- MorphemeTokenizer.js  Local CPU morpheme analyzer. Splits Unicode script runs then routes per language: Korean garu-ko (filterHangulMorphemes strips particles/endings/single-syllable tokens), English natural PorterStemmer, Chinese @node-rs/jieba, Japanese kuromoji (skipped when enableKuromoji=false). MorphemeIndex.tokenize() delegates to it, replacing the LLM subprocess on the default path (MEMENTO_MORPHEME_TOKENIZER=local). Benchmark: 1.06ms/call, resident RSS +28.9MB.
+            |   +-- MorphemeTokenizer.js  Local CPU morpheme analyzer. Splits Unicode script runs then routes per language: Korean garu-ko (filterHangulMorphemes strips particles/endings/single-syllable tokens), English natural PorterStemmer, Chinese @node-rs/jieba, Japanese kuromoji (skipped when enableKuromoji=false). MorphemeIndex.tokenize() delegates to it, replacing the LLM subprocess on the default path (WEASLEY_DEEPMIND_MORPHEME_TOKENIZER=local). Benchmark: 1.06ms/call, resident RSS +28.9MB.
             +-- signals/                  Signal layer modules
             |   +-- SpreadingActivation.js Async activation propagation based on contextText (ACT-R model, keywords GIN seed -> 1-hop graph spread, 10-min TTL cache)
-            |   +-- CaseRewardBackprop.js  case verification event -> evidence fragment importance atomic backpropagation. Returns immediately when MEMENTO_CASE_BACKPROP_ENABLED is unset
+            |   +-- CaseRewardBackprop.js  case verification event -> evidence fragment importance atomic backpropagation. Returns immediately when WEASLEY_DEEPMIND_CASE_BACKPROP_ENABLED is unset
             |   +-- NLIClassifier.js      NLI-based contradiction classifier (mDeBERTa ONNX, CPU)
             |   +-- MemoryEvaluator.js    Async Gemini CLI quality evaluation worker (singleton)
             |   +-- SearchMetrics.js      L1/L2/L3/total layer-level latency collection (Redis circular buffer, P50/P90/P99)
@@ -97,15 +104,15 @@ Supporting modules:
 
 ```
 lib/
-+-- config.js          Environment variables exposed as constants. Includes AUTH_DISABLED (MEMENTO_AUTH_DISABLED), OAUTH_TOKEN_TTL_SECONDS, OAUTH_REFRESH_TTL_SECONDS, ENABLE_OPENAPI, SSE_HEARTBEAT_INTERVAL_MS
-+-- auth.js            Bearer token validation. `validateAuthentication(req, msg)` -- actual entry point. When `MEMENTO_ACCESS_KEY` is unset, all requests pass through with master privileges. `resolveAuthConfig(accessKey, authDisabled)` -- pure function for auth config resolution. `buildAuthDecision(accessKey, authDisabled, bearerToken)` -- pure function for unit testing (excludes OAuth/DB API key verification)
++-- config.js          Environment variables exposed as constants. Includes AUTH_DISABLED (WEASLEY_DEEPMIND_AUTH_DISABLED), OAUTH_TOKEN_TTL_SECONDS, OAUTH_REFRESH_TTL_SECONDS, ENABLE_OPENAPI, SSE_HEARTBEAT_INTERVAL_MS
++-- auth.js            Bearer token validation. `validateAuthentication(req, msg)` -- actual entry point. When `WEASLEY_DEEPMIND_ACCESS_KEY` is unset, requests fail closed unless `WEASLEY_DEEPMIND_AUTH_DISABLED=true` explicitly opts out for local development. `resolveAuthConfig(accessKey, authDisabled)` -- pure function for auth config resolution. `buildAuthDecision(accessKey, authDisabled, bearerToken)` -- pure function for unit testing (excludes OAuth/DB API key verification)
 +-- oauth.js           OAuth 2.0 PKCE authorization/token handling
 +-- sessions.js        Streamable/Legacy SSE session lifecycle
 +-- redis.js           ioredis client (Sentinel support)
 +-- gemini.js          Google Gemini API/CLI client (geminiCLIJson, isGeminiCLIAvailable)
 +-- compression.js     Response compression (gzip/deflate)
-+-- metrics.js         Prometheus metric collection (prom-client). 4 denial-path counters: `memento_auth_denied_total{reason}` (auth denial), `memento_cors_denied_total{reason}` (CORS denial), `memento_rbac_denied_total{tool,reason}` (RBAC denial), `memento_tenant_isolation_blocked_total{component}` (tenant isolation block)
-+-- logger.js          Winston logger (daily rotate). REDACT_PATTERNS-based redactor format: auto-masking of Authorization Bearer tokens, mmcp_ API keys, mmcp_session cookies, OAuth code/refresh_token/access_token (6 patterns). content field trimmed to head 50 + tail 50 when exceeding 200 chars
++-- metrics.js         Prometheus metric collection (prom-client). 4 denial-path counters: `weasley_deepmind_auth_denied_total{reason}` (auth denial), `weasley_deepmind_cors_denied_total{reason}` (CORS denial), `weasley_deepmind_rbac_denied_total{tool,reason}` (RBAC denial), `weasley_deepmind_tenant_isolation_blocked_total{component}` (tenant isolation block)
++-- logger.js          Winston logger (daily rotate). REDACT_PATTERNS-based redactor format: auto-masking of Authorization Bearer tokens, wdm_ API keys, wdm_session cookies, OAuth code/refresh_token/access_token (6 patterns). content field trimmed to head 50 + tail 50 when exceeding 200 chars
 +-- openapi.js         OpenAPI 3.1.0 spec generator. Enabled when `ENABLE_OPENAPI=true` via `GET /openapi.json`. Auth-level-based tool list filtering: master key -> all paths (including Admin REST API), API key -> permissions-based tool list
 +-- rate-limiter.js    IP-based sliding window rate limiter
 +-- rbac.js            RBAC authorization (read/write/admin tool-level permissions)
@@ -147,7 +154,7 @@ The storage adapter layer is separated into `lib/storage/`.
 
 ```
 lib/storage/
-+-- index.js         getStorage() factory singleton. Selects adapter via MEMENTO_STORAGE env var
++-- index.js         getStorage() factory singleton. Selects adapter via WEASLEY_DEEPMIND_STORAGE env var
 |                    pgvector (default) -> PgVectorStore / sqlite-vec -> SqliteVecStore
 |                    Unknown values fall back to pgvector without warning
 +-- PgVectorStore.js PostgreSQL + pgvector adapter. Wraps lib/tools/db.js getPrimaryPool() and
@@ -181,7 +188,7 @@ CLI entry point and subcommands are separated into `bin/` and `lib/cli/`.
 
 ```
 bin/
-+-- memento.js          CLI entry point
++-- weasley_deepmind.js          CLI entry point
 
 lib/cli/
 +-- parseArgs.js        Argument parser
@@ -433,7 +440,7 @@ The store for all fragments. This is the core table of the system.
 | valid_to | TIMESTAMPTZ | | Temporal validity end. NULL means currently valid |
 | superseded_by | TEXT | | ID of the fragment that supersedes this one |
 | last_decay_at | TIMESTAMPTZ | | Last decay application timestamp. When NULL, falls back to accessed_at/created_at |
-| key_id | TEXT | FK -> api_keys.id, ON DELETE SET NULL | API key-based memory isolation. NULL means stored via master key (MEMENTO_ACCESS_KEY). When set, only that API key can query the fragment |
+| key_id | TEXT | FK -> api_keys.id, ON DELETE SET NULL | API key-based memory isolation. NULL means stored via master key (WEASLEY_DEEPMIND_ACCESS_KEY). When set, only that API key can query the fragment |
 | ema_activation | FLOAT | DEFAULT 0.0 | ACT-R base-level activation EMA approximation. Updated on `incrementAccess()` via `alpha * (dt_sec)^{-0.5} + (1-alpha) * prev` (alpha=0.3). Not updated on L1 fallback path (noEma=true). Used as importance boost in `_computeRankScore()` |
 | ema_last_updated | TIMESTAMPTZ | | EMA last update timestamp. Falls back to created_at when NULL |
 | quality_verified | BOOLEAN | DEFAULT NULL | MemoryEvaluator quality verdict. NULL=unevaluated, TRUE=keep (verified), FALSE=downgrade/discard (rejected). Used in permanent promotion Circuit Breaker |
@@ -595,9 +602,9 @@ Access is granted only to fragments matching the agent ID, `default` agent fragm
 
 ### API Key-Based Memory Isolation
 
-The `key_id` column provides an additional isolation layer at the API key level. Fragments stored via the master key (`MEMENTO_ACCESS_KEY`) have `key_id = NULL` and are queryable only by the master key. Fragments stored via a DB-issued API key have `key_id = <that key's ID>` and are queryable only by that key.
+The `key_id` column provides an additional isolation layer at the API key level. Fragments stored via the master key (`WEASLEY_DEEPMIND_ACCESS_KEY`) have `key_id = NULL` and are queryable only by the master key. Fragments stored via a DB-issued API key have `key_id = <that key's ID>` and are queryable only by that key.
 
-This isolation model implements per-key memory partitioning in multi-agent environments. API keys are managed through the Admin SPA (`/v1/internal/model/nothing`). On creation, the raw key (`mmcp_<slug>_<32 hex>`) is returned in the response exactly once; only the SHA-256 hash is stored in the database.
+This isolation model implements per-key memory partitioning in multi-agent environments. API keys are managed through the Admin SPA (`/v1/internal/model/nothing`). On creation, the raw key (`wdm_<slug>_<32 hex>`) is returned in the response exactly once; only the SHA-256 hash is stored in the database.
 
 The Admin UI (`/v1/internal/model/nothing`) requires master key authentication. Authenticate via the Authorization Bearer header. A successful POST /auth issues an HttpOnly session cookie that is automatically attached to subsequent requests.
 
@@ -614,7 +621,7 @@ The `fragments.workspace` column provides an additional isolation layer within t
 **Configuration**: Set `default_workspace` in the Admin SPA key editor, or use `PATCH /v1/internal/model/nothing/keys/:id/workspace`.
 
 **Use cases**:
-- Developer switching between projects in the same session (`workspace: "memento-mcp"`, `workspace: "docs-mcp"`)
+- Developer switching between projects in the same session (`workspace: "weasley-deepmind"`, `workspace: "docs-mcp"`)
 - Agent separating work and personal memories (`workspace: "work"`, `workspace: "personal"`)
 - Freelancer isolating client memories (`workspace: "client-acme"`, `workspace: "client-xyz"`)
 
@@ -654,7 +661,7 @@ MCP clients connect via an OAuth 2.0 flow based on RFC 8414/RFC 7591/RFC 7636. U
    -> lib/auth.js -> validateAuthentication() verifies token and extracts keyId
 ```
 
-- **API key as OAuth client_id**: Passing an `mmcp_`-prefixed key as `client_id` allows direct entry into the authorization_code flow without DCR
+- **API key as OAuth client_id**: Passing an `wdm_`-prefixed key as `client_id` allows direct entry into the authorization_code flow without DCR
 - **Session auto-recovery**: On "Session not found" error, the server re-authenticates and automatically creates a new session with keyId/groupKeyIds preserved
 - **Implementation files**: `lib/oauth.js`, `lib/admin/OAuthClientStore.js`
 
@@ -760,7 +767,16 @@ Admin REST endpoints:
 
 The recall tool searches from the least expensive layer first. If an earlier layer yields sufficient results, later layers are skipped.
 
-![Retrieval Flow](../assets/images/retrieval_flow.svg)
+```mermaid
+flowchart LR
+    Query["Recall query"] --> L1["L1 Redis keywords"]
+    Query --> L2["L2 PostgreSQL GIN"]
+    Query --> L3["L3 pgvector HNSW"]
+    L1 --> Merge["RRF merge + temporal ranking"]
+    L2 --> Merge
+    L3 --> Merge
+    Merge --> Budget["Token-budgeted result"]
+```
 
 **L1: Redis Set intersection.** When a fragment is stored, FragmentIndex uses each keyword as a Redis Set key, storing the fragment ID. The Set `keywords:database` contains the IDs of all fragments with "database" as a keyword. Multi-keyword search is a SINTER operation across multiple Sets. Intersection time complexity is O(N*K), where N is the smallest Set's size and K is the keyword count. Since Redis processes this in-memory, it completes within milliseconds. L1 results are merged with L2 results in subsequent stages.
 
@@ -790,7 +806,15 @@ When `includeLinks: true` (default) is set on recall, linked fragments are fetch
 
 Fragments move across four tiers -- hot, warm, cold, permanent -- based on access frequency. MemoryConsolidator periodically handles demotion/promotion. Re-accessed fragments are restored to hot.
 
-![Fragment Lifecycle](../assets/images/fragment_lifecycle.svg)
+```mermaid
+stateDiagram-v2
+    [*] --> hot
+    hot --> warm: inactivity
+    warm --> cold: inactivity
+    cold --> hot: recalled
+    hot --> permanent: anchored
+    warm --> permanent: anchored
+```
 
 | Tier | Description |
 |------|-------------|
@@ -859,7 +883,7 @@ Passing `caseMode: true` to the recall tool activates the CaseRecall path. It re
 
 ### CaseRewardBackprop
 
-`lib/memory/signals/CaseRewardBackprop.js`. When `verification_passed` or `verification_failed` events are inserted into case_events, atomically backpropagates importance to evidence fragments via fragment_evidence. Returns immediately when `MEMENTO_CASE_BACKPROP_ENABLED` is not set to `"true"`.
+`lib/memory/signals/CaseRewardBackprop.js`. When `verification_passed` or `verification_failed` events are inserted into case_events, atomically backpropagates importance to evidence fragments via fragment_evidence. Returns immediately when `WEASLEY_DEEPMIND_CASE_BACKPROP_ENABLED` is not set to `"true"`.
 
 - `verification_passed` -> evidence fragment `importance += 0.15` (clamped to 1.0 upper bound)
 - `verification_failed` -> evidence fragment `importance -= 0.10` (clamped to 0.0 lower bound)
@@ -980,10 +1004,10 @@ Rule files (`lib/symbolic/rules/v1/`): `explain.js`, `link-integrity.js`, `claim
 ### Observability
 
 4 Prometheus metrics (labels: `rule`, `phase`):
-- `memento_symbolic_claim_extracted_total` — ClaimExtractor extraction count
-- `memento_symbolic_warning_total` — advisory warning generation count
-- `memento_symbolic_gate_blocked_total{phase}` — block count per phase (phase=cbr|proactive etc.)
-- `memento_symbolic_op_latency_ms` — orchestrator call latency histogram
+- `weasley_deepmind_symbolic_claim_extracted_total` — ClaimExtractor extraction count
+- `weasley_deepmind_symbolic_warning_total` — advisory warning generation count
+- `weasley_deepmind_symbolic_gate_blocked_total{phase}` — block count per phase (phase=cbr|proactive etc.)
+- `weasley_deepmind_symbolic_op_latency_ms` — orchestrator call latency histogram
 
 ### Staged Rollout
 
@@ -1002,7 +1026,7 @@ The blind spot in SessionLinker.wouldCreateCycle is sealed. `store.isReachable` 
 `lib/memory/ModeRegistry.js`. Loads Mode preset JSON and applies per-session tool filters and skill_guide overrides.
 
 - Preset definition files: `config/modes/*.json` (recall-only, write-only, onboarding, audit)
-- Reads the preset name from the `X-Memento-Mode` header or `initialize.params.mode`
+- Reads the preset name from the `X-Weasley DeepMind-Mode` header or `initialize.params.mode`
 - `api_keys.default_mode` column (migration-034) enables per-key default configuration via admin console
 - Filters tools/list response to expose only allowed tools for the active preset
 
@@ -1234,7 +1258,7 @@ Current 22 stages (in order):
 ```
 Primary Pool (getPrimaryPool)          Batch Pool (getBatchPool)
   max = DB_MAX_CONNECTIONS               max = floor(primaryMax * 0.3), min 2
-  application_name = 'memento-mcp'       application_name = 'memento-mcp:batch'
+  application_name = 'weasley-deepmind'       application_name = 'weasley-deepmind:batch'
   DB = DATABASE_URL                      DB = BATCH_DATABASE_URL (falls back to primary DB)
 ```
 
@@ -1252,7 +1276,7 @@ The `batch_remember` tool supports async opt-in via the `async: true` parameter.
 
 Flow:
 1. Pre-validation (Phase A) -- immediately returns rejected items with content/type errors
-2. Redis queue (`memento:batch_remember_queue`) enqueue -- serializes job and calls `pushToQueue`
+2. Redis queue (`weasley_deepmind:batch_remember_queue`) enqueue -- serializes job and calls `pushToQueue`
 3. Returns `{ async: true, accepted, rejected, jobId }` immediately
 4. BatchRememberWorker polls the queue in the background and processes via the BatchRememberProcessor synchronous INSERT path
 
@@ -1274,7 +1298,7 @@ Call sites: `FragmentReader.getById` / `findCaseIdBySessionTopic` / `findErrorFr
 
 ## CaseRewardBackprop ENV Gate
 
-Unless the `MEMENTO_CASE_BACKPROP_ENABLED` environment variable is set to `"true"`, `CaseRewardBackprop.backprop()` returns immediately. Only when the gate is passed does fragment_evidence lookup and importance backpropagation execute.
+Unless the `WEASLEY_DEEPMIND_CASE_BACKPROP_ENABLED` environment variable is set to `"true"`, `CaseRewardBackprop.backprop()` returns immediately. Only when the gate is passed does fragment_evidence lookup and importance backpropagation execute.
 
 ## migration body-only Convention
 
