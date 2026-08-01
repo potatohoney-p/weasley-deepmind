@@ -2,13 +2,13 @@
 /**
  * backfill-claims.js — 기존 파편에 ClaimExtractor 소급 실행
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 수정일: 2026-04-20 (v2.12.0 문서 현행화 반영)
  *
  * 목적: v2.7.0 이전 코퍼스에 ClaimExtractor를 소급 실행하여 fragment_claims 테이블을 채운다.
  *       실행 이후 신규 파편은 RememberPostProcessor 8단계 hook에서 실시간 추출되므로
  *       이 스크립트는 기존 코퍼스 전용이다.
- * 호출 조건: Phase 1 Shadow(MEMENTO_SYMBOLIC_SHADOW=true) 활성화 전 1회
+ * 호출 조건: Phase 1 Shadow(WEASLEY_DEEPMIND_SYMBOLIC_SHADOW=true) 활성화 전 1회
  * 빈도: 일회성
  * 의존: DATABASE_URL, OPENAI_API_KEY(또는 로컬 transformers provider)
  * 관련 문서: docs/operations/backfill-claims.md, docs/operations/maintenance.md
@@ -17,7 +17,7 @@
  *       --min-confidence 0..1, --dry-run, --verbose
  * 전제: 실행 전 반드시 --dry-run으로 추출 볼륨과 tenant_violations 수치를 확인한다.
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 수정일: 2026-04-19
  *
  * 목적: Phase 1 Shadow 진입 시 기존 v2.7.0 파편(미추출 상태)을 대상으로
@@ -41,7 +41,7 @@
  *
  * 주의:
  *  - 테스트 DB 권장. 프로덕션 DB 실행 전 --dry-run 으로 먼저 수치 확인.
- *  - MEMENTO_SYMBOLIC_ENABLED 등 런타임 플래그와 무관하게 스크립트 자체가 결정.
+ *  - WEASLEY_DEEPMIND_SYMBOLIC_ENABLED 등 런타임 플래그와 무관하게 스크립트 자체가 결정.
  */
 
 import path from "node:path";

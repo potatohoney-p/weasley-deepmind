@@ -1,12 +1,12 @@
 /**
  * R12 회귀 통합 테스트 — reflect 큰 페이로드 TDZ 회귀 가드
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-20
  *
  * 배경 (docs/plans/2026-04-19-tech-debt-audit.md R12):
  *   v2.9.0에서 MemoryManager.remember 본문의 atomic 분기가 const fragment
- *   선언보다 앞에 놓여 MEMENTO_REMEMBER_ATOMIC=true && keyId != null 경로에서
+ *   선언보다 앞에 놓여 WEASLEY_DEEPMIND_REMEMBER_ATOMIC=true && keyId != null 경로에서
  *   `ReferenceError: Cannot access 'fragment' before initialization`.
  *   재현 조건: 다건 summary + 긴 narrative_summary를 포함한 reflect 페이로드.
  *
@@ -26,13 +26,13 @@ describe("R12 reflect 큰 페이로드 TDZ 회귀 가드", () => {
   let prevAtomic;
 
   before(() => {
-    prevAtomic = process.env.MEMENTO_REMEMBER_ATOMIC;
-    process.env.MEMENTO_REMEMBER_ATOMIC = "true";
+    prevAtomic = process.env.WEASLEY_DEEPMIND_REMEMBER_ATOMIC;
+    process.env.WEASLEY_DEEPMIND_REMEMBER_ATOMIC = "true";
   });
 
   after(() => {
-    if (prevAtomic === undefined) delete process.env.MEMENTO_REMEMBER_ATOMIC;
-    else                           process.env.MEMENTO_REMEMBER_ATOMIC = prevAtomic;
+    if (prevAtomic === undefined) delete process.env.WEASLEY_DEEPMIND_REMEMBER_ATOMIC;
+    else                           process.env.WEASLEY_DEEPMIND_REMEMBER_ATOMIC = prevAtomic;
   });
 
   it("summary 10건 + narrative 300자 페이로드가 atomic + keyId 경로에서 ReferenceError 없이 완료된다", async () => {

@@ -1,7 +1,7 @@
 /**
  * 거부 경로 메트릭 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-10
  *
  * authDenied / corsDenied / rbacDenied / tenantIsolationBlocked 카운터가
@@ -34,10 +34,10 @@ async function getCounterValue(counter, labels) {
 }
 
 // ---------------------------------------------------------------------------
-// memento_auth_denied_total
+// weasley_deepmind_auth_denied_total
 // ---------------------------------------------------------------------------
 
-describe("memento_auth_denied_total", () => {
+describe("weasley_deepmind_auth_denied_total", () => {
   it("recordAuthDenied('invalid_key') 호출 시 카운터가 증가한다", async () => {
     const before = await getCounterValue(authDeniedTotal, { reason: "invalid_key" });
     recordAuthDenied("invalid_key");
@@ -54,10 +54,10 @@ describe("memento_auth_denied_total", () => {
 });
 
 // ---------------------------------------------------------------------------
-// memento_cors_denied_total
+// weasley_deepmind_cors_denied_total
 // ---------------------------------------------------------------------------
 
-describe("memento_cors_denied_total", () => {
+describe("weasley_deepmind_cors_denied_total", () => {
   it("recordCorsDenied('origin_not_allowed') 호출 시 카운터가 증가한다", async () => {
     const before = await getCounterValue(corsDeniedTotal, { reason: "origin_not_allowed" });
     recordCorsDenied("origin_not_allowed");
@@ -67,10 +67,10 @@ describe("memento_cors_denied_total", () => {
 });
 
 // ---------------------------------------------------------------------------
-// memento_rbac_denied_total
+// weasley_deepmind_rbac_denied_total
 // ---------------------------------------------------------------------------
 
-describe("memento_rbac_denied_total", () => {
+describe("weasley_deepmind_rbac_denied_total", () => {
   it("recordRbacDenied 호출 시 tool + reason 레이블로 카운터가 증가한다", async () => {
     const before = await getCounterValue(rbacDeniedTotal, { tool: "memory_consolidate", reason: "requires_admin" });
     recordRbacDenied("memory_consolidate", "requires_admin");
@@ -91,10 +91,10 @@ describe("memento_rbac_denied_total", () => {
 });
 
 // ---------------------------------------------------------------------------
-// memento_tenant_isolation_blocked_total
+// weasley_deepmind_tenant_isolation_blocked_total
 // ---------------------------------------------------------------------------
 
-describe("memento_tenant_isolation_blocked_total", () => {
+describe("weasley_deepmind_tenant_isolation_blocked_total", () => {
   it("recordTenantIsolationBlocked('forget') 호출 시 카운터가 증가한다", async () => {
     const before = await getCounterValue(tenantIsolationBlockedTotal, { component: "forget" });
     recordTenantIsolationBlocked("forget");

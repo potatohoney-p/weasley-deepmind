@@ -1,7 +1,7 @@
 /**
  * mcp-handler-batch-json.test.js
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-06-19
  *
  * batch_remember / memory_consolidate 가 커스텀 SSE 경로가 아니라

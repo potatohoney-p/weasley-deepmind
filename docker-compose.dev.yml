@@ -2,13 +2,13 @@ services:
   postgres:
     image: pgvector/pgvector:pg15
     environment:
-      POSTGRES_DB: memento_dev
-      POSTGRES_USER: memento
-      POSTGRES_PASSWORD: memento_dev
+      POSTGRES_DB: weasley_deepmind_dev
+      POSTGRES_USER: weasley_deepmind
+      POSTGRES_PASSWORD: weasley_deepmind_dev
     ports:
       - "35432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U memento -d memento_dev"]
+      test: ["CMD-SHELL", "pg_isready -U weasley_deepmind -d weasley_deepmind_dev"]
       interval: 2s
       timeout: 5s
       retries: 10

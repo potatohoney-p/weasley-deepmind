@@ -1,7 +1,7 @@
 /**
  * EMBEDDING_PROVIDER=transformers config 가드 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-18
  *
  * config.js는 모듈 로드 시점에 throw하므로 독립 서브프로세스로 격리 검증한다.
@@ -10,11 +10,12 @@
 import { test, describe } from "node:test";
 import assert              from "node:assert/strict";
 import { execFileSync }    from "node:child_process";
-import { fileURLToPath }   from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import path                from "node:path";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT      = path.resolve(__dirname, "../..");
+const CONFIG_URL = pathToFileURL(path.join(ROOT, "lib", "config.js")).href;
 
 /**
  * 격리된 Node.js 서브프로세스로 config.js를 로드하고 지정 상수값을 반환한다.
@@ -25,7 +26,7 @@ const ROOT      = path.resolve(__dirname, "../..");
  */
 function runConfigSnippet(env, snippet) {
   const script = `
-    import("${ROOT}/lib/config.js")
+    import("${CONFIG_URL}")
       .then(cfg => {
         ${snippet}
       })

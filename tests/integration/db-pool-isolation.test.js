@@ -1,13 +1,13 @@
 /**
  * DB Pool 격리 통합 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-27
  *
  * Phase 7 검증:
  * - getBatchPool() 인스턴스가 getPrimaryPool()과 별개 객체
  * - 두 풀이 동시에 active 상태 유지 가능
- * - batchPool application_name이 'memento-mcp:batch'
+ * - batchPool application_name이 'weasley-deepmind:batch'
  * - BATCH_DATABASE_URL env 분기 동작
  * - getPoolStats()에 batch 통계 포함
  * - shutdownPool()이 두 풀 모두 종료
@@ -79,7 +79,7 @@ describe("Phase 7 — DB Pool 격리 검증", () => {
       `batchPool.max(${batchMax}) !== floor(${primaryMax} * 0.3) = ${expected}`);
   });
 
-  it("BATCH_DATABASE_URL 없을 때 batchPool.options에 application_name이 'memento-mcp:batch'다", () => {
+  it("BATCH_DATABASE_URL 없을 때 batchPool.options에 application_name이 'weasley-deepmind:batch'다", () => {
     /** BATCH_DATABASE_URL이 없으면 config 객체에 application_name 직접 설정 */
     if (process.env.BATCH_DATABASE_URL) {
       /** connectionString 경로: options.connectionString에 app_name 포함될 수 있음 — skip */
@@ -87,8 +87,8 @@ describe("Phase 7 — DB Pool 격리 검증", () => {
     }
     assert.strictEqual(
       batchPool.options.application_name,
-      "memento-mcp:batch",
-      "application_name이 'memento-mcp:batch'가 아니다"
+      "weasley-deepmind:batch",
+      "application_name이 'weasley-deepmind:batch'가 아니다"
     );
   });
 
@@ -105,7 +105,7 @@ describe("Phase 7 — DB Pool 격리 검증", () => {
       const res = await client.query("SELECT current_setting('application_name') AS app_name");
       assert.strictEqual(
         res.rows[0].app_name,
-        "memento-mcp:batch",
+        "weasley-deepmind:batch",
         `DB application_name 불일치: ${res.rows[0].app_name}`
       );
     } finally {

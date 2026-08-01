@@ -1,4 +1,4 @@
-﻿# Changelog
+# Changelog
 
 ## [5.3.1] - 2026-07-27
 
@@ -8,12 +8,12 @@
 
 ### Changed
 - L3kw 보조 질의를 정규화(소문자·중복 제거·정렬, contextText 제외)해 임베딩 캐시 적중률을 높이고, 이 경로의 형태소 보조 검색을 생략한다. 실측 기준 L3kw 발동 지연 p50이 약 2.5초에서 0.5~1.1초로 감소.
-- L3kw 실행 상한 도입: `MEMENTO_KEYWORD_FALLBACK_TIMEOUT_MS`(기본 1500ms, 100~60000 클램프). 초과 시 보조 없이 즉시 반환하며 searchPath에 `L3kw:timeout`을 남긴다.
+- L3kw 실행 상한 도입: `WEASLEY_DEEPMIND_KEYWORD_FALLBACK_TIMEOUT_MS`(기본 1500ms, 100~60000 클램프). 초과 시 보조 없이 즉시 반환하며 searchPath에 `L3kw:timeout`을 남긴다.
 
 ## [5.3.0] - 2026-07-26
 
 ### Added
-- text 없는 keywords-only recall에 L3 시맨틱 보조 경로. keywords(+contextText) 합성 텍스트 임베딩이 L2와 병렬 수행되어 저장 keywords 배열에 없는 용어도 content 기반으로 회수된다. searchPath에 `L3kw:N` 세그먼트가 남으며 `semanticSearch.keywordFallback`(env `MEMENTO_KEYWORD_SEMANTIC_FALLBACK=false`)로 비활성화할 수 있다.
+- text 없는 keywords-only recall에 L3 시맨틱 보조 경로. keywords(+contextText) 합성 텍스트 임베딩이 L2와 병렬 수행되어 저장 keywords 배열에 없는 용어도 content 기반으로 회수된다. searchPath에 `L3kw:N` 세그먼트가 남으며 `semanticSearch.keywordFallback`(env `WEASLEY_DEEPMIND_KEYWORD_SEMANTIC_FALLBACK=false`)로 비활성화할 수 있다.
 - `reflect`에 `workspace` 파라미터 노출. 생성되는 모든 reflect 파편에 적용되며, 미지정 시 API 키의 default_workspace → 전역(NULL) 순으로 폴백한다.
 ### Fixed
 - 서버 재기동 후 Redis에서 복원된 세션이 이전 협상값(negotiatedVersion)을 그대로 되살려 이후 모든 요청이 400으로 거부되던 문제 수정. 협상값과 헤더가 달라도 지원 목록에 있는 값이면 헤더 값으로 재앵커링해 통과시키며(`mcp_protocol_version_reanchored_total` 카운터로 관측), 미지원 버전에 대한 400 거부는 유지된다. initialize 시 협상값을 Redis에 즉시 영속한다. (#26)
@@ -79,8 +79,8 @@
 ## [5.0.0] - 2026-07-14
 
 ### Changed
-- 프로젝트명을 weasley-deepmind로 변경 (패키지명 weasley-deepmind-mcp). memento-mcp라는 이름이 다수의 동명·유사 프로젝트와 겹쳐 개명했으며, 도구명·환경 변수(MEMENTO_*)·DB 스키마·API 경로·키 형식(mmcp_) 등 런타임 계약은 모두 그대로다 (Breaking 없음).
-- CLI bin에 `weasley-deepmind` 명령 추가. 기존 `memento-mcp` 명령은 별칭으로 유지.
+- 프로젝트명을 weasley-deepmind로 변경 (패키지명 weasley-deepmind). weasley-deepmind라는 이름이 다수의 동명·유사 프로젝트와 겹쳐 개명했으며, 도구명·환경 변수(WEASLEY_DEEPMIND_*)·DB 스키마·API 경로·키 형식(wdm_) 등 런타임 계약은 모두 그대로다 (Breaking 없음).
+- CLI bin에 `weasley-deepmind` 명령 추가. 기존 `weasley-deepmind` 명령은 별칭으로 유지.
 - MCP initialize 응답의 serverInfo.name을 `weasley-deepmind-server`로 변경 (표시 메타데이터).
 - admin 콘솔·로그인 화면 브랜딩과 README 로고를 weasley-deepmind로 교체.
 - README·SKILL.md·docs 전반의 표기를 현행 코드 기준으로 정비.
@@ -98,7 +98,7 @@
 ### Added
 - 관리자 API `GET /memory/fragments/:id`: 파편 전문·keywords·메타·1-hop 링크를 반환하는 상세 조회. `key_id`/`group_id` 스코프를 적용하며 스코프 밖 id는 404.
 - 관리자 API `GET /memory/fragments`에 `q` 파라미터: content 본문 부분 일치 검색(ILIKE, 와일드카드 이스케이프).
-- `MEMENTO_CONTEXT_ANCHOR_LIMIT` 환경 변수: context 응답에 포함되는 앵커 파편 개수 설정(기본 10, 1~30 클램프). `config/memory.js contextInjection.maxAnchorFragments`.
+- `WEASLEY_DEEPMIND_CONTEXT_ANCHOR_LIMIT` 환경 변수: context 응답에 포함되는 앵커 파편 개수 설정(기본 10, 1~30 클램프). `config/memory.js contextInjection.maxAnchorFragments`.
 - admin 메모리 뷰: 본문 검색 입력(Enter 실행 지원), 파편 클릭 시 상세 인스펙터(전문·keywords·링크·그래프 뷰 이동), EXPORT JSONL 다운로드 버튼, episode/relation 타입 필터.
 - admin 사이드바 오프캔버스 토글: 768px 이하에서 메뉴 버튼·오버레이·ESC로 여닫는다.
 
@@ -141,7 +141,7 @@
 ### Added
 - 벡터 검색 HNSW 인덱스 강제 옵션·토글: `ORDER BY embedding <=> v LIMIT` 트랜잭션에 `enable_seqscan=off`·`enable_bitmapscan=off`·`hnsw.iterative_scan` 힌트를 적용해 HNSW 인덱스 경로를 강제.
 - `batch_remember` 비동기(파이어앤포겟) 모드 opt-in: `async: true` 지정 시 선검증 후 Redis 큐 적재, `{async, accepted, rejected, jobId}` 즉시 반환. `BatchRememberWorker`가 본처리. 기본 `async: false`로 기존 동기 동작 불변. Redis 비활성 환경에서는 동기 폴백.
-- 배치 작업 전용 연결 풀(`getBatchPool`, `application_name='memento-mcp:batch'`) 및 배치 풀 통계 메트릭 수집.
+- 배치 작업 전용 연결 풀(`getBatchPool`, `application_name='weasley-deepmind:batch'`) 및 배치 풀 통계 메트릭 수집.
 
 ### Changed
 - HNSW 인덱스 정의의 `ef_construction` 정합화, L3 형태소 보강 검색 병렬 실행, RRF 병합 후보에 importance 하한 컷오프 적용.
@@ -159,12 +159,12 @@
 
 ### Added
 - `lib/memory/consolidate/split-gate.js`: 분할 자식 품질 게이트 순수 함수 모듈. `isAcceptableSplitChild`(최소 길이 20자·대체 문자·CJK 혼입·대명사 시작 reject)와 `clampChildImportance`(부모×0.7 상한 클램프; fact 타입은 0.4 미만 시 `null` 반환)를 export한다.
-- `lib/memory/consolidate/split-metrics.js`: `memento_consolidate_split_skipped_total{reason}` Prometheus 카운터 모듈. reason 라벨: `provider_error` · `llm_error` · `low_yield` · `insert_shortfall`.
+- `lib/memory/consolidate/split-metrics.js`: `weasley_deepmind_consolidate_split_skipped_total{reason}` Prometheus 카운터 모듈. reason 라벨: `provider_error` · `llm_error` · `low_yield` · `insert_shortfall`.
 - `scripts/cleanup-legacy-split-fragments.js`: `source LIKE 'split:%'` 자식 파편 일괄 정리 스크립트.
 - `lib/memory/migration-036-split-attempt-failed-at.sql`: `fragments.split_attempt_failed_at TIMESTAMPTZ NULL` 컬럼 및 partial index 추가. 분할 실패 backoff 구현의 DB 기반.
 - `config/memory.js` `gc.splitChildPolicy` 블록: `maxImportance`(0.3), `orphanAgeDays`(30), `tombstonedGraceDays`(7) 키 신설.
 - `config/memory.js` `fragmentSplit` 블록에 `minChildLength`(20), `excludeMetaTopics`(`["session_reflect","consolidation","reflection"]`), `failureBackoffHours`(24) 키 신설.
-- `lib/config.js` `resolveSplitChainConfig(env)`: `MEMENTO_SPLIT_LLM_PRIMARY` + `MEMENTO_SPLIT_LLM_FALLBACKS` 환경변수에서 split 전용 provider 체인을 파싱한다. 미설정 시 `null` 반환 → 전역 체인 재사용.
+- `lib/config.js` `resolveSplitChainConfig(env)`: `WEASLEY_DEEPMIND_SPLIT_LLM_PRIMARY` + `WEASLEY_DEEPMIND_SPLIT_LLM_FALLBACKS` 환경변수에서 split 전용 provider 체인을 파싱한다. 미설정 시 `null` 반환 → 전역 체인 재사용.
 
 ### Changed
 - `splitLongFragments` two-phase gate-then-commit: Phase 1에서 모든 자식 후보를 `isAcceptableSplitChild`·`clampChildImportance`로 검증하고, 통과 수 < `minItems`이면 DB 커밋 없이 해당 파편의 `split_attempt_failed_at`만 갱신한다. Phase 2는 통과 후보만 일괄 insert한다.
@@ -194,15 +194,15 @@
 ### Added
 
 - `lib/memory/embedding/MorphemeTokenizer.js` 신규 모듈. 유니코드 스크립트 런 분할 후 언어별 분석기로 라우팅: 한글 garu-ko, 영어 natural PorterStemmer, 중국어 @node-rs/jieba, 일본어 kuromoji. `MorphemeIndex.tokenize()`가 이 모듈에 위임한다.
-- 환경변수 `MEMENTO_MORPHEME_TOKENIZER=local|llm` (기본 `local`). `llm` 설정 시 종전 LLM 서브프로세스 경로로 롤백.
-- 환경변수 `MEMENTO_ENABLE_KUROMOJI=true|false` (기본 `true`). `false` 설정 시 kuromoji 로딩 생략 (~269MB RSS 절감).
+- 환경변수 `WEASLEY_DEEPMIND_MORPHEME_TOKENIZER=local|llm` (기본 `local`). `llm` 설정 시 종전 LLM 서브프로세스 경로로 롤백.
+- 환경변수 `WEASLEY_DEEPMIND_ENABLE_KUROMOJI=true|false` (기본 `true`). `false` 설정 시 kuromoji 로딩 생략 (~269MB RSS 절감).
 - `config/memory.js` `morphemeIndex` 블록에 `kanaMinChars`(기본 2), `enableKuromoji`(기본 true) 키 추가.
 - 한글 형태소 stopword 필터 `filterHangulMorphemes`: 조사·어미·단음절을 제거하고 의미 형태소만 반환.
 
 ### Changed
 
 - L3 형태소 토크나이저를 LLM 서브프로세스(쿼리당 ~10초)에서 로컬 CPU 분석기(MorphemeTokenizer)로 전환. 벤치마크: 1.06ms/call(약 9400배 개선), 상주 RSS +28.9MB.
-- `MorphemeIndex._tokenize()` 내부가 `MEMENTO_MORPHEME_TOKENIZER=local`(기본)일 때 `MorphemeTokenizer.tokenize()`로 위임. `llm` 경로는 기존 `_tokenizeViaLLM()` 그대로 유지.
+- `MorphemeIndex._tokenize()` 내부가 `WEASLEY_DEEPMIND_MORPHEME_TOKENIZER=local`(기본)일 때 `MorphemeTokenizer.tokenize()`로 위임. `llm` 경로는 기존 `_tokenizeViaLLM()` 그대로 유지.
 - OpenAI 임베딩 경로(`getOrRegisterEmbeddings`) 및 `morpheme_dict` DB 스키마 변경 없음.
 - Docker 베이스 이미지를 `node:20-alpine`에서 `node:24-alpine`으로 상향. garu-ko(WASM)가 요구하는 WASM stringref를 컨테이너 런타임에서 지원하기 위함.
 - reflect의 narrative episode 저장 경로에서 충돌 감지(`detectConflicts`)를 생략하는 `skipConflictDetection` 옵션 도입. episode 저장 지연을 약 1,100ms에서 약 150ms로 단축한다. 일반 `remember`는 기본값으로 충돌 감지를 유지하며, 정합성 자동 링크(related·temporal·preceded_by)는 그대로 수행된다.
@@ -227,9 +227,9 @@
 
 ### Added
 
-- `config/memory.js` `proactiveRecall` 블록 신설: `mode`(env `MEMENTO_PROACTIVE_RECALL_MODE`, 기본 `auto`; 값 `off`/`auto`/`legacy`), `keywordOverlapMin`(env `MEMENTO_PROACTIVE_KW_OVERLAP_MIN`, 기본 0.5), `requireSameWorkspace`(true), `caseIdPolicy`(env `MEMENTO_PROACTIVE_CASE_POLICY`, 기본 `strict-or-adjacent`; 값 `both-required`/`strict-or-adjacent`/`loose`), `adjacencyWindowMs`(24h), `requireSameTopicOrType`(false).
-- `config/memory.js` `consolidate.schemaFit` 블록: `pendingCaseFragmentsMin`(5), `recentRelatedLinksMin`(20), `fragmentsSinceLastRunMin`(30), `mode`(env `MEMENTO_CONSOLIDATE_GATE_MODE`, 기본 `any`; 값 `all`/`any`/`off`).
-- `config/memory.js` `consolidate.enableRiskyStages` 블록: `splitLongFragments`(env `MEMENTO_CONSOLIDATE_SPLIT_LONG`, 기본 true), `detectContradictions`(env `MEMENTO_CONSOLIDATE_DETECT_CONTRADICT`, 기본 true), `compressOldFragments`(env `MEMENTO_CONSOLIDATE_COMPRESS_OLD`, 기본 false).
+- `config/memory.js` `proactiveRecall` 블록 신설: `mode`(env `WEASLEY_DEEPMIND_PROACTIVE_RECALL_MODE`, 기본 `auto`; 값 `off`/`auto`/`legacy`), `keywordOverlapMin`(env `WEASLEY_DEEPMIND_PROACTIVE_KW_OVERLAP_MIN`, 기본 0.5), `requireSameWorkspace`(true), `caseIdPolicy`(env `WEASLEY_DEEPMIND_PROACTIVE_CASE_POLICY`, 기본 `strict-or-adjacent`; 값 `both-required`/`strict-or-adjacent`/`loose`), `adjacencyWindowMs`(24h), `requireSameTopicOrType`(false).
+- `config/memory.js` `consolidate.schemaFit` 블록: `pendingCaseFragmentsMin`(5), `recentRelatedLinksMin`(20), `fragmentsSinceLastRunMin`(30), `mode`(env `WEASLEY_DEEPMIND_CONSOLIDATE_GATE_MODE`, 기본 `any`; 값 `all`/`any`/`off`).
+- `config/memory.js` `consolidate.enableRiskyStages` 블록: `splitLongFragments`(env `WEASLEY_DEEPMIND_CONSOLIDATE_SPLIT_LONG`, 기본 true), `detectContradictions`(env `WEASLEY_DEEPMIND_CONSOLIDATE_DETECT_CONTRADICT`, 기본 true), `compressOldFragments`(env `WEASLEY_DEEPMIND_CONSOLIDATE_COMPRESS_OLD`, 기본 false).
 - `lib/symbolic/rules/v1/proactive-gate.js` `evaluateProactiveGate`에 `workspace_mismatch`·`case_policy` 차단 사유 추가. `caseIdPolicy` 3-값 분기 구현.
 - `lib/scheduler.js` `evaluateSchemaFitGate(pool, cfg, lastRunTimestamp)` 함수. setInterval 콜백이 consolidate 호출 전 schema-fit gate를 평가하여 미충족 시 다음 tick으로 deferred. gate 오류 시 fail-open으로 안전 통과.
 - 신규 unit 테스트: `tests/unit/proactive-recall-gate.test.js`(8), `tests/unit/auto-link-session-gate.test.js`(10), `tests/unit/consolidator-schema-fit-gate.test.js`(15), `tests/unit/reflect-meta-link-suggestions.test.js`(3).
@@ -279,7 +279,7 @@ recall 최종 정렬에서 cross-encoder reranker 결과를 보존하고, topic/
 
 ### Added
 
-- `MEMENTO_RECALL_MIN_SIM_FLOOR` 환경변수. `SearchParamAdaptor.getMinSimilarity`가 반환하는 적응형 임계값에 옵트인 하한을 강제한다. 미설정 시 기존 동작 그대로.
+- `WEASLEY_DEEPMIND_RECALL_MIN_SIM_FLOOR` 환경변수. `SearchParamAdaptor.getMinSimilarity`가 반환하는 적응형 임계값에 옵트인 하한을 강제한다. 미설정 시 기존 동작 그대로.
 
 ### Changed
 
@@ -305,7 +305,7 @@ recall 최종 정렬에서 cross-encoder reranker 결과를 보존하고, topic/
 ### Added
 
 - `lib/storage/` 어댑터 계층 신설.
-  - `lib/storage/index.js`: `getStorage()` 팩토리. `MEMENTO_STORAGE` 환경변수로 어댑터 선택(기본 `pgvector`).
+  - `lib/storage/index.js`: `getStorage()` 팩토리. `WEASLEY_DEEPMIND_STORAGE` 환경변수로 어댑터 선택(기본 `pgvector`).
   - `lib/storage/PgVectorStore.js`: 기존 `lib/tools/db.js`의 `getPrimaryPool`·`queryWithAgentVector`를 위임 호출하는 어댑터. `engine='pgvector'`, `vectorSupport='native'`.
   - `lib/storage/SqliteVecStore.js`: v4.1 본격 구현 예정 stub. 모든 메서드가 not-implemented throw.
   - `lib/storage/README.md`: 어댑터 계층 가이드.
@@ -407,11 +407,11 @@ recall 최종 정렬에서 cross-encoder reranker 결과를 보존하고, topic/
 ### Added
 
 - `lib/config.js`에 `CASE_BACKPROP_ENABLED` export 추가 (외부 노출용 상수).
-- `MEMENTO_CASE_BACKPROP_ENABLED` 환경변수: `CaseRewardBackprop.backprop`을 활성화한다. 기본 off. 미설정 또는 `false` 시 호출 자체가 즉시 반환되어 DB 쿼리·메트릭 영향이 없다.
+- `WEASLEY_DEEPMIND_CASE_BACKPROP_ENABLED` 환경변수: `CaseRewardBackprop.backprop`을 활성화한다. 기본 off. 미설정 또는 `false` 시 호출 자체가 즉시 반환되어 DB 쿼리·메트릭 영향이 없다.
 
 ### Changed
 
-- `CaseRewardBackprop.backprop`이 매 호출 시 `process.env.MEMENTO_CASE_BACKPROP_ENABLED`를 평가한다(런타임 토글 가능).
+- `CaseRewardBackprop.backprop`이 매 호출 시 `process.env.WEASLEY_DEEPMIND_CASE_BACKPROP_ENABLED`를 평가한다(런타임 토글 가능).
 - `docs/features.md` 실험 플래그 표를 사실 정정: NLIClassifier·AutoReflect·ReconsolidationEngine을 실험 표에서 제거하고 dual-mode/항상 활성 기능으로 별도 분류. 실제 ENV 토글이 동작하는 SpreadingActivation·CaseRewardBackprop만 실험 플래그로 유지.
 
 ### Tests
@@ -524,10 +524,10 @@ recall 최종 정렬에서 cross-encoder reranker 결과를 보존하고, topic/
 - `SessionLinker.autoLinkSessionFragments`: sortedKey 사전식 정렬 + `wouldCreateCycle` 캐시.
 - `LinkStore.createLinks`: advisory lock + multi-row INSERT 단일 트랜잭션. 단건 fallback 유지.
 - `FragmentStore.createLinks`: N개 링크 생성 통합.
-- `db.js` `getBatchPool()`: `max = primaryMax × 0.3`, `application_name = 'memento-mcp:batch'`.
+- `db.js` `getBatchPool()`: `max = primaryMax × 0.3`, `application_name = 'weasley-deepmind:batch'`.
 - `BATCH_DATABASE_URL` 환경변수: 배치 전용 DB 엔드포인트 분리 옵션.
 - `GEMINI_TIMEOUT_MS` 환경변수: AutoReflect LLM timeout 오버라이드 (기본 30s).
-- batchPool Prometheus Gauge 3개: `memento_batchpool_active`, `memento_batchpool_idle`, `memento_batchpool_waiting`.
+- batchPool Prometheus Gauge 3개: `weasley_deepmind_batchpool_active`, `weasley_deepmind_batchpool_idle`, `weasley_deepmind_batchpool_waiting`.
 
 ### Migration
 
@@ -548,9 +548,9 @@ LLM Provider 체인 동시성 제어를 추가해 Ollama Cloud 및 외부 LLM �
 - 디스패처 세마포어 wrap: `lib/llm/index.js`의 `llmJson` 루프가 provider 호출을 `acquire()`/`release()`로 감싼다. `waitTimeoutMs` 초과 시 해당 provider를 실패로 처리하고 다음 fallback으로 즉시 전환.
 - `_cooldownUntil` 필드 + `_setCooldown(ms)` 헬퍼를 `OllamaProvider` · `OpenAICompatibleProvider`에 추가. HTTP 429 수신 시 500-2000ms 랜덤 쿨다운 동안 `isAvailable()=false`.
 - 3개 Prometheus 메트릭:
-  - `memento_llm_provider_concurrency_active{provider}` — Gauge
-  - `memento_llm_provider_concurrency_wait_ms{provider}` — Histogram (buckets 1 ~ 30000ms)
-  - `memento_llm_provider_429_total{provider}` — Counter
+  - `weasley_deepmind_llm_provider_concurrency_active{provider}` — Gauge
+  - `weasley_deepmind_llm_provider_concurrency_wait_ms{provider}` — Histogram (buckets 1 ~ 30000ms)
+  - `weasley_deepmind_llm_provider_429_total{provider}` — Counter
 - 환경 변수:
   - `LLM_CONCURRENCY_ENABLED` (default `true`, kill switch)
   - `LLM_CONCURRENCY_WAIT_MS` (default `30000`)
@@ -582,7 +582,7 @@ LLM Provider 체인 동시성 제어를 추가해 Ollama Cloud 및 외부 LLM �
 1. `npm install` — dependency 변화 없음, `package-lock.json`만 갱신
 2. 신규 env 변수 설정은 선택사항. 미설정 시 내장 기본값 사용
 3. `LLM_FALLBACKS` 내 provider chain key가 내장 기본값과 다르면 `LLM_CONCURRENCY='{...}'`로 명시
-4. 서비스 재시작 후 `memento_llm_provider_429_total` 메트릭 감시
+4. 서비스 재시작 후 `weasley_deepmind_llm_provider_429_total` 메트릭 감시
 
 ### 미해결 / 후속
 
@@ -596,17 +596,17 @@ v3.0.0에서 예고된 deprecation 2건을 실제로 제거한다. v3.0.0으로 
 
 ### Breaking Changes
 
-- **recall / context 응답 top-level mirror 필드 제거**: `_searchEventId`, `_memento_hint`, `_suggestion` 세 필드가 더 이상 응답 최상위에 포함되지 않는다. 동일 값은 v3.0.0부터 제공된 `_meta.searchEventId`, `_meta.hints`, `_meta.suggestion`에 그대로 존재. 클라이언트는 `_meta.*` 경로로 참조하도록 전환해야 한다.
+- **recall / context 응답 top-level mirror 필드 제거**: `_searchEventId`, `_weasley_deepmind_hint`, `_suggestion` 세 필드가 더 이상 응답 최상위에 포함되지 않는다. 동일 값은 v3.0.0부터 제공된 `_meta.searchEventId`, `_meta.hints`, `_meta.suggestion`에 그대로 존재. 클라이언트는 `_meta.*` 경로로 참조하도록 전환해야 한다.
 - **`scripts/migration-007-flexible-embedding-dims.js` 심볼릭 링크 제거**: 2026-04-19 이후 유지되던 구 경로 하위 호환이 종료됐다. 외부 스크립트·CI에서 구 경로를 참조하는 경우 `scripts/post-migrate-flexible-embedding-dims.js`로 갱신해야 한다.
 
 ### Changed
 
-- `lib/tools/memory.js` 3곳(`tool_recall` caseMode 분기, `tool_recall` 일반 분기, `tool_context`)의 응답 조립부에서 top-level mirror 필드 삭제. `tool_context`는 `{ _memento_hint, _searchEventId, _suggestion, ...rest }` destructure로 내부 전달용 필드를 응답 직전에 분리하고 `_meta`에만 담는다.
+- `lib/tools/memory.js` 3곳(`tool_recall` caseMode 분기, `tool_recall` 일반 분기, `tool_context`)의 응답 조립부에서 top-level mirror 필드 삭제. `tool_context`는 `{ _weasley_deepmind_hint, _searchEventId, _suggestion, ...rest }` destructure로 내부 전달용 필드를 응답 직전에 분리하고 `_meta`에만 담는다.
 - `lib/openapi.js` info.version `3.0.0` → `3.1.0`
 
 ### Migration Guide (v3.0.0 → v3.1.0)
 
-1. 클라이언트 코드에서 `response._searchEventId` → `response._meta.searchEventId`, `response._memento_hint` → `response._meta.hints[0]`, `response._suggestion` → `response._meta.suggestion`으로 교체
+1. 클라이언트 코드에서 `response._searchEventId` → `response._meta.searchEventId`, `response._weasley_deepmind_hint` → `response._meta.hints[0]`, `response._suggestion` → `response._meta.suggestion`으로 교체
 2. CI·스크립트에서 `scripts/migration-007-flexible-embedding-dims.js` 참조가 있다면 `scripts/post-migrate-flexible-embedding-dims.js`로 일괄 치환
 3. `npm install` 후 `npm run migrate` — 신규 마이그레이션 없음. `package-lock.json`만 갱신
 
@@ -625,7 +625,7 @@ v2.8.0 태그 이후 누적된 un-tagged 빌드 11종(v2.8.1 ~ v2.16.0)을 umbre
 - **Admin Metrics Dashboard** (v2.16.0): Prometheus 8 카드(Active Sessions / Auth Denied / RBAC Denied / Tenant Blocked / RPC p50/p99 / Tool Errors / Symbolic Gate Blocked / OAuth Tokens) + 도구별 호출/에러 분포 테이블 + SVG sparkline 시계열. `/v1/internal/model/nothing/metrics-summary` 엔드포인트(master/admin 전용, TTL 10초 캐시, `?windowSec=N`)
 - **CLI/API Enhancement L+M+H** (v2.11.0 ~ v2.12.0): 원격 CLI(`lib/cli/_mcpClient.js`, `--remote URL` / `--key KEY`), `_meta` 래퍼(`searchEventId` / `hints` / `suggestion`), sparse fields 17종 화이트리스트, `--help`/`--format table|json|csv`, idempotencyKey(maxLength 128, partial UNIQUE), X-RateLimit 헤더, dryRun 파라미터(remember/link/forget/amend), stdin / progress streaming / export·import, CLI session 관리 및 rotate / rate-limit / CSRF
 - **MemoryManager 분해** (v2.10.0): 1252줄 → 259줄 facade. 비즈니스 로직을 `lib/memory/processors/` 4개 클래스로 분리(MemoryRememberer / MemoryRecaller / MemoryReflector / MemoryLinker). facade ↔ 프로세서 간 `_installSharedSync` setter 동기화 패턴
-- **Mode preset / Affective tagging / Local Embedding** (v2.9.0): recall-only / write-only / onboarding / audit 4개 JSON preset(`X-Memento-Mode` 헤더 / `initialize.params.mode` / `api_keys.default_mode`). fragments.affect 컬럼(6 enum: neutral / frustration / confidence / surprise / doubt / satisfaction). `@huggingface/transformers` 로컬 임베딩 provider(`EMBEDDING_PROVIDER=transformers`, Xenova/multilingual-e5-small / bge-m3). Codex CLI / GitHub Copilot CLI LLM provider 추가. RecallSuggestionEngine 비침습적 힌트 필드. 토큰 기반 세션 재사용(sha256 + keyId 네임스페이스)
+- **Mode preset / Affective tagging / Local Embedding** (v2.9.0): recall-only / write-only / onboarding / audit 4개 JSON preset(`X-Weasley DeepMind-Mode` 헤더 / `initialize.params.mode` / `api_keys.default_mode`). fragments.affect 컬럼(6 enum: neutral / frustration / confidence / surprise / doubt / satisfaction). `@huggingface/transformers` 로컬 임베딩 provider(`EMBEDDING_PROVIDER=transformers`, Xenova/multilingual-e5-small / bge-m3). Codex CLI / GitHub Copilot CLI LLM provider 추가. RecallSuggestionEngine 비침습적 힌트 필드. 토큰 기반 세션 재사용(sha256 + keyId 네임스페이스)
 - **Session 안정화 + OAuth 호환성** (v2.8.1 ~ v2.8.7): claude.ai / ChatGPT / Copilot / Gemini OAuth DCR-less 커넥터 완전 호환. name-based DCR client_id(`<name>_<keyIdHex8>`) + `client_name="apikey:<keyId>"` 내부 바인딩, `client_secret` API 키 바인딩, bound_key_id 경로. 세션 ID 보존 복구 + keyId 교차 검증(403). RFC 8707 `resource` 파라미터. `token_endpoint_auth_methods_supported` 확장. MCP 2025-06-18 Protocol-Version 헤더 검증. `MCP_REJECT_NONAPIKEY_OAUTH` / `MCP_ALLOW_AUTO_DCR_REGISTER` / `MCP_STRICT_ORIGIN` 보안 기본값. FragmentReader keyId ANY() 래핑 일괄 수정(v2.8.7)
 - **Symbolic Memory Layer hard gate** (v2.8.0): 이미 v2.8.0에서 도입(본 릴리즈는 hard gate 이후 후속 수정 및 문서 동기화 포함). `fragment_claims` + `api_keys.symbolic_hard_gate` BOOLEAN. 6 Phase(Foundation / Shadow / Explain / Link Integrity / Policy / CBR+Proactive) 전개. 기본값 전면 opt-out
 - **Scripts rename** (un-tagged 2026-04-19): `scripts/migration-007-flexible-embedding-dims.js` → `scripts/post-migrate-flexible-embedding-dims.js`. 자동 마이그레이션 러너와 수동 dimension 재구성 스크립트 구분. 심볼릭 링크로 하위 호환
@@ -635,7 +635,7 @@ v2.8.0 태그 이후 누적된 un-tagged 빌드 11종(v2.8.1 ~ v2.16.0)을 umbre
 
 코드 레벨 breaking 없음. 모든 신규 기능 opt-in. 기존 환경 변수·API 응답·DB 스키마 완전 호환.
 
-Deprecation 예고(v3.1.0에서 제거): recall / context 응답의 top-level `_searchEventId` / `_memento_hint` / `_suggestion` 필드. v3.0.0은 `_meta.searchEventId` / `_meta.hints` / `_meta.suggestion`과 top-level mirror를 동시 제공. 호출부는 `_meta.*`로 전환 권고.
+Deprecation 예고(v3.1.0에서 제거): recall / context 응답의 top-level `_searchEventId` / `_weasley_deepmind_hint` / `_suggestion` 필드. v3.0.0은 `_meta.searchEventId` / `_meta.hints` / `_meta.suggestion`과 top-level mirror를 동시 제공. 호출부는 `_meta.*`로 전환 권고.
 
 ### Migration Guide (v2.8.0 → v3.0.0)
 
@@ -644,7 +644,7 @@ Deprecation 예고(v3.1.0에서 제거): recall / context 응답의 top-level `_
 3. 환경 변수 확인 — 기본값 유지 시 추가 작업 없음. 선택적 기능 활성화:
    - `EMBEDDING_PROVIDER=transformers` (로컬 임베딩)
    - `LLM_PRIMARY` / `LLM_FALLBACKS` (LLM 폴백 체인)
-   - `MEMENTO_SYMBOLIC_*` (Symbolic 계층 단계적 활성화 — v2.8.0 Migration Guide 참조)
+   - `WEASLEY_DEEPMIND_SYMBOLIC_*` (Symbolic 계층 단계적 활성화 — v2.8.0 Migration Guide 참조)
    - `MCP_REJECT_NONAPIKEY_OAUTH=false` (claude.ai 외 DCR-less 클라이언트에 대한 하위 호환 복원이 필요한 경우만)
 4. EMBEDDING_PROVIDER 변경 시에만 `npm run backfill:embeddings` 수동 실행. 차원 불일치 시 서버 기동 단계에서 `scripts/check-embedding-consistency.js`가 즉시 중단
 5. 기존 스크립트 경로 `scripts/migration-007-flexible-embedding-dims.js` 참조 시 `scripts/post-migrate-flexible-embedding-dims.js`로 전환 권고(심볼릭 링크는 v2.13.0 네임스페이스 하위 호환 유지)
@@ -652,7 +652,7 @@ Deprecation 예고(v3.1.0에서 제거): recall / context 응답의 top-level `_
 ### Known Limitations
 
 - v2.8.0 이후 v2.9.0 ~ v2.16.0의 중간 빌드는 git tag가 존재하지 않는다. v3.0.0이 유일한 공식 릴리즈 태그이며, 하위 빌드 히스토리는 본 CHANGELOG로만 추적된다
-- `MEMENTO_ACCESS_KEY` 미설정 상태에서 `MEMENTO_AUTH_DISABLED=true` 없이 서버를 기동하면 fail-closed로 거부된다(v2.7.0 정책 유지)
+- `WEASLEY_DEEPMIND_ACCESS_KEY` 미설정 상태에서 `WEASLEY_DEEPMIND_AUTH_DISABLED=true` 없이 서버를 기동하면 fail-closed로 거부된다(v2.7.0 정책 유지)
 
 ---
 
@@ -673,7 +673,7 @@ Deprecation 예고(v3.1.0에서 제거): recall / context 응답의 top-level `_
 
 ### Added
 
-- M1 원격 CLI: `lib/cli/_mcpClient.js` 신설. `--remote URL` / `--key KEY` 전역 플래그 및 `MEMENTO_CLI_REMOTE` / `MEMENTO_CLI_KEY` 환경변수 fallback. initialize → tools/call 2단계 세션을 생성하고 재사용한다. local-only 명령(migrate, admin 등)을 원격 모드에서 호출하면 에러를 반환한다.
+- M1 원격 CLI: `lib/cli/_mcpClient.js` 신설. `--remote URL` / `--key KEY` 전역 플래그 및 `WEASLEY_DEEPMIND_CLI_REMOTE` / `WEASLEY_DEEPMIND_CLI_KEY` 환경변수 fallback. initialize → tools/call 2단계 세션을 생성하고 재사용한다. local-only 명령(migrate, admin 등)을 원격 모드에서 호출하면 에러를 반환한다.
 - M3 X-RateLimit HTTP 헤더: 모든 API 응답에 `X-RateLimit-Limit` / `X-RateLimit-Remaining` / `X-RateLimit-Resource` 헤더 포함. `QuotaChecker.getUsage` + 모듈 레벨 Map 캐시(TTL 10초, 상한 1000 엔트리). master key 또는 limit=null이면 헤더 생략.
 - M5 dryRun 파라미터: remember / link / forget / amend 4개 MCP 도구에 `dryRun: boolean` 파라미터 추가. 기본값 false. true 시 `simulated: true` 응답 반환 + 모든 side-effect 스킵.
 
@@ -689,13 +689,13 @@ Deprecation 예고(v3.1.0에서 제거): recall / context 응답의 top-level `_
 
 ### Deprecated
 
-- recall / context 응답의 top-level `_searchEventId` / `_memento_hint` / `_suggestion` 필드: v2.12.x 마지막 릴리즈를 끝으로 v2.13.0에서 제거된다. `_meta.searchEventId` / `_meta.hints` / `_meta.suggestion`으로 전환할 것.
+- recall / context 응답의 top-level `_searchEventId` / `_weasley_deepmind_hint` / `_suggestion` 필드: v2.12.x 마지막 릴리즈를 끝으로 v2.13.0에서 제거된다. `_meta.searchEventId` / `_meta.hints` / `_meta.suggestion`으로 전환할 것.
 
 ### v2.10.1 — TDZ 핫픽스 (2026-04-20)
 
 ### Fixed
 
-- R12 TDZ 핫픽스: `remember()` 내부의 atomic 분기(`MEMENTO_REMEMBER_ATOMIC=true && keyId != null` 경로)가 `const fragment` 선언 이전에 위치하여 ReferenceError가 발생했다. atomic 분기를 fragment 생성 이후로 이동하고, `quotaChecker.check`를 `!(atomicRemember && keyId)` 가드로 조건부 호출하도록 수정했다. 원격 `memento.weasley-deepmind.net` 서버에서 동일 증상이 발생하던 문제도 함께 해소된다.
+- R12 TDZ 핫픽스: `remember()` 내부의 atomic 분기(`WEASLEY_DEEPMIND_REMEMBER_ATOMIC=true && keyId != null` 경로)가 `const fragment` 선언 이전에 위치하여 ReferenceError가 발생했다. atomic 분기를 fragment 생성 이후로 이동하고, `quotaChecker.check`를 `!(atomicRemember && keyId)` 가드로 조건부 호출하도록 수정했다. 원격 `deepmind.example.com` 서버에서 동일 증상이 발생하던 문제도 함께 해소된다.
 
 ### Added
 
@@ -729,7 +729,7 @@ Deprecation 예고(v3.1.0에서 제거): recall / context 응답의 top-level `_
 
 ### Added
 
-- **Mode preset 시스템**: recall-only / write-only / onboarding / audit 4개 JSON preset. `X-Memento-Mode` 헤더, `initialize.params.mode`, `api_keys.default_mode` DB 컬럼 3경로로 활성화. tools/list 응답이 mode별로 필터링된다. (`lib/memory/ModeRegistry.js`, `lib/memory/modes/*.json`, migration-034-v2.16.0-bundle.sql)
+- **Mode preset 시스템**: recall-only / write-only / onboarding / audit 4개 JSON preset. `X-Weasley DeepMind-Mode` 헤더, `initialize.params.mode`, `api_keys.default_mode` DB 컬럼 3경로로 활성화. tools/list 응답이 mode별로 필터링된다. (`lib/memory/ModeRegistry.js`, `lib/memory/modes/*.json`, migration-034-v2.16.0-bundle.sql)
 - **RecallSuggestionEngine 비침습적 힌트 필드**: recall 응답에 `_suggestion: {code, message, recommendedTool, recommendedArgs}` 메타 필드 첨부. 4개 감지 규칙(repeat_query / empty_result_no_context / large_limit_no_budget / no_type_filter_noisy). 클라이언트가 무시해도 기존 동작 불변. (`lib/memory/RecallSuggestionEngine.js`)
 - **Affective tagging**: fragments.affect 컬럼(neutral / frustration / confidence / surprise / doubt / satisfaction 6 enum). remember / recall 스키마에 affect 파라미터 노출. CHECK 제약 + partial index. (migration-034-v2.16.0-bundle.sql, FragmentWriter / Reader)
 - **Tool 메타 레지스트리**: 16개 도구에 `meta: {capabilities[], riskLevel, requiresMaster, beta, idempotent}` 정적 필드 추가. 도구별 능력 디스커버리를 위한 Node.js 관용 메타데이터 레지스트리. (`lib/tool-registry.js`)
@@ -833,7 +833,7 @@ Deprecation 예고(v3.1.0에서 제거): recall / context 응답의 top-level `_
 
 ### Notes
 
-- 별도 DB 스키마 변경 없음. 기존 `mmcp_*` 접두 client_id 플로우를 재활용한다.
+- 별도 DB 스키마 변경 없음. 기존 `wdm_*` 접두 client_id 플로우를 재활용한다.
 - Authorization 헤더 없거나 유효하지 않은 토큰이면 기존 랜덤 client_id로 등록하되, 그 클라이언트가 발급받은 토큰은 auth.js의 `REJECT_NONAPIKEY_OAUTH=true` 정책에 의해 여전히 거부된다.
 
 ### v2.8.2 — MCP spec compliance + OAuth hardening (2026-04-17)
@@ -876,11 +876,11 @@ Deprecation 예고(v3.1.0에서 제거): recall / context 응답의 top-level `_
 
 ### Added — Symbolic Memory Layer (opt-in, 기본 전면 비활성)
 
-v2.7.0 확률론적 검색(FragmentSearch/RRF/Reranker/SpreadingActivation) 위에 feature-flag 기반 심볼릭 검증 계층을 추가. 기존 경로 대체 없음. 검증/해설/advisory warning만 담당. 모든 `MEMENTO_SYMBOLIC_*` 플래그 기본 false → 프로덕션 경로 영향 0건.
+v2.7.0 확률론적 검색(FragmentSearch/RRF/Reranker/SpreadingActivation) 위에 feature-flag 기반 심볼릭 검증 계층을 추가. 기존 경로 대체 없음. 검증/해설/advisory warning만 담당. 모든 `WEASLEY_DEEPMIND_SYMBOLIC_*` 플래그 기본 false → 프로덕션 경로 영향 0건.
 
 **Phase 0: Foundation**
 - `lib/symbolic/` 9개 core 모듈 + `lib/symbolic/rules/v1/` 5개 규칙 파일 (SymbolicOrchestrator, ClaimStore, ClaimExtractor, ClaimConflictDetector, LinkIntegrityChecker, ExplanationBuilder, CbrEligibility, PolicyRules, SymbolicMetrics)
-- `config/symbolic.js`: Object.freeze 12개 환경변수 (9 boolean 플래그 + `MEMENTO_SYMBOLIC_RULE_VERSION` + `MEMENTO_SYMBOLIC_TIMEOUT_MS` + `MEMENTO_SYMBOLIC_MAX_CANDIDATES`)
+- `config/symbolic.js`: Object.freeze 12개 환경변수 (9 boolean 플래그 + `WEASLEY_DEEPMIND_SYMBOLIC_RULE_VERSION` + `WEASLEY_DEEPMIND_SYMBOLIC_TIMEOUT_MS` + `WEASLEY_DEEPMIND_SYMBOLIC_MAX_CANDIDATES`)
 - `migration-032-fragment-claims.sql`: `fragment_claims` 테이블 + v2.7.0 migration-031 content-hash 테넌트 격리 패턴 복제 (master NULL / tenant 분리 partial unique 2개) + `validation_warnings` JSONB
 - `migration-033-symbolic-hard-gate.sql`: `api_keys.symbolic_hard_gate BOOLEAN DEFAULT false` — 키 단위 opt-in
 - `scripts/benchmark-hot-path.js` + `scripts/baseline-v27.json` — 회귀 감시 baseline
@@ -899,7 +899,7 @@ v2.7.0 확률론적 검색(FragmentSearch/RRF/Reranker/SpreadingActivation) 위�
 **Phase 3: Advisory Link Integrity + Polarity Conflict**
 - `LinkIntegrityChecker.checkCycle`: `sessionLinker.wouldCreateCycle` 재사용 (Phase 0.5에서 4-arg 전파 완료). DIRECTIONAL_RELATIONS {caused_by, resolved_by, superseded_by, preceded_by} 외엔 early return
 - Caller-side advisory guards 4곳: ConflictResolver.autoLinkOnRemember / .supersede, RememberPostProcessor linked_to Promise.all / _proactiveRecall
-- `ClaimConflictDetector`: `ClaimStore.findPolarityConflicts` + severity heuristic (1→low, 2-3→medium, 4+→high) + `memento_symbolic_warning_total` 기록
+- `ClaimConflictDetector`: `ClaimStore.findPolarityConflicts` + severity heuristic (1→low, 2-3→medium, 4+→high) + `weasley_deepmind_symbolic_warning_total` 기록
 - `ConflictResolver.checkAssertionConsistency`: 기존 Jaccard 파이프라인 보존 + symbolic polarity 병기. supersedeCandidates 병합 + `validationWarnings` 반환 필드 신설
 
 **Phase 4: Policy Rules + Soft Gating**
@@ -915,14 +915,14 @@ v2.7.0 확률론적 검색(FragmentSearch/RRF/Reranker/SpreadingActivation) 위�
 **Phase 5: CBR Constraint Filtering**
 - `CbrEligibility` 4 제약 (`tenant_match`, `has_case_id`, `not_quarantine`, `resolved_state`). Prolog 미도입(옵션 A JS-only)
 - FragmentSearch `case_mode` 경로 (`sq.caseId` 주입 시) 필터 적용
-- SearchParamAdaptor 학습 신호 보호: `rawResultCount`는 pre-filter로 `recordOutcome`, post-filter 차단은 `memento_symbolic_gate_blocked_total{phase=cbr}`로 별도 기록
+- SearchParamAdaptor 학습 신호 보호: `rawResultCount`는 pre-filter로 `recordOutcome`, post-filter 차단은 `weasley_deepmind_symbolic_gate_blocked_total{phase=cbr}`로 별도 기록
 
 **Phase 6: ProactiveRecall Gating**
 - `RememberPostProcessor._proactiveRecall` overlap ≥ 0.5 분기 내 `_proactiveGateCheck` 삽입
 - `rules/v1/proactive-gate.js`: 비용 순 검사 (invalid_target → quarantine → cohort_mismatch → polarity_conflict). detector throw는 fail-open
 
 **Observability**
-- Prometheus 메트릭 4종: `memento_symbolic_claim_total`, `memento_symbolic_warning_total`, `memento_symbolic_gate_blocked_total`, `memento_symbolic_latency_seconds`
+- Prometheus 메트릭 4종: `weasley_deepmind_symbolic_claim_total`, `weasley_deepmind_symbolic_warning_total`, `weasley_deepmind_symbolic_gate_blocked_total`, `weasley_deepmind_symbolic_latency_seconds`
 
 ### Added — LLM Provider Abstraction + Fallback Chain
 
@@ -952,14 +952,14 @@ LLM_FALLBACKS='[
 - Fallback chain: primary → JSON 순서대로 순차 시도. 성공 시 즉시 반환
 - Circuit breaker: 5회 연속 실패 시 해당 provider 60초 skip (Redis 또는 in-memory, REDIS_ENABLED 자동 분기)
 - Prompt redaction: 모든 provider 호출 전 Winston REDACT_PATTERNS 재사용하여 API 키/토큰/세션 쿠키 자동 마스킹
-- Token usage: Prometheus `memento_llm_token_usage_total{provider, direction}` 카운터로 집계
+- Token usage: Prometheus `weasley_deepmind_llm_token_usage_total{provider, direction}` 카운터로 집계
 - Fatal error (사용자 취소, 명백한 설정 오류)는 즉시 throw. Timeout/429/5xx/parse error는 다음 provider 폴백
 
 **Observability (Prometheus)**
-- `memento_llm_provider_calls_total{provider, outcome}`
-- `memento_llm_provider_latency_ms{provider}` histogram
-- `memento_llm_fallback_triggered_total{primary, fallback}`
-- `memento_llm_token_usage_total{provider, direction}`
+- `weasley_deepmind_llm_provider_calls_total{provider, outcome}`
+- `weasley_deepmind_llm_provider_latency_ms{provider}` histogram
+- `weasley_deepmind_llm_fallback_triggered_total{primary, fallback}`
+- `weasley_deepmind_llm_token_usage_total{provider, direction}`
 
 **Backward compatibility**
 - 기존 `geminiCLIJson`/`isGeminiCLIAvailable` API는 thin shim으로 유지 (5 caller 수정 0건)
@@ -969,7 +969,7 @@ LLM_FALLBACKS='[
 
 **보안 주의**
 - 외부 LLM 사용 시 사용자 파편 content가 해당 업체 서버로 전송됨
-- 패턴 기반 redaction 적용: `sk-...`, `sk-ant-...`, `gsk_...`, `Bearer ...`, `mmcp_...`, `mmcp_session=...` 등 자동 마스킹
+- 패턴 기반 redaction 적용: `sk-...`, `sk-ant-...`, `gsk_...`, `Bearer ...`, `wdm_...`, `wdm_session=...` 등 자동 마스킹
 - 도메인 특화 PII(이름, 주소 등)는 마스킹 대상 아님 — 운영자가 프롬프트 민감도 판단 필요
 - 외부 provider 차단: `LLM_FALLBACKS`에 해당 provider를 포함하지 않으면 됨
 
@@ -995,25 +995,25 @@ LLM_FALLBACKS='[
 - `npm run migrate` 실행: migration-032, migration-033 적용 — 스키마 확장만 수행, 기본 플래그 false 상태 유지 → 기존 동작과 완전 동일
 
 **Symbolic 계층 단계적 활성화 순서 (권장)**
-1. `MEMENTO_SYMBOLIC_ENABLED=true` — 마스터 킬 스위치 해제
-2. `MEMENTO_SYMBOLIC_SHADOW=true` + `MEMENTO_SYMBOLIC_CLAIM_EXTRACTION=true` — Phase 1 shadow mode로 claim 축적 확인
+1. `WEASLEY_DEEPMIND_SYMBOLIC_ENABLED=true` — 마스터 킬 스위치 해제
+2. `WEASLEY_DEEPMIND_SYMBOLIC_SHADOW=true` + `WEASLEY_DEEPMIND_SYMBOLIC_CLAIM_EXTRACTION=true` — Phase 1 shadow mode로 claim 축적 확인
 3. `scripts/backfill-claims.js` 실행으로 기존 파편 claim 백필 (옵션: `--dry-run` 선행)
-4. `MEMENTO_SYMBOLIC_EXPLAIN=true` — Phase 2 recall 응답 explanation 필드 공개
-5. `MEMENTO_SYMBOLIC_LINK_CHECK=true` + `MEMENTO_SYMBOLIC_POLARITY_CONFLICT=true` — Phase 3 advisory warning
-6. `MEMENTO_SYMBOLIC_POLICY_RULES=true` — Phase 4 soft gating (validation_warnings 누적만, block 없음)
-7. `MEMENTO_SYMBOLIC_CBR_FILTER=true` + `MEMENTO_SYMBOLIC_PROACTIVE_GATE=true` — Phase 5/6 제약 필터
+4. `WEASLEY_DEEPMIND_SYMBOLIC_EXPLAIN=true` — Phase 2 recall 응답 explanation 필드 공개
+5. `WEASLEY_DEEPMIND_SYMBOLIC_LINK_CHECK=true` + `WEASLEY_DEEPMIND_SYMBOLIC_POLARITY_CONFLICT=true` — Phase 3 advisory warning
+6. `WEASLEY_DEEPMIND_SYMBOLIC_POLICY_RULES=true` — Phase 4 soft gating (validation_warnings 누적만, block 없음)
+7. `WEASLEY_DEEPMIND_SYMBOLIC_CBR_FILTER=true` + `WEASLEY_DEEPMIND_SYMBOLIC_PROACTIVE_GATE=true` — Phase 5/6 제약 필터
 8. 필요 시 개별 API 키에 `api_keys.symbolic_hard_gate=true` 설정으로 hard gate 전환
 9. 필요 시 `UPDATE agent_memory.api_keys SET symbolic_hard_gate=true WHERE id=<uuid>`로 특정 키를 hard gate로 전환. 캐시 무효화는 최대 30초 후 자동 반영
 
 **신규 응답 필드**
 - `remember` 응답: `validation_warnings: string[]` — rule 이름 배열 (e.g. `["decisionHasRationale"]`). violations 없으면 필드 생략. hard gate 위반 시 필드 대신 JSON-RPC `-32003` 에러 반환.
-- `recall` 응답 fragment: `explanations: [{code: string, detail: string, ruleVersion: string}]` — 파편이 검색된 이유 (MEMENTO_SYMBOLIC_EXPLAIN=true 시). 없으면 필드 생략.
+- `recall` 응답 fragment: `explanations: [{code: string, detail: string, ruleVersion: string}]` — 파편이 검색된 이유 (WEASLEY_DEEPMIND_SYMBOLIC_EXPLAIN=true 시). 없으면 필드 생략.
 - Hard gate 에러: `{"error": {"code": -32003, "message": "...", "data": {"violations": ["ruleName", ...], "fragmentType": "..."}}}` — MCP 도구 에러가 아닌 JSON-RPC 프로토콜 레벨 에러.
 
 ## [2.7.0] - 2026-04-10
 
 ### Security (Breaking Changes)
-- **Fail-closed authentication**: `MEMENTO_ACCESS_KEY` 미설정 시 서버 기동 거부. `MEMENTO_AUTH_DISABLED=true` 명시 opt-in으로만 우회. (78e59d1)
+- **Fail-closed authentication**: `WEASLEY_DEEPMIND_ACCESS_KEY` 미설정 시 서버 기동 거부. `WEASLEY_DEEPMIND_AUTH_DISABLED=true` 명시 opt-in으로만 우회. (78e59d1)
 - **OAuth silent consent 제거**: 모든 authorize 요청은 consent 화면 경유 필수. `OAUTH_TRUSTED_ORIGINS` 기본값 빈 배열. (bcef71b)
 - **CORS fail-closed**: `ALLOWED_ORIGINS`/`ADMIN_ALLOWED_ORIGINS` 미설정 시 same-origin만 허용 (이전: 모든 origin 허용). (517c76a)
 - **RBAC default-deny**: 알려지지 않은 도구는 `{ allowed: false }` 반환. 18개 도구 전체 맵핑 완료. (d97738a)
@@ -1039,7 +1039,7 @@ LLM_FALLBACKS='[
 - **OpenAPI 3.1.0**: `GET /openapi.json` — master=35 paths 전체, API key=권한 필터링. `ENABLE_OPENAPI=true`로 활성화. (dc39ca4)
 - **AutoReflect 개선**: `_shouldSkipReflect` (명시적 파편 세션 skip), `_buildGeminiPrompt` (자기완결성 5원칙 주입), `_reflectMinimal` 제거. (7834f4e~d7fa815)
 - **remember/reflect 스키마 강화**: 자기완결성 5대 기준(대명사 해소, 구체 엔티티/수치, 메타 금지, 원자성, 인과 결합 예외) + 6개월 판단 테스트. (eadcca1)
-- **거부 경로 Prometheus 카운터 4종**: `memento_auth_denied_total`, `memento_cors_denied_total`, `memento_rbac_denied_total`, `memento_tenant_isolation_blocked_total`. (a35d185)
+- **거부 경로 Prometheus 카운터 4종**: `weasley_deepmind_auth_denied_total`, `weasley_deepmind_cors_denied_total`, `weasley_deepmind_rbac_denied_total`, `weasley_deepmind_tenant_isolation_blocked_total`. (a35d185)
 - **Winston 로그 redactor**: Authorization/API 키/세션 토큰/OAuth 코드/content 마스킹. (f589536)
 - **SSE 연결 안정성 강화**:
   - Heartbeat failure detection: `SSE_MAX_HEARTBEAT_FAILURES`(기본 3) 연속 실패 시 세션 자동 종료. write backpressure 및 예외 감지
@@ -1049,7 +1049,7 @@ LLM_FALLBACKS='[
   - 환경변수: `SSE_HEARTBEAT_INTERVAL_MS`(25000), `SSE_MAX_HEARTBEAT_FAILURES`(3), `SSE_RETRY_MS`(5000)
 
 ### Migration Guide (v2.6.0 → v2.7.0)
-- `MEMENTO_ACCESS_KEY` 필수 — 미설정 시 서버 기동 거부. 개발용: `MEMENTO_AUTH_DISABLED=true`
+- `WEASLEY_DEEPMIND_ACCESS_KEY` 필수 — 미설정 시 서버 기동 거부. 개발용: `WEASLEY_DEEPMIND_AUTH_DISABLED=true`
 - `ALLOWED_ORIGINS` 미설정 시 same-origin만 허용. 기존 cross-origin 클라이언트는 명시적 설정 필요
 - OAuth 기존 토큰은 최대 30일 TTL까지 유효. 갱신 시 consent 화면 1회 경유
 - `npm run migrate` 실행: migration-030 (search_param_thresholds 타입), migration-031 (content_hash 격리)
@@ -1160,9 +1160,9 @@ LLM_FALLBACKS='[
 ## [2.5.1] - 2026-04-04
 
 ### Added
-- `context()`: `_memento_hint` 필드 추가 — AI 능동 행동 유도 (active_errors / empty_context signal)
+- `context()`: `_weasley_deepmind_hint` 필드 추가 — AI 능동 행동 유도 (active_errors / empty_context signal)
 - `context(structured=true)`: `rankedInjection` 필드 추가 — anchor 고정 + 복합 점수(importance×0.6 + ema_activation×0.4) 정렬 슬라이스
-- `tool_recall`: `_memento_hint` 필드 추가 — no_results / stale_results / consider_context signal
+- `tool_recall`: `_weasley_deepmind_hint` 필드 추가 — no_results / stale_results / consider_context signal
 - `config/memory.js`: `rankWeights` 설정 추가 (importance: 0.6, ema_activation: 0.4)
 - `SKILL.md`: curl 직접 호출 섹션, 능동 활용 트리거 섹션, 안티패턴 섹션 추가
 - `lib/tools/memory-schemas.js`: `get_skill_guide` section 옵션에 `triggers`, `antipatterns` 추가
@@ -1269,7 +1269,7 @@ LLM_FALLBACKS='[
 - Admin UI: daily-limit inline edit, permissions toggle, fragment_limit edit, group/status filters
 - Knowledge graph: episode type (pink + glow), limit slider up to 10,000
 - get_skill_guide tool: returns SKILL.md optimization guide (full or by section)
-- Auto-update: check_update/apply_update tools, `memento update` CLI
+- Auto-update: check_update/apply_update tools, `weasley_deepmind update` CLI
 - Session auto-recovery with keyId/groupKeyIds preservation
 - Keyword rules in aiInstructions: project name + hostname
 - migration-021-oauth-clients.sql, OAuthClientStore.js
@@ -1373,7 +1373,7 @@ LLM_FALLBACKS='[
 ## [2.0.0] - 2026-03-28
 
 ### Added
-- CLI tool: 9 subcommands via bin/memento.js (serve, migrate, cleanup, backfill, stats, health, recall, remember, inspect)
+- CLI tool: 9 subcommands via bin/weasley-deepmind.js (serve, migrate, cleanup, backfill, stats, health, recall, remember, inspect)
 - CLI argument parser (lib/cli/parseArgs.js) with zero external dependencies
 - Inline quality gate: FragmentFactory.validateContent() rejects content < 10 chars AND < 3 words, URL-only, null type+topic
 - Semantic dedup gate in GraphLinker.linkFragment(): cos >= 0.95 soft delete, cos >= 0.90 warning
@@ -1405,7 +1405,7 @@ LLM_FALLBACKS='[
 - CORS origin whitelist via ALLOWED_ORIGINS env var (getAllowedOrigin helper)
 - /metrics requires master key authentication
 - /health returns minimal response for unauthenticated requests
-- Admin panel blocked when MEMENTO_ACCESS_KEY unset
+- Admin panel blocked when WEASLEY_DEEPMIND_ACCESS_KEY unset
 - Admin cookie: conditional Secure flag based on X-Forwarded-Proto
 - Content-Security-Policy header on Admin UI
 - db_query SQL validation: word-boundary regex, semicolon/comment/length/catalog/function blocking

@@ -1,7 +1,7 @@
 /**
  * ReflectProcessor 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-05
  *
  * store/index/factory/sessionLinker/remember를 mock하여
@@ -29,7 +29,7 @@ const { teardownTestResources, assertCleanShutdown } = await import("../_lifecyc
  * 테스트 종료 후 lifecycle helper로 정리하지 않으면 event loop가 유지되어
  * node:test가 "Promise resolution is still pending" 메시지와 함께 cleanup hang.
  *
- * MEMENTO_METRICS_DEFAULT=off (CP2) 적용 후 prom-client collectDefaultMetrics
+ * WEASLEY_DEEPMIND_METRICS_DEFAULT=off (CP2) 적용 후 prom-client collectDefaultMetrics
  * timer가 비활성화되므로 assertCleanShutdown이 active handle 0을 검증할 수 있다.
  */
 after(async () => {

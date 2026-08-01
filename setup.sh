@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Memento MCP Setup
+# Weasley DeepMind Setup
 
 set -euo pipefail
 
@@ -38,7 +38,7 @@ ask_yn() {
 
 echo
 echo -e "${BOLD}------------------------------------------${RESET}"
-echo -e "${BOLD}  Memento MCP -- Interactive Setup${RESET}"
+echo -e "${BOLD}  Weasley DeepMind -- Interactive Setup${RESET}"
 echo -e "${BOLD}------------------------------------------${RESET}"
 echo
 
@@ -63,17 +63,17 @@ PORT=$(ask "Port" "57332")
 SESSION_TTL=$(ask "Session TTL (minutes)" "43200")
 LOG_DIR=$(ask "Log directory" "/var/log/mcp")
 
-MEMENTO_ACCESS_KEY=""
-MEMENTO_AUTH_DISABLED=""
+WEASLEY_DEEPMIND_ACCESS_KEY=""
+WEASLEY_DEEPMIND_AUTH_DISABLED=""
 
 while true; do
-  MEMENTO_ACCESS_KEY=$(ask_secret "Access key (MEMENTO_ACCESS_KEY, leave blank for dev mode)")
-  if [[ -n "$MEMENTO_ACCESS_KEY" ]]; then
+  WEASLEY_DEEPMIND_ACCESS_KEY=$(ask_secret "Access key (WEASLEY_DEEPMIND_ACCESS_KEY, leave blank for dev mode)")
+  if [[ -n "$WEASLEY_DEEPMIND_ACCESS_KEY" ]]; then
     break
   fi
-  warn "MEMENTO_ACCESS_KEY is required from v2.7.0. Blank value causes server startup failure."
-  if ask_yn "Disable authentication instead? (dev only -- sets MEMENTO_AUTH_DISABLED=true)" "n"; then
-    MEMENTO_AUTH_DISABLED="true"
+  warn "WEASLEY_DEEPMIND_ACCESS_KEY is required from v2.7.0. Blank value causes server startup failure."
+  if ask_yn "Disable authentication instead? (dev only -- sets WEASLEY_DEEPMIND_AUTH_DISABLED=true)" "n"; then
+    WEASLEY_DEEPMIND_AUTH_DISABLED="true"
     break
   fi
   warn "Please enter a non-empty access key, or choose to disable authentication."
@@ -204,7 +204,7 @@ echo
 info "Writing .env..."
 
 cat > "$ENV_FILE" <<EOF
-# Memento MCP environment variables
+# Weasley DeepMind environment variables
 # Generated: $(date '+%Y-%m-%d %H:%M:%S')
 
 # --- Server ----------------------------------------------------------
@@ -216,14 +216,14 @@ LOG_DIR=${LOG_DIR}
 # WORKER_ID=single
 EOF
 
-if [[ -n "$MEMENTO_ACCESS_KEY" ]]; then
-  echo "MEMENTO_ACCESS_KEY=${MEMENTO_ACCESS_KEY}" >> "$ENV_FILE"
+if [[ -n "$WEASLEY_DEEPMIND_ACCESS_KEY" ]]; then
+  echo "WEASLEY_DEEPMIND_ACCESS_KEY=${WEASLEY_DEEPMIND_ACCESS_KEY}" >> "$ENV_FILE"
 else
-  echo "# MEMENTO_ACCESS_KEY=" >> "$ENV_FILE"
+  echo "# WEASLEY_DEEPMIND_ACCESS_KEY=" >> "$ENV_FILE"
 fi
 
-if [[ -n "$MEMENTO_AUTH_DISABLED" ]]; then
-  echo "MEMENTO_AUTH_DISABLED=${MEMENTO_AUTH_DISABLED}" >> "$ENV_FILE"
+if [[ -n "$WEASLEY_DEEPMIND_AUTH_DISABLED" ]]; then
+  echo "WEASLEY_DEEPMIND_AUTH_DISABLED=${WEASLEY_DEEPMIND_AUTH_DISABLED}" >> "$ENV_FILE"
 fi
 
 cat >> "$ENV_FILE" <<EOF

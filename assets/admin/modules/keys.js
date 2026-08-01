@@ -1,7 +1,7 @@
 /**
- * Memento MCP Admin Console — API Keys 뷰
+ * Weasley DeepMind Admin Console — API Keys 뷰
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-07
  */
 

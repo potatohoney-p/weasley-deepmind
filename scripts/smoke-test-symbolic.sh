@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # smoke-test-symbolic.sh — v2.8.0 Symbolic Memory end-to-end smoke 검증
 #
-# 작성자: 최진호
+# 작성자: Weasley Open Source
 # 작성일: 2026-04-16
 # 수정일: 2026-04-20 (v2.12.0 문서 현행화 반영)
 #
 # 목적: v2.8.0 Symbolic Memory의 hard gate, validation_warnings, recall explanations,
 #       /metrics 노출을 HTTP/DB 레벨에서 end-to-end 검증한다.
-# 호출 조건: MEMENTO_SYMBOLIC_* 플래그 전환 후 기능 동작 확인
+# 호출 조건: WEASLEY_DEEPMIND_SYMBOLIC_* 플래그 전환 후 기능 동작 확인
 # 빈도: 조건부 (Symbolic 플래그 변경 시)
 # 의존: .env, 실행 중인 서버(PORT), PostgreSQL, python3
 # 관련 문서: docs/operations/symbolic-hard-gate.md, docs/operations/maintenance.md
@@ -15,7 +15,7 @@
 # 사전 조건:
 #   - .env 파일이 프로젝트 루트에 존재
 #   - 서버가 $PORT (기본 57332) 로 실행 중
-#   - MEMENTO_SYMBOLIC_* 플래그 전부 true
+#   - WEASLEY_DEEPMIND_SYMBOLIC_* 플래그 전부 true
 #
 # 종료 코드:
 #   0 = 전체 PASS
@@ -37,7 +37,7 @@ fi
 # shellcheck disable=SC2046
 export $(grep -v '^\s*#' .env | grep '=' | xargs -d '\n') 2>/dev/null || true
 
-ACCESS_KEY="${MEMENTO_ACCESS_KEY}"
+ACCESS_KEY="${WEASLEY_DEEPMIND_ACCESS_KEY}"
 BASE_URL="http://localhost:${PORT:-57332}"
 export PGPASSWORD="${POSTGRES_PASSWORD}"
 PSQL_CMD="psql -h ${POSTGRES_HOST} -p ${POSTGRES_PORT} -U ${POSTGRES_USER} -d ${POSTGRES_DB} -t -A -c"
@@ -191,7 +191,7 @@ const pool = new pg.Pool({
 const name   = 'smoke-hard-gate-' + Date.now();
 const slug   = 'smokehg';
 const random = randomBytes(16).toString('hex');
-const rawKey = `mmcp_${slug}_${random}`;
+const rawKey = `wdm_${slug}_${random}`;
 const hash   = createHash('sha256').update(rawKey).digest('hex');
 const prefix = rawKey.slice(0, 14);
 
@@ -252,11 +252,11 @@ else
 fi
 
 # ─── Case 8: Prometheus /metrics auth 포함 조회 ─────────────────────
-say "8. Prometheus /metrics — auth 포함 조회 시 memento_symbolic_* 노출 확인"
+say "8. Prometheus /metrics — auth 포함 조회 시 weasley_deepmind_symbolic_* 노출 확인"
 MET_COUNT=$(curl -s -H "Authorization: Bearer $ACCESS_KEY" "$BASE_URL/metrics" 2>/dev/null \
-  | grep -c "^memento_symbolic" || true)
-printf "  memento_symbolic_* lines: %s\n" "$MET_COUNT"
-check "/metrics에 memento_symbolic_* 1건 이상 노출" "$([ "${MET_COUNT:-0}" -gt 0 ] && echo 1 || echo 0)"
+  | grep -c "^weasley_deepmind_symbolic" || true)
+printf "  weasley_deepmind_symbolic_* lines: %s\n" "$MET_COUNT"
+check "/metrics에 weasley_deepmind_symbolic_* 1건 이상 노출" "$([ "${MET_COUNT:-0}" -gt 0 ] && echo 1 || echo 0)"
 
 # cleanup은 EXIT trap에서 자동 실행
 exit $([ "$fail" -eq 0 ] && echo 0 || echo 1)

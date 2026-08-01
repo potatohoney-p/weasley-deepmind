@@ -1,7 +1,7 @@
 /**
  * SessionLinker 배치 링크 생성 동시성 회귀 테스트 (Phase 5)
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-27
  *
  * 검증 범위:

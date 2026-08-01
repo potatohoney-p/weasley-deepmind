@@ -1,7 +1,7 @@
 /**
- * 앵커 주입 개수 설정(maxAnchorFragments / MEMENTO_CONTEXT_ANCHOR_LIMIT) 단위 테스트
+ * 앵커 주입 개수 설정(maxAnchorFragments / WEASLEY_DEEPMIND_CONTEXT_ANCHOR_LIMIT) 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-14
  *
  * env 클램프 규칙과 #loadAnchorMemory LIMIT 바인딩,
@@ -11,13 +11,14 @@
 import { describe, it, mock } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import path from "node:path";
 
 import { ContextBuilder } from "../../lib/memory/read/ContextBuilder.js";
 import { MEMORY_CONFIG } from "../../config/memory.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+const MEMORY_CONFIG_URL = pathToFileURL(path.join(ROOT, "config", "memory.js")).href;
 
 /**
  * 서브프로세스에서 env를 설정한 뒤 config를 새로 로드하여
@@ -25,18 +26,18 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", ".
  */
 function loadAnchorLimit(envValue) {
   const env = { ...process.env };
-  delete env.MEMENTO_CONTEXT_ANCHOR_LIMIT;
-  if (envValue !== undefined) env.MEMENTO_CONTEXT_ANCHOR_LIMIT = envValue;
+  delete env.WEASLEY_DEEPMIND_CONTEXT_ANCHOR_LIMIT;
+  if (envValue !== undefined) env.WEASLEY_DEEPMIND_CONTEXT_ANCHOR_LIMIT = envValue;
   const out = execFileSync(process.execPath, [
     "--input-type=module",
     "-e",
-    `import { MEMORY_CONFIG } from "${path.join(ROOT, "config", "memory.js")}";` +
+    `import { MEMORY_CONFIG } from "${MEMORY_CONFIG_URL}";` +
     "console.log(MEMORY_CONFIG.contextInjection.maxAnchorFragments);"
   ], { env, encoding: "utf8" });
   return Number(out.trim());
 }
 
-describe("MEMENTO_CONTEXT_ANCHOR_LIMIT env 클램프", () => {
+describe("WEASLEY_DEEPMIND_CONTEXT_ANCHOR_LIMIT env 클램프", () => {
   it("미설정 시 기본값 10", () => {
     assert.equal(loadAnchorLimit(undefined), 10);
   });

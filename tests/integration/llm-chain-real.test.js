@@ -1,7 +1,7 @@
 /**
  * LLM Chain 실측 통합 테스트 — 실제 provider 순차 폴백 검증
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-18
  *
  * E2E_LLM_CHAIN=1 환경변수가 없으면 전체 suite가 skip된다.

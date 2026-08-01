@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 /**
  * L8 OpenAPI examples + schema description 보강 검증
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-20
  */
 

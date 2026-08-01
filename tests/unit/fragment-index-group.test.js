@@ -1,7 +1,7 @@
 /**
  * FragmentIndex — group-aware namespace union 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-10
  *
  * 커밋 ae3a6e6이 도입한 변경사항 회귀 검증:

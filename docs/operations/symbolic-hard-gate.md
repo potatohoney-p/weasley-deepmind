@@ -1,6 +1,6 @@
 # symbolic-hard-gate 운영 가이드
 
-작성자: 최진호
+작성자: Weasley Open Source
 작성일: 2026-04-16
 
 ## 개요
@@ -58,21 +58,21 @@ curl -X POST http://localhost:57332/mcp \
 ## 모니터링
 
 ```
-rate(memento_symbolic_gate_blocked_total{phase="policy"}[5m])
+rate(weasley_deepmind_symbolic_gate_blocked_total{phase="policy"}[5m])
 ```
 
 Prometheus에서 hard gate 차단 발생 빈도를 추적한다.
 
-`/metrics` 엔드포인트는 master key 인증을 요구한다. Prometheus scrape config에 `Authorization: Bearer <MEMENTO_ACCESS_KEY>` 헤더를 포함시킬 것.
+`/metrics` 엔드포인트는 master key 인증을 요구한다. Prometheus scrape config에 `Authorization: Bearer <WEASLEY_DEEPMIND_ACCESS_KEY>` 헤더를 포함시킬 것.
 
 ```bash
 # 수동 확인
-curl -H "Authorization: Bearer <MEMENTO_ACCESS_KEY>" http://localhost:57332/metrics | grep memento_symbolic
+curl -H "Authorization: Bearer <WEASLEY_DEEPMIND_ACCESS_KEY>" http://localhost:57332/metrics | grep weasley_deepmind_symbolic
 ```
 
 ## 마스터 키 예외
 
-`MEMENTO_ACCESS_KEY`로 인증된 요청(keyId=null)은 대상에서 제외된다. `api_keys` 행이 없기 때문이다. 마스터 키 레벨 hard gate 적용은 `MEMENTO_SYMBOLIC_HARD_GATE_MASTER` 환경변수 지원이 필요하며 향후 과제로 보류됐다.
+`WEASLEY_DEEPMIND_ACCESS_KEY`로 인증된 요청(keyId=null)은 대상에서 제외된다. `api_keys` 행이 없기 때문이다. 마스터 키 레벨 hard gate 적용은 `WEASLEY_DEEPMIND_SYMBOLIC_HARD_GATE_MASTER` 환경변수 지원이 필요하며 향후 과제로 보류됐다.
 
 ## Fail-open
 

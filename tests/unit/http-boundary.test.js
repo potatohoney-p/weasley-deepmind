@@ -1,7 +1,7 @@
 /**
  * HTTP 경계 조건 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-03-13
  *
  * handleLegacySsePost _keyId 전파, Admin 인증 거부,

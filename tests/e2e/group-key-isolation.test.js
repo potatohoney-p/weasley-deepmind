@@ -1,7 +1,7 @@
 /**
  * E2E Test - 그룹 키 격리 회귀
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-06-09
  *
  * 동일 그룹의 다른 key_id로 저장된 파편을 graph_explore, search_traces,

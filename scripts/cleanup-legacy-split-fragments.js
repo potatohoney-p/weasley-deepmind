@@ -1,7 +1,7 @@
 /**
  * Legacy split-fragment cleanup (one-off, dryRun-gated).
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-06-09
  *
  * 기본 dry-run. 실제 삭제는 --apply 와 --yes 를 모두 줄 때만 수행한다.

@@ -1,7 +1,7 @@
 /**
- * Memento MCP Admin Console — UI 컴포넌트 (Toast / Modal)
+ * Weasley DeepMind Admin Console — UI 컴포넌트 (Toast / Modal)
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-07
  *
  * DOM만 조작하며 state/api 의존성 없음.

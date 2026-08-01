@@ -1,7 +1,7 @@
 /**
  * POST /session/rotate 통합 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-20
  *
  * 시나리오:
@@ -84,10 +84,10 @@ async function createSession(overrides = {}) {
 
 /* ------------------------------------------------------------------ */
 /*  auth stub: validateAuthentication을 실제 모듈로 사용하되           */
-/*  MEMENTO_AUTH_DISABLED=true 로 인증 우회                            */
+/*  WEASLEY_DEEPMIND_AUTH_DISABLED=true 로 인증 우회                            */
 /* ------------------------------------------------------------------ */
 before(() => {
-  process.env.MEMENTO_AUTH_DISABLED = "true";
+  process.env.WEASLEY_DEEPMIND_AUTH_DISABLED = "true";
 });
 
 /* ------------------------------------------------------------------ */

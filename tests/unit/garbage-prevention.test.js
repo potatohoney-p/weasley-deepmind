@@ -2,7 +2,7 @@
  * garbage-prevention.test.js (node:test 이주)
  * Tasks 1, 2, 4, 6, 8, 9 — GC 가비지 방지 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-03-17
  * 수정일: 2026-04-19 (Jest → node:test 이주)
  */

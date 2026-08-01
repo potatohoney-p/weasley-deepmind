@@ -1,7 +1,7 @@
 /**
  * tool_reflect 응답 _meta 블록 구조 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-05-19
  *
  * v4.2.0에서 tool_reflect 응답에 _meta 블록을 신설하고 link_suggestions[]를 노출한다.

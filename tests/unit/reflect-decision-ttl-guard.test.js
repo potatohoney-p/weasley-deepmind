@@ -1,7 +1,7 @@
 /**
  * P4 회귀 방지: reflect decision importance가 permanent 승격 임계(0.8) 미만이어야 한다.
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-16
  */
 import { test } from "node:test";

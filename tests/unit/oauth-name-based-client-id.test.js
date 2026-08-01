@@ -1,7 +1,7 @@
 /**
  * OAuth name-based client_id 바인딩 단위 테스트 (v2.8.4)
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-17
  *
  * 검증 대상:
@@ -118,7 +118,7 @@ describe("/register — client_name 바인딩 마커", () => {
 describe("/register — Authorization 헤더 없음 (backward compat)", () => {
   /**
    * Authorization 헤더가 없으면 boundClientId = null 이므로
-   * registerClient에 client_id: undefined가 전달되어 랜덤 mmcp_ prefix ID 생성.
+   * registerClient에 client_id: undefined가 전달되어 랜덤 wdm_ prefix ID 생성.
    */
   it("boundClientId가 null일 때 undefined로 전달 → 랜덤 ID 생성", () => {
     const boundClientId = null;

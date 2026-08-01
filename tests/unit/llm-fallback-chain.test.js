@@ -5,7 +5,7 @@
  * 실제 API 호출 0건 — LlmProvider 추상 기반 클래스를 직접 서브클래싱하여
  * fetch mock 없이 callText 동작을 제어한다.
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-16
  */
 

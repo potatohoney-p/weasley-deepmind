@@ -1,7 +1,7 @@
 /**
  * ReflectProcessor 단위 테스트 — 추가 커버리지 (DB-free 인라인 재현)
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-19
  *
  * ReflectProcessor는 top-level import에서 MorphemeIndex/EpisodeContinuityService/

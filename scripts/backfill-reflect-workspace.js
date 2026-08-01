@@ -1,7 +1,7 @@
-﻿/**
+/**
  * backfill-reflect-workspace.js — reflect 파편 workspace 소급 분류
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-27
  *
  * 대상: topic='session_reflect' AND workspace IS NULL AND valid_to IS NULL.

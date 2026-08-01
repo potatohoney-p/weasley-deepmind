@@ -48,16 +48,16 @@ describe("completion — L6 shell completion", () => {
   });
 
   // ── bash 스크립트 ─────────────────────────────────────────────
-  it("bash 인자 → _memento_mcp_complete 함수 정의가 포함된다", async () => {
+  it("bash 인자 → _weasley_deepmind_complete 함수 정의가 포함된다", async () => {
     const { output, exitCode } = await captureCompletion("bash");
     assert.strictEqual(exitCode, 0);
-    assert.ok(output.includes("_memento_mcp_complete"), "함수 정의 누락");
+    assert.ok(output.includes("_weasley_deepmind_complete"), "함수 정의 누락");
   });
 
   it("bash 인자 → complete -F 지시어가 포함된다", async () => {
     const { output, exitCode } = await captureCompletion("bash");
     assert.strictEqual(exitCode, 0);
-    assert.ok(output.includes("complete -F _memento_mcp_complete memento-mcp"), "complete -F 지시어 누락");
+    assert.ok(output.includes("complete -F _weasley_deepmind_complete weasley-deepmind"), "complete -F 지시어 누락");
   });
 
   it("bash 스크립트에 서브명령 목록이 포함된다", async () => {
@@ -71,8 +71,8 @@ describe("completion — L6 shell completion", () => {
   it("zsh 인자 → bash 호환 스크립트가 출력된다", async () => {
     const { output, exitCode } = await captureCompletion("zsh");
     assert.strictEqual(exitCode, 0);
-    assert.ok(output.includes("_memento_mcp_complete"), "함수 정의 누락");
-    assert.ok(output.includes("complete -F _memento_mcp_complete memento-mcp"), "complete -F 지시어 누락");
+    assert.ok(output.includes("_weasley_deepmind_complete"), "함수 정의 누락");
+    assert.ok(output.includes("complete -F _weasley_deepmind_complete weasley-deepmind"), "complete -F 지시어 누락");
   });
 
   it("zsh 스크립트에 bashcompinit 로드 지시어가 포함된다", async () => {

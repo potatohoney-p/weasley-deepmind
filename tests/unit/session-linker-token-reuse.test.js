@@ -1,7 +1,7 @@
 /**
  * SessionLinker 토큰 재사용 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-19
  *
  * deriveTokenKey(lib/handlers/mcp-handler.js:38)
@@ -14,7 +14,7 @@
  *
  * 검증 항목:
  * 1. deriveTokenKey — Authorization Bearer 헤더 추출
- * 2. deriveTokenKey — memento-access-key 헤더 추출
+ * 2. deriveTokenKey — weasley_deepmind-access-key 헤더 추출
  * 3. deriveTokenKey — initialize.params.accessKey 추출
  * 4. deriveTokenKey — 토큰 원문이 아닌 sha256 16자 해시 사용
  * 5. deriveTokenKey — keyId 네임스페이스 포함 (`ns:hash`)
@@ -84,15 +84,15 @@ describe("deriveTokenKey — Authorization Bearer 헤더", () => {
   });
 });
 
-describe("deriveTokenKey — memento-access-key 헤더", () => {
-  it("authorization 없을 때 memento-access-key 헤더를 사용", () => {
+describe("deriveTokenKey — weasley_deepmind-access-key 헤더", () => {
+  it("authorization 없을 때 weasley_deepmind-access-key 헤더를 사용", () => {
     const req = {
-      headers: { "memento-access-key": "my-access-key-xyz" }
+      headers: { "weasley_deepmind-access-key": "my-access-key-xyz" }
     };
 
     const key = deriveTokenKey(req, {}, { keyId: 7 });
 
-    assert.ok(key, "memento-access-key에서 tokenKey 추출 필요");
+    assert.ok(key, "weasley_deepmind-access-key에서 tokenKey 추출 필요");
     assert.ok(key.startsWith("7:"));
   });
 });

@@ -1,7 +1,7 @@
 /**
  * batch_remember fragments 문자열 입력 진단 메시지 검증
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-26
  */
 

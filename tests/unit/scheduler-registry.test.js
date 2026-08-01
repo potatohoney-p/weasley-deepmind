@@ -2,7 +2,7 @@
  * scheduler-registry.test.js (node:test 이주)
  * SchedulerRegistry 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-03-31
  * 수정일: 2026-04-19 (Jest → node:test 이주)
  */

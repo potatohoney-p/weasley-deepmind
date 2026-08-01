@@ -2,7 +2,7 @@
 /**
  * migrate.js — 경량 DB 마이그레이션 러너
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 수정일: 2026-04-20 (v2.12.0 문서 현행화 반영)
  *
  * 목적: lib/memory/migration-NNN-*.sql 파일을 번호 순으로 자동 탐지하여 실행한다.
@@ -31,7 +31,7 @@ dotenv.config();
 if (!process.env.DATABASE_URL) {
   const h  = process.env.POSTGRES_HOST     || "localhost";
   const p  = process.env.POSTGRES_PORT     || "5432";
-  const d  = process.env.POSTGRES_DB       || "memento";
+  const d  = process.env.POSTGRES_DB       || "weasley_deepmind";
   const u  = process.env.POSTGRES_USER     || "postgres";
   const pw = process.env.POSTGRES_PASSWORD || "";
   process.env.DATABASE_URL = `postgresql://${u}:${encodeURIComponent(pw)}@${h}:${p}/${d}`;
@@ -54,6 +54,7 @@ async function migrate() {
   console.log("Migration lock acquired");
 
   try {
+    await client.query("CREATE SCHEMA IF NOT EXISTS agent_memory");
     await client.query(`
       CREATE TABLE IF NOT EXISTS agent_memory.schema_migrations (
         filename   TEXT PRIMARY KEY,

@@ -9,7 +9,7 @@ import { describe, test, after } from "node:test";
 import assert from "node:assert/strict";
 
 process.env.DOTENV_CONFIG_PATH ??= ".env.test";
-process.env.MEMENTO_METRICS_DEFAULT ??= "off";
+process.env.WEASLEY_DEEPMIND_METRICS_DEFAULT ??= "off";
 process.env.REDIS_ENABLED ??= "false";
 process.env.CACHE_ENABLED ??= "false";
 
@@ -61,7 +61,7 @@ describe("validateOrigin", () => {
 
   test("ALLOWED_ORIGINS 설정 + 화이트리스트 일치 -> 허용", async () => {
     await withSetContents(ALLOWED_ORIGINS, ["https://claude.ai"], () => {
-      const req = { headers: { host: "memento.example.com", origin: "https://claude.ai" } };
+      const req = { headers: { host: "weasley_deepmind.example.com", origin: "https://claude.ai" } };
       const res = fakeRes();
       assert.equal(validateOrigin(req, res), true);
       assert.equal(res.statusCode, 0);
@@ -70,7 +70,7 @@ describe("validateOrigin", () => {
 
   test("ALLOWED_ORIGINS 설정 + 화이트리스트 불일치 -> 거부", async () => {
     await withSetContents(ALLOWED_ORIGINS, ["https://claude.ai"], () => {
-      const req = { headers: { host: "memento.example.com", origin: "https://evil.com" } };
+      const req = { headers: { host: "weasley_deepmind.example.com", origin: "https://evil.com" } };
       const res = fakeRes();
       assert.equal(validateOrigin(req, res), false);
       assert.equal(res.statusCode, 403);
@@ -100,7 +100,7 @@ describe("validateAdminOrigin", () => {
 
   test("ADMIN_ALLOWED_ORIGINS 설정 + 화이트리스트 일치 -> 허용", async () => {
     await withSetContents(ADMIN_ALLOWED_ORIGINS, ["https://trusted-admin.example.com"], () => {
-      const req = { headers: { host: "memento.example.com", origin: "https://trusted-admin.example.com" } };
+      const req = { headers: { host: "weasley_deepmind.example.com", origin: "https://trusted-admin.example.com" } };
       const res = fakeRes();
       assert.equal(validateAdminOrigin(req, res), true);
       assert.equal(res.statusCode, 0);
@@ -109,7 +109,7 @@ describe("validateAdminOrigin", () => {
 
   test("ADMIN_ALLOWED_ORIGINS 설정 + 화이트리스트 불일치 -> 거부", async () => {
     await withSetContents(ADMIN_ALLOWED_ORIGINS, ["https://trusted-admin.example.com"], () => {
-      const req = { headers: { host: "memento.example.com", origin: "https://evil.com" } };
+      const req = { headers: { host: "weasley_deepmind.example.com", origin: "https://evil.com" } };
       const res = fakeRes();
       assert.equal(validateAdminOrigin(req, res), false);
       assert.equal(res.statusCode, 403);

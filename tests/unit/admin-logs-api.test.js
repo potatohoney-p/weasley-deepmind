@@ -1,7 +1,7 @@
 /**
  * Admin 로그 뷰어 API 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-03-26
  *
  * /logs/files, /logs/read, /logs/stats 엔드포인트의 라우팅, 인증, 응답 형태를 검증한다.
@@ -20,7 +20,7 @@ const ADMIN_BASE = "/v1/internal/model/nothing";
 /*  테스트용 임시 로그 디렉토리 및 파일 생성                                */
 /* ------------------------------------------------------------------ */
 
-const tmpLogDir = fs.mkdtempSync(path.join(os.tmpdir(), "memento-log-test-"));
+const tmpLogDir = fs.mkdtempSync(path.join(os.tmpdir(), "weasley_deepmind-log-test-"));
 const today     = new Date().toISOString().slice(0, 10);
 
 const COMBINED_LOG = [
@@ -176,7 +176,7 @@ function getLogStats(logDir) {
 /* ------------------------------------------------------------------ */
 
 function validateMasterKey(req, accessKey) {
-  if (!accessKey) return true;
+  if (!accessKey) return false;
   const auth = req.headers?.authorization;
   if (!auth) return false;
   const match = auth.match(/^Bearer\s+(.+)$/i);
@@ -339,10 +339,10 @@ describe("Admin Log Viewer API", () => {
       assert.equal(result, true);
     });
 
-    it("allows access when no ACCESS_KEY is configured", () => {
+    it("rejects access when no ACCESS_KEY is configured", () => {
       const req    = { headers: {}, url: `${ADMIN_BASE}/logs/files` };
       const result = validateMasterKey(req, "");
-      assert.equal(result, true);
+      assert.equal(result, false);
     });
   });
 });

@@ -1,7 +1,7 @@
 /**
  * keywords 보조 L3 실행 상한(timeout) 검증
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-27
  *
  * L3 시맨틱 보조가 keywordFallbackTimeoutMs를 초과하면 supplement는

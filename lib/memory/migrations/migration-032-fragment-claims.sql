@@ -1,6 +1,6 @@
 -- migration-032-fragment-claims.sql
 -- v2.8.0 Symbolic Memory Phase 0: fragment_claims 테이블
--- 작성자: 최진호
+-- 작성자: Weasley Open Source
 -- 작성일: 2026-04-15
 --
 -- 목적: Neurosymbolic 기억 시스템의 정규화된 claim 저장소
@@ -13,7 +13,7 @@
 --      fragment_claims.key_id / fragment_id 모두 TEXT 로 맞춰야 FK 의미론 일치.
 --      fragment_id 에 UUID 사용 시 타입 불일치로 FK 제약 실패함.
 --   2) ClaimStore.insert 는 fragment_claims.key_id 가 fragments.key_id 와 일치하는지
---      write-time 에 확인. 위반 시 memento_tenant_isolation_blocked_total 카운터 증가.
+--      write-time 에 확인. 위반 시 weasley_deepmind_tenant_isolation_blocked_total 카운터 증가.
 --   3) master(NULL) / tenant(TEXT) 분리 partial unique 인덱스로 ON CONFLICT 경로에서
 --      크로스 테넌트 누출 차단.
 --   4) Phase 3 advisory warning 을 위해 fragments.validation_warnings JSONB 컬럼 추가.

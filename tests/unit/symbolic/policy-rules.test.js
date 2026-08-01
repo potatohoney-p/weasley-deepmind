@@ -1,7 +1,7 @@
 /**
  * PolicyRules — Phase 4 Soft Gating 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-15
  *
  * 5개 predicate 독립 검증:

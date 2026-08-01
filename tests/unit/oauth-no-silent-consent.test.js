@@ -1,7 +1,7 @@
 /**
  * OAuth silent consent 제거 회귀 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-10
  *
  * 검증 대상:
@@ -166,9 +166,9 @@ function buildAccessData({ clientId, scope, isApiKey }) {
 
 describe("API key 기반 OAuth 토큰 — keyId 연결 구조 검증", () => {
   it("is_api_key=true 시 토큰 데이터에 is_api_key 필드 존재", () => {
-    const token = buildAccessData({ clientId: "mmcp_test_key", scope: "mcp", isApiKey: true });
+    const token = buildAccessData({ clientId: "wdm_test_key", scope: "mcp", isApiKey: true });
     assert.strictEqual(token.is_api_key, true);
-    assert.strictEqual(token.client_id, "mmcp_test_key");
+    assert.strictEqual(token.client_id, "wdm_test_key");
     assert.ok("type" in token);
     assert.ok("expires_at" in token);
   });
@@ -189,11 +189,11 @@ describe("API key 기반 OAuth 토큰 — keyId 연결 구조 검증", () => {
    *   validateApiKeyFromDB(client_id)로 keyId를 조회한다.
    */
   it("is_api_key=true 토큰에서 validateAuthentication이 keyId를 조회하는 흐름", async () => {
-    const tokenData = buildAccessData({ clientId: "mmcp_sample_api_key", scope: "mcp", isApiKey: true });
+    const tokenData = buildAccessData({ clientId: "wdm_sample_api_key", scope: "mcp", isApiKey: true });
 
     /** validateApiKeyFromDB mock */
     async function mockValidateApiKeyFromDB(clientId) {
-      if (clientId === "mmcp_sample_api_key") {
+      if (clientId === "wdm_sample_api_key") {
         return { valid: true, keyId: 42, groupKeyIds: [], permissions: {} };
       }
       return { valid: false };

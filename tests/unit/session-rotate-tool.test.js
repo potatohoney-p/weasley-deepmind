@@ -1,7 +1,7 @@
 /**
  * session_rotate MCP 도구 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-20
  *
  * mock.module이 필요한 통합 시나리오는 별도 통합 테스트에서 처리한다.

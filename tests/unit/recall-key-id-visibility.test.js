@@ -1,7 +1,7 @@
 /**
  * recall key_id 컬럼 가시성 회귀 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-10
  * 수정일: 2026-06-15 (SEARCH_COLS_BASE 상수화 후 검사 전략 변경)
  *

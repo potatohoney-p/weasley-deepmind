@@ -1,7 +1,7 @@
 /**
  * 최소 DOM shim -- admin.js 유닛 테스트용
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-03-26
  *
  * 브라우저 DOM API의 최소 구현.

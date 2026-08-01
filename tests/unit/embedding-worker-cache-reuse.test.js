@@ -1,7 +1,7 @@
 /**
  * EmbeddingWorker 캐시-우선 생성 (정적 가드 + 동작 검증)
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-16
  */
 

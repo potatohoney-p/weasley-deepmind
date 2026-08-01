@@ -1,7 +1,7 @@
 /**
  * GraphLinker 단위 테스트 — 추가 커버리지
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-19
  *
  * 기존 tests/unit/graph-linker.test.js(2026-03-07)에서 미커버된 항목:

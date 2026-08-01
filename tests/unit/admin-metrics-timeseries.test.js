@@ -1,14 +1,14 @@
 /**
  * Admin Metrics Timeseries Ring Buffer 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-20
  *
  * 테스트 대상: lib/admin/admin-metrics.js Phase 2 확장
  *  1. ring buffer RING_SIZE 초과 시 oldest 제거
  *  2. buildMetricsSummary timeseries 3개 키 모두 포함
  *  3. include에 "timeseries" 누락 시 timeseries 키 미포함
- *  4. MEMENTO_ADMIN_METRICS_SAMPLING=off 시 폴러 비활성
+ *  4. WEASLEY_DEEPMIND_ADMIN_METRICS_SAMPLING=off 시 폴러 비활성
  *  5. timeseries 항목이 ts(ISO8601) + value(number) 구조
  *  6. 빈 buffer는 빈 배열로 반환
  *  7. _injectSample이 buffer에 정확히 반영
@@ -144,7 +144,7 @@ describe("admin-metrics timeseries ring buffer", () => {
     });
   });
 
-  describe("4. MEMENTO_ADMIN_METRICS_SAMPLING=off 폴러 비활성 검증", () => {
+  describe("4. WEASLEY_DEEPMIND_ADMIN_METRICS_SAMPLING=off 폴러 비활성 검증", () => {
     it("샘플링 비활성 플래그가 off이면 _collectSample을 호출해도 buffer에 추가되지 않는다", async () => {
       /**
        * _collectSample 내부 로직을 인라인으로 재현하여

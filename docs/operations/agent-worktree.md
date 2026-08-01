@@ -1,6 +1,6 @@
 # agent-worktree
 
-작성자: 최진호
+작성자: Weasley Open Source
 작성일: 2026-05-13
 
 에이전트 도구가 isolation worktree를 생성한 뒤 회수하지 않아 워크트리가 누적되는 문제의 원인, 운영 정책, 점검 명령, cron 설정을 정리한다.
@@ -9,7 +9,7 @@
 
 ## 1. 문제 정의
 
-Claude Code 등 에이전트 도구는 병렬 작업 격리를 위해 `git worktree add`로 임시 워크트리를 자동 생성한다. 작업이 비정상 종료되거나 cleanup 훅이 누락되면 워크트리가 회수되지 않고 잔존한다. memento-mcp 저장소에서는 `.claude/worktrees/agent-*` 패턴으로 25개가 누적된 사례가 있었다. 메타 등록 경로가 실제 디스크와 달라 stale 상태가 된 경우도 포함됐다.
+Claude Code 등 에이전트 도구는 병렬 작업 격리를 위해 `git worktree add`로 임시 워크트리를 자동 생성한다. 작업이 비정상 종료되거나 cleanup 훅이 누락되면 워크트리가 회수되지 않고 잔존한다. weasley-deepmind 저장소에서는 `.claude/worktrees/agent-*` 패턴으로 25개가 누적된 사례가 있었다. 메타 등록 경로가 실제 디스크와 달라 stale 상태가 된 경우도 포함됐다.
 
 누적 시 영향은 세 가지다. 첫째, `.git/worktrees/` 아래 메타 디렉토리가 증가해 `git status`·`git log` 등 기본 명령의 overhead가 늘어난다. 둘째, 워크트리당 체크아웃된 파일이 남아 디스크를 소비한다. 셋째, `git worktree list` 출력이 길어져 실제 작업 중인 워크트리의 가시성이 떨어진다.
 
@@ -24,7 +24,7 @@ Claude Code 등 에이전트 도구는 병렬 작업 격리를 위해 `git workt
 ```
 # 훅 파일 예시 위치: .claude/agent-hooks/post-finalize.sh
 
-REPO=/path/to/memento-mcp
+REPO=/path/to/weasley-deepmind
 WORKTREE_PATH="$1"   # 에이전트가 생성한 워크트리 절대 경로
 
 if git -C "$REPO" worktree list --porcelain \
@@ -64,7 +64,7 @@ rm -rf "$WORKTREE_PATH"
 ### 현황 파악
 
 ```bash
-REPO=/path/to/memento-mcp
+REPO=/path/to/weasley-deepmind
 
 # 현재 등록된 워크트리 전체 목록 (상태 포함)
 git -C "$REPO" worktree list --porcelain
@@ -78,7 +78,7 @@ git -C "$REPO" worktree prune -v
 아래 4단계를 순서대로 실행한다.
 
 ```bash
-REPO=/path/to/memento-mcp
+REPO=/path/to/weasley-deepmind
 PATTERN=".claude/worktrees/agent-"
 
 # (a) lock 해제 — prune/remove가 lock된 워크트리를 건너뛰므로 선행 필수
@@ -107,7 +107,7 @@ git -C "$REPO" branch \
 `git worktree list --porcelain`에서 경로는 존재하지만 실제 디스크에 디렉토리가 없는 경우 stale 상태다.
 
 ```bash
-REPO=/path/to/memento-mcp
+REPO=/path/to/weasley-deepmind
 
 # stale 메타만 정리 (디스크 디렉토리가 없어도 메타는 삭제)
 git -C "$REPO" worktree prune -v
@@ -122,7 +122,7 @@ git -C "$REPO" worktree remove --force <path>
 
 ```crontab
 # 매일 03:00 에이전트 워크트리 GC
-0 3 * * * /path/to/memento-mcp/.claude/scripts/gc-worktrees.sh >> /var/log/memento-gc.log 2>&1
+0 3 * * * /path/to/weasley-deepmind/.claude/scripts/gc-worktrees.sh >> /var/log/weasley_deepmind-gc.log 2>&1
 ```
 
 스크립트 흐름(`gc-worktrees.sh`):
@@ -131,7 +131,7 @@ git -C "$REPO" worktree remove --force <path>
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO=/path/to/memento-mcp
+REPO=/path/to/weasley-deepmind
 STALE_DAYS=7
 COUNT_LIMIT=5
 

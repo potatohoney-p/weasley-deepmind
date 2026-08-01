@@ -3,7 +3,7 @@
 -- co_retrieved: 동일 recall 결과에 함께 반환된 파편 간 Hebbian 연결.
 -- weight 컬럼(migration-007)으로 강화 횟수를 누적 관리한다.
 --
--- 작성자: 최진호
+-- 작성자: Weasley Open Source
 -- 작성일: 2026-03-11
 --
 -- 실행: psql $DATABASE_URL -f lib/memory/migration-009-co-retrieved.sql

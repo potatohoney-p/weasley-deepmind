@@ -1,4 +1,4 @@
-﻿# Installation Guide
+# Installation Guide
 
 > [!TIP]
 > Not confident installing this yourself? Jump to [Delegate to an AI Assistant](#delegate-to-an-ai-assistant). A single prompt covers prerequisites, dependencies, `.env`, MCP registration, and the health check.
@@ -17,28 +17,28 @@ The fastest path for someone new to this repository is to hand the work to an AI
 > 2. Run `npm install` and `bash setup.sh` to install dependencies and generate `.env`
 > 3. If PostgreSQL or Redis is missing, install them or propose a Docker Compose setup
 > 4. Run `npm run migrate`
-> 5. Confirm `node bin/memento.js health` passes
-> 6. Register memento-mcp in my current AI client's MCP settings (Claude Code / Cursor / Codex)
-> 7. Call `mcp__memento__memory_stats` to verify wiring
+> 5. Confirm `node bin/weasley-deepmind.js health` passes
+> 6. Register weasley-deepmind in my current AI client's MCP settings (Claude Code / Cursor / Codex)
+> 7. Call `mcp__weasley_deepmind__memory_stats` to verify wiring
 >
 > Report each step as a table. On failure, consult `docs/getting-started/troubleshooting.md` and try to recover."
 
 **Integrate into an existing Claude Code setup**
 
-> "Add memento-mcp to my `~/.claude.json`. Follow `docs/getting-started/claude-code.md`:
+> "Add weasley-deepmind to my `~/.claude.json`. Follow `docs/getting-started/claude-code.md`:
 >
 > 1. Back up `~/.claude.json`
-> 2. Add memento-mcp under `mcpServers` with URL and ACCESS_KEY
+> 2. Add weasley-deepmind under `mcpServers` with URL and ACCESS_KEY
 > 3. Tell me how to restart Claude Code
-> 4. Verify `mcp__memento__remember` etc. appear in the tool list"
+> 4. Verify `mcp__weasley_deepmind__remember` etc. appear in the tool list"
 
 ### Checklist the AI Should Satisfy
 
 After the assistant finishes, all of the following must hold:
 
-- `.env` exists, with `MEMENTO_ACCESS_KEY`, `POSTGRES_*`, and `REDIS_*` populated
+- `.env` exists, with `WEASLEY_DEEPMIND_ACCESS_KEY`, `POSTGRES_*`, and `REDIS_*` populated
 - `npm run migrate` succeeds through `migration-037`
-- `node bin/memento.js health` returns OK for DB, Redis, and the embedding provider
+- `node bin/weasley-deepmind.js health` returns OK for DB, Redis, and the embedding provider
 - The AI client lists `mcp__*__remember`, `recall`, and `reflect`
 - A `memory_stats` call returns a valid response (zero fragments is fine)
 
@@ -254,7 +254,7 @@ npm run migrate
 #    DATABASE_URL=$DATABASE_URL node scripts/backfill-embeddings.js
 
 # 4. Check .env
-#    Add MEMENTO_CLI_REMOTE and MEMENTO_CLI_KEY if using the CLI in remote mode
+#    Add WEASLEY_DEEPMIND_CLI_REMOTE and WEASLEY_DEEPMIND_CLI_KEY if using the CLI in remote mode
 
 # 5. Restart the server
 node server.js
@@ -309,7 +309,7 @@ For the full operational sample:
 
 ```bash
 cp .env.example .env
-# Edit .env: set DATABASE_URL, MEMENTO_ACCESS_KEY, and other required values
+# Edit .env: set DATABASE_URL, WEASLEY_DEEPMIND_ACCESS_KEY, and other required values
 ```
 
 Additional environment variables:
@@ -317,9 +317,9 @@ Additional environment variables:
 ```
 LLM_PRIMARY                   - Primary LLM provider (default: gemini-cli). Options: gemini-cli, codex, copilot, anthropic, etc.
 LLM_FALLBACKS                 - JSON array of fallback providers: [{"provider":"anthropic","apiKey":"...","model":"claude-opus-4-6"}]
-MEMENTO_REMEMBER_ATOMIC       - When true, atomizes quota check + INSERT in remember() into a single transaction to eliminate TOCTOU (default: false)
-MEMENTO_CASE_BACKPROP_ENABLED - When true, enables CaseRewardBackprop — reward back-propagation per case_id (default: false)
-MEMENTO_STORAGE               - Storage adapter selection. pgvector (default). See lib/storage/ for additional adapters
+WEASLEY_DEEPMIND_REMEMBER_ATOMIC       - When true, atomizes quota check + INSERT in remember() into a single transaction to eliminate TOCTOU (default: false)
+WEASLEY_DEEPMIND_CASE_BACKPROP_ENABLED - When true, enables CaseRewardBackprop — reward back-propagation per case_id (default: false)
+WEASLEY_DEEPMIND_STORAGE               - Storage adapter selection. pgvector (default). See lib/storage/ for additional adapters
 MIGRATION_LINT_FROM           - Lower-bound migration number for lint:migrations checks. Defaults to max existing number + 1 when unset
 ```
 
@@ -330,6 +330,13 @@ For the full list of environment variables, see [Configuration — Environment V
 ## Local Embedding Mode (No OpenAI API Key Required)
 
 You can generate embeddings using a local `@huggingface/transformers` model without an OpenAI API key.
+
+This is an optional dependency so the default server installation stays free of the native image-processing chain. Install it in your application with the patched `sharp` override before enabling this provider:
+
+```bash
+npm pkg set overrides.sharp="^0.35.3"
+npm install @huggingface/transformers
+```
 
 ### .env Configuration
 
@@ -414,7 +421,7 @@ curl -s http://localhost:57332/health | jq .status
 # Failure: review EMBEDDING_DIMENSIONS and re-run migration-007 if needed
 
 # 3. CLI diagnostics
-node bin/memento.js health
+node bin/weasley-deepmind.js health
 ```
 
 A `consistency check result: PASS` log line confirms that `EMBEDDING_DIMENSIONS` matches the actual vector dimensions stored in the database. If `FAIL` appears, re-run `scripts/post-migrate-flexible-embedding-dims.js` and restart the server.

@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Windows PowerShell Setup"
 date: 2026-03-13
 updated: 2026-04-20
@@ -32,14 +32,14 @@ Copy-Item .env.example.minimal .env
 PORT=57332
 SESSION_TTL_MINUTES=60
 LOG_DIR=./logs
-MEMENTO_ACCESS_KEY=change-me
+WEASLEY_DEEPMIND_ACCESS_KEY=change-me
 
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
-POSTGRES_DB=memento
+POSTGRES_DB=weasley_deepmind
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=change-me
-DATABASE_URL=postgresql://postgres:change-me@localhost:5432/memento
+DATABASE_URL=postgresql://postgres:change-me@localhost:5432/weasley_deepmind
 
 REDIS_ENABLED=false
 CACHE_ENABLED=false
@@ -62,13 +62,13 @@ npm install --onnxruntime-node-install-cuda=skip
 `vector` extension을 먼저 만든다.
 
 ```powershell
-psql -d "postgresql://postgres:change-me@localhost:5432/memento" -c "CREATE EXTENSION IF NOT EXISTS vector;"
+psql -d "postgresql://postgres:change-me@localhost:5432/weasley_deepmind" -c "CREATE EXTENSION IF NOT EXISTS vector;"
 ```
 
 그 다음 schema를 적용한다.
 
 ```powershell
-psql -d "postgresql://postgres:change-me@localhost:5432/memento" -f lib/memory/memory-schema.sql
+psql -d "postgresql://postgres:change-me@localhost:5432/weasley_deepmind" -f lib/memory/memory-schema.sql
 ```
 
 ## 5. 서버 실행
@@ -113,7 +113,7 @@ Invoke-RestMethod -Method Post -Uri "http://localhost:57332/mcp" -Headers $heade
 PowerShell에서 일회성 환경 변수는 아래와 같이 설정한다.
 
 ```powershell
-$env:DATABASE_URL = "postgresql://postgres:change-me@localhost:5432/memento"
+$env:DATABASE_URL = "postgresql://postgres:change-me@localhost:5432/weasley_deepmind"
 node server.js
 ```
 
@@ -125,16 +125,16 @@ PowerShell에서 CLI 원격 접속 환경변수를 설정할 때 따옴표에 �
 
 ```powershell
 # 환경변수 설정 (세션 내 유효)
-$env:MEMENTO_CLI_REMOTE = "https://memento.weasley-deepmind.net/mcp"
-$env:MEMENTO_CLI_KEY = "mmcp_xxx"
+$env:WEASLEY_DEEPMIND_CLI_REMOTE = "https://deepmind.example.com/mcp"
+$env:WEASLEY_DEEPMIND_CLI_KEY = "wdm_xxx"
 
 # 설정 후 CLI 사용
-node bin/memento.js stats
-node bin/memento.js recall "검색어"
+node bin/weasley-deepmind.js stats
+node bin/weasley-deepmind.js recall "검색어"
 
 # 일회성 실행 (환경변수 없이 직접 지정)
-node bin/memento.js stats --remote "https://memento.weasley-deepmind.net/mcp" --key "mmcp_xxx"
+node bin/weasley-deepmind.js stats --remote "https://deepmind.example.com/mcp" --key "wdm_xxx"
 ```
 
-주의: PowerShell에서 `--key $env:MEMENTO_CLI_KEY` 형태로 전달할 때, 값에 특수문자가 있으면 따옴표로 감싸야 한다.
+주의: PowerShell에서 `--key $env:WEASLEY_DEEPMIND_CLI_KEY` 형태로 전달할 때, 값에 특수문자가 있으면 따옴표로 감싸야 한다.
 

@@ -20,7 +20,7 @@ describe("UpdateExecutor", () => {
     it("migrate returns migration command", async () => {
       const ex = new UpdateExecutor({
         installType: "git", targetVersion: "v2.3.0", projectRoot: "/fake",
-        execCommand: () => Promise.resolve("ok"),
+        execCommand: (_cmd, args) => Promise.resolve(args.includes("--porcelain") ? "" : "ok"),
         getMigrationStatus: () => ({ pending: ["migration-005.sql"], applied: [] })
       });
       const r = await ex.executeStep("migrate", { dryRun: true });
@@ -43,7 +43,7 @@ describe("UpdateExecutor", () => {
     it("returns correct nextStep chain", async () => {
       const ex = new UpdateExecutor({
         installType: "git", targetVersion: "v2.3.0", projectRoot: "/fake",
-        execCommand: () => Promise.resolve("ok"),
+        execCommand: (_cmd, args) => Promise.resolve(args.includes("--porcelain") ? "" : "ok"),
         getMigrationStatus: () => ({ pending: [], applied: [] })
       });
       assert.equal((await ex.executeStep("fetch", { dryRun: false })).nextStep, "install");
@@ -53,7 +53,7 @@ describe("UpdateExecutor", () => {
   });
 
   describe("git clean worktree", () => {
-    it("skips stash/pop when working tree is clean", async () => {
+    it("updates without stash/pop when working tree is clean", async () => {
       const cmds = [];
       const ex = new UpdateExecutor({
         installType: "git", targetVersion: "v2.3.0", projectRoot: "/fake",
@@ -69,13 +69,29 @@ describe("UpdateExecutor", () => {
       const stashCmds = cmds.filter(c => c.cmd === "git" && c.args.includes("stash") && !c.args.includes("--porcelain"));
       assert.equal(stashCmds.length, 0);
     });
+
+    it("refuses to update a dirty working tree", async () => {
+      const cmds = [];
+      const ex = new UpdateExecutor({
+        installType: "git", targetVersion: "v2.3.0", projectRoot: "/fake",
+        execCommand: (cmd, args) => {
+          cmds.push({ cmd, args });
+          if (cmd === "git" && args.includes("--porcelain")) return Promise.resolve(" M local.js");
+          return Promise.resolve("ok");
+        }
+      });
+      const r = await ex.executeStep("install", { dryRun: false });
+      assert.equal(r.success, false);
+      assert.match(r.output, /dirty Git checkout/);
+      assert.equal(cmds.some(({ args }) => args.includes("checkout")), false);
+    });
   });
 
   describe("docker", () => {
     it("install returns guidance message", async () => {
       const ex = new UpdateExecutor({ installType: "docker", targetVersion: "v2.3.0", projectRoot: "/app", execCommand: () => Promise.resolve("ok") });
       const r = await ex.executeStep("install", { dryRun: false });
-      assert.ok(r.output.includes("컨테이너 외부"));
+      assert.ok(r.output.includes("docker pull ghcr.io/potatohoney-p/weasley-deepmind"));
     });
   });
 
@@ -83,7 +99,7 @@ describe("UpdateExecutor", () => {
     it("install uses npm install -g", async () => {
       const ex = new UpdateExecutor({ installType: "npm-global", targetVersion: "v2.3.0", projectRoot: "/usr/local", execCommand: () => Promise.resolve("ok") });
       const r = await ex.executeStep("install", { dryRun: true });
-      assert.ok(r.commands.some(c => c.cmd === "npm" && c.args.includes("memento-mcp@2.3.0")));
+      assert.ok(r.commands.some(c => c.cmd === "npm" && c.args.includes("weasley-deepmind@2.3.0")));
     });
   });
 });

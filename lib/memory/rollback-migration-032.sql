@@ -1,6 +1,6 @@
 -- rollback-migration-032.sql
 -- v2.8.0 Symbolic Memory Phase 0 롤백 스크립트
--- 작성자: 최진호
+-- 작성자: Weasley Open Source
 -- 작성일: 2026-04-15
 --
 -- 실행 순서: 인덱스 → 컬럼 → 테이블 순 (의존성 역순)

@@ -1,6 +1,6 @@
-﻿# API Reference
+# API Reference
 
-작성자: 최진호
+작성자: Weasley Open Source
 수정일: 2026-06-16
 
 MCP 도구 상세는 [SKILL.md](../SKILL.md) 참조.
@@ -67,7 +67,7 @@ MCP 도구 상세는 [SKILL.md](../SKILL.md) 참조.
 Redis가 비활성화(`REDIS_ENABLED=false`)되거나 연결 실패해도 서버는 healthy(200)를 반환합니다.
 L1 캐시와 Working Memory가 비활성화되지만 핵심 기억 저장/검색은 PostgreSQL만으로 동작합니다.
 
-인증 방식은 두 가지다. Streamable HTTP는 `initialize` 요청 시 `Authorization: Bearer <MEMENTO_ACCESS_KEY>` 헤더로 인증하며 이후 세션으로 유지된다. Legacy SSE는 `/sse?accessKey=<MEMENTO_ACCESS_KEY>` 쿼리 파라미터로 인증한다.
+인증 방식은 두 가지다. Streamable HTTP는 `initialize` 요청 시 `Authorization: Bearer <WEASLEY_DEEPMIND_ACCESS_KEY>` 헤더로 인증하며 이후 세션으로 유지된다. Legacy SSE는 `/sse?accessKey=<WEASLEY_DEEPMIND_ACCESS_KEY>` 쿼리 파라미터로 인증한다.
 
 ### HTTP 응답 헤더 — Rate Limit
 
@@ -93,8 +93,8 @@ X-RateLimit-Resource: fragments
 
 모든 MCP 도구 호출은 RBAC 검증을 통과해야 한다.
 
-- master key (`MEMENTO_ACCESS_KEY`): `permissions=null`로 처리되며 모든 도구를 호출할 수 있다.
-- API key (`mmcp_xxx`): 키 생성 시 지정된 `permissions` 배열 기준으로 도구 접근이 제한된다. 배열에 필요한 권한이 없으면 즉시 거부된다.
+- master key (`WEASLEY_DEEPMIND_ACCESS_KEY`): `permissions=null`로 처리되며 모든 도구를 호출할 수 있다.
+- API key (`wdm_xxx`): 키 생성 시 지정된 `permissions` 배열 기준으로 도구 접근이 제한된다. 배열에 필요한 권한이 없으면 즉시 거부된다.
 - `TOOL_PERMISSIONS` 맵에 등록된 도구는 해당 권한 레벨이 요구된다. 맵에 등록되지 않은 도구명은 `required=null`로 간주되어 권한 검사를 통과한다. 도구를 RBAC 경계에 편입하려면 `TOOL_PERMISSIONS` 맵에 명시적으로 등록해야 한다.
 - 권한 레벨은 세 가지다: `read`(recall/context/memory_stats 등), `write`(remember/forget/amend 등), `admin`(memory_consolidate/apply_update 등). `admin` 권한을 가진 키는 모든 레벨을 호출할 수 있다.
 - 타 테넌트(다른 API 키)가 소유한 파편에 forget/amend/link 요청 시 `"Fragment not found"` 에러가 반환된다. SQL 레벨에서 `key_id` 조건으로 격리되므로 존재 여부조차 노출되지 않는다.
@@ -103,7 +103,7 @@ X-RateLimit-Resource: fragments
 
 ### Mode Preset
 
-`X-Memento-Mode` 헤더 또는 `initialize` 요청의 `params.mode`로 세션 동작 모드를 지정할 수 있다. admin console에서 `api_keys.default_mode`를 설정하면 키 단위 기본값을 고정할 수 있다.
+`X-Weasley DeepMind-Mode` 헤더 또는 `initialize` 요청의 `params.mode`로 세션 동작 모드를 지정할 수 있다. admin console에서 `api_keys.default_mode`를 설정하면 키 단위 기본값을 고정할 수 있다.
 
 | Preset | 설명 | 허용 도구 |
 |--------|------|----------|
@@ -114,7 +114,7 @@ X-RateLimit-Resource: fragments
 
 HTTP 헤더로 설정:
 ```
-X-Memento-Mode: recall-only
+X-Weasley DeepMind-Mode: recall-only
 ```
 
 `initialize` 파라미터로 설정:
@@ -164,10 +164,10 @@ Content-Type: application/json
 
 - 인증: `Authorization: Bearer` 필수. 대상 세션 소유권이 일치하지 않으면 403
 - CSRF 방어: `Origin` 헤더 필수. 누락 또는 허용 목록 외 Origin이면 403
-- Rate limit: IP당 분당 `MEMENTO_ROTATE_RATE_LIMIT_PER_MIN` 회 (기본 5). 초과 시 429
+- Rate limit: IP당 분당 `WEASLEY_DEEPMIND_ROTATE_RATE_LIMIT_PER_MIN` 회 (기본 5). 초과 시 429
 - `reason` 필드는 감사 로그용으로 최대 128자. 지정하지 않으면 `explicit_rotate`
 - 메트릭: `mcp_session_rotation_total{reason}` 카운터 + `mcp_rotate_rate_limited_total` 카운터
-- CLI: `memento-mcp session rotate <sessionId>` 서브명령으로 동일 기능 호출. 자세한 사용법은 `docs/cli.md` 참조
+- CLI: `weasley-deepmind session rotate <sessionId>` 서브명령으로 동일 기능 호출. 자세한 사용법은 `docs/cli.md` 참조
 
 ### tools/list 응답 — meta 필드
 
@@ -192,7 +192,7 @@ Content-Type: application/json
 |------|------|------|
 | `capabilities` | string[] | 도구가 지원하는 기능 태그 목록 |
 | `riskLevel` | string | 도구의 위험 등급. `read` / `write` / `admin` |
-| `requiresMaster` | boolean | master key(MEMENTO_ACCESS_KEY)만 호출 가능 여부 |
+| `requiresMaster` | boolean | master key(WEASLEY_DEEPMIND_ACCESS_KEY)만 호출 가능 여부 |
 | `beta` | boolean | 실험적 기능 여부. true 시 인터페이스가 변경될 수 있음 |
 | `idempotent` | boolean | 동일 파라미터로 반복 호출해도 부작용이 없는지 여부 |
 
@@ -235,7 +235,7 @@ RFC 7591 동적 클라이언트 등록. 인증 불필요.
 
 ```json
 {
-  "client_id": "mmcp_...",
+  "client_id": "wdm_...",
   "client_name": "Claude",
   "redirect_uris": ["https://claude.ai/api/mcp/auth_callback"],
   "grant_types": ["authorization_code"],
@@ -407,7 +407,7 @@ API 키의 일일 호출 제한을 변경한다. 마스터 키 인증 필요.
 | `large_limit_no_budget` | pageSize=50 요청이고 tokenBudget 미지정인 경우 | tokenBudget 명시로 응답 크기 제어 |
 | `no_type_filter_noisy` | type 필터 없이 10건 이상 반환되었고 depth도 미지정인 경우 | type 또는 depth 필터 추가 |
 
-`explanation` (`MEMENTO_SYMBOLIC_EXPLAIN=true` 시에만 포함): 해당 파편이 검색 결과에 포함된 이유를 최대 3개 reason code로 설명한다.
+`explanation` (`WEASLEY_DEEPMIND_SYMBOLIC_EXPLAIN=true` 시에만 포함): 해당 파편이 검색 결과에 포함된 이유를 최대 3개 reason code로 설명한다.
 
 ```json
 {
@@ -559,7 +559,7 @@ violations 있는 경우 (soft gate — 저장됨):
 }
 ```
 
-`validation_warnings`: PolicyRules soft gating violations rule 이름 string[]. violations 없으면 필드 자체 생략. `MEMENTO_SYMBOLIC_POLICY_RULES=false` (기본값) 시 항상 생략. atomic 경로(`MEMENTO_REMEMBER_ATOMIC=true`)와 non-atomic 경로 모두 동일한 `_runPolicyGate` 호출 경로를 거치므로 포맷이 동일하다. 활성화 시 다음 5가지 predicate 중 실패한 것이 누적된다:
+`validation_warnings`: PolicyRules soft gating violations rule 이름 string[]. violations 없으면 필드 자체 생략. `WEASLEY_DEEPMIND_SYMBOLIC_POLICY_RULES=false` (기본값) 시 항상 생략. atomic 경로(`WEASLEY_DEEPMIND_REMEMBER_ATOMIC=true`)와 non-atomic 경로 모두 동일한 `_runPolicyGate` 호출 경로를 거치므로 포맷이 동일하다. 활성화 시 다음 5가지 predicate 중 실패한 것이 누적된다:
 
 - `decisionHasRationale` — decision 타입이 linked_to 2건 이상 또는 근거 키워드 미포함
 - `errorHasResolutionPath` — error 타입이 cause/fix 키워드 또는 resolution_status 미포함
@@ -918,7 +918,7 @@ id, content, importance만 반환받아 토큰 절감:
 
 ```bash
 curl -X POST https://weasley-deepmind.example.com/mcp \
-  -H "Authorization: Bearer $MEMENTO_KEY" \
+  -H "Authorization: Bearer $WEASLEY_DEEPMIND_KEY" \
   -H "Mcp-Session-Id: $SESSION" \
   -H "Content-Type: application/json" \
   -d '{
@@ -944,7 +944,7 @@ MCP JSON-RPC 동등 호출:
 
 ```bash
 curl -X POST https://weasley-deepmind.example.com/mcp \
-  -H "Authorization: Bearer $MEMENTO_KEY" \
+  -H "Authorization: Bearer $WEASLEY_DEEPMIND_KEY" \
   -H "Mcp-Session-Id: $SESSION" \
   -H "Content-Type: application/json" \
   -d '{
@@ -971,7 +971,7 @@ curl -X POST https://weasley-deepmind.example.com/mcp \
 
 ```bash
 curl -X POST https://weasley-deepmind.example.com/mcp \
-  -H "Authorization: Bearer $MEMENTO_KEY" \
+  -H "Authorization: Bearer $WEASLEY_DEEPMIND_KEY" \
   -H "Mcp-Session-Id: $SESSION" \
   -H "Content-Type: application/json" \
   -d '{
@@ -1027,10 +1027,10 @@ curl -si -X POST https://weasley-deepmind.example.com/mcp \
 
 | 변수 | 기본값 | 영향 범위 |
 |-|-|-|
-| `MEMENTO_REMEMBER_ATOMIC` | `false` | `true` 시 remember 경로가 `_rememberAtomic`으로 전환. `SELECT api_keys FOR UPDATE` + 단일 BEGIN/COMMIT 트랜잭션으로 quota 재검증과 INSERT를 원자적으로 처리. `_runPolicyGate`는 양 경로 모두 동일하게 실행되므로 `validation_warnings` 포맷에 차이 없음. |
-| `MEMENTO_CASE_BACKPROP_ENABLED` | `false` | `true` 시 case_id를 가진 파편의 amend(resolutionStatus 변경) 시점에 동일 caseId 파편들의 importance를 역전파 조정. `lib/config.js`의 `CASE_BACKPROP_ENABLED` 상수로 export. case 해결 완료 시 관련 파편의 활성화 점수가 상향되어 이후 recall 정밀도를 높인다. |
-| `MEMENTO_STORAGE` | `pgvector` | 스토리지 어댑터 선택. `pgvector`(기본, 프로덕션용 PgVectorStore) 또는 `sqlite-vec`(SqliteVecStore). 어댑터 교체 시 `transaction(fn)` 인터페이스가 유지되므로 write 경로 동시성 시맨틱은 동일하게 보존됨. |
-| `MEMENTO_SYMBOLIC_POLICY_RULES` | `false` | `true` 시 `_runPolicyGate`가 PolicyRules soft gate를 평가하여 위반 rule 이름을 `validation_warnings`에 누적. |
+| `WEASLEY_DEEPMIND_REMEMBER_ATOMIC` | `false` | `true` 시 remember 경로가 `_rememberAtomic`으로 전환. `SELECT api_keys FOR UPDATE` + 단일 BEGIN/COMMIT 트랜잭션으로 quota 재검증과 INSERT를 원자적으로 처리. `_runPolicyGate`는 양 경로 모두 동일하게 실행되므로 `validation_warnings` 포맷에 차이 없음. |
+| `WEASLEY_DEEPMIND_CASE_BACKPROP_ENABLED` | `false` | `true` 시 case_id를 가진 파편의 amend(resolutionStatus 변경) 시점에 동일 caseId 파편들의 importance를 역전파 조정. `lib/config.js`의 `CASE_BACKPROP_ENABLED` 상수로 export. case 해결 완료 시 관련 파편의 활성화 점수가 상향되어 이후 recall 정밀도를 높인다. |
+| `WEASLEY_DEEPMIND_STORAGE` | `pgvector` | 스토리지 어댑터 선택. `pgvector`(기본, 프로덕션용 PgVectorStore) 또는 `sqlite-vec`(SqliteVecStore). 어댑터 교체 시 `transaction(fn)` 인터페이스가 유지되므로 write 경로 동시성 시맨틱은 동일하게 보존됨. |
+| `WEASLEY_DEEPMIND_SYMBOLIC_POLICY_RULES` | `false` | `true` 시 `_runPolicyGate`가 PolicyRules soft gate를 평가하여 위반 rule 이름을 `validation_warnings`에 누적. |
 
 ---
 

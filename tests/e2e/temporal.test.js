@@ -1,7 +1,7 @@
 /**
  * Integration Test - Point-in-time 쿼리 (Temporal Schema)
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-03-03
  *
  * valid_from / valid_to 컬럼을 이용한 특정 시점 기억 조회 검증.

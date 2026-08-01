@@ -2,7 +2,7 @@
  * key-groups.test.js (node:test 이주)
  * API Key Group effective_key_id resolution 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 수정일: 2026-04-19 (Jest → node:test 이주)
  */
 

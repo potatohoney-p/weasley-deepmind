@@ -1,7 +1,7 @@
 /**
  * LLM Dispatcher 인라인 mirror 재발 방지 가드
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-05-13
  *
  * `dispatchChain`을 추출하기 전, dispatcher 테스트는 `lib/llm/index.js`의 for-loop을
@@ -39,7 +39,7 @@ describe("LLM Dispatcher — 인라인 mirror 재발 방지", () => {
   it("llmJson 본문이 chain for-loop을 직접 들고 있지 않다", () => {
     /** llmJson 함수 본문에서 'for (const provider of chain)' 패턴 잔존 차단 */
     const llmJsonBody = dispatcherSource.match(
-      /export\s+async\s+function\s+llmJson\s*\([\s\S]*?\n\}\n/
+      /export\s+async\s+function\s+llmJson\s*\([\s\S]*?\r?\n\}\r?\n/
     );
     assert.ok(llmJsonBody, "llmJson 함수 본문을 찾을 수 없다");
     assert.doesNotMatch(

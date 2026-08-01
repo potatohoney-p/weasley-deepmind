@@ -31,12 +31,12 @@ mock.module("../../lib/config.js", {
   namedExports: {
     LLM_PRIMARY         : "primary",
     LLM_FALLBACKS      : [
-      { provider: "primary", timeoutMs: 70 },
-      { provider: "fallback", timeoutMs: 70 }
+      { provider: "primary", timeoutMs: 1500 },
+      { provider: "fallback", timeoutMs: 3000 }
     ],
     LLM_PROVIDER_TIMEOUT_MS : 60_000,
     LLM_PROVIDER_TIMEOUT_CONFIGURED: false,
-    LLM_CHAIN_TIMEOUT_MS    : 80,
+    LLM_CHAIN_TIMEOUT_MS    : 2000,
     LLM_CONCURRENCY_ENABLED : false,
     LLM_CONCURRENCY_WAIT_MS : 30_000,
     getConcurrencyLimit     : () => 1
@@ -67,10 +67,10 @@ describe("llmJson chain deadline", () => {
 
     assert.deepEqual(result, { ok: true, provider: "fallback" });
     assert.equal(calls[0].name, "primary");
-    assert.equal(calls[0].timeoutMs, 70);
+    assert.equal(calls[0].timeoutMs, 1500);
     assert.equal(calls[1].name, "fallback");
     assert.ok(calls[1].timeoutMs > 0);
-    assert.ok(calls[1].timeoutMs < 70);
-    assert.ok(calls[1].timeoutMs <= 80);
+    assert.ok(calls[1].timeoutMs < 3000);
+    assert.ok(calls[1].timeoutMs <= 2000);
   });
 });

@@ -1,6 +1,6 @@
 -- migration-035-morpheme-indexed.sql
 --
--- 작성자: 최진호
+-- 작성자: Weasley Open Source
 -- 작성일: 2026-04-27
 --
 -- 목적: morpheme_indexed 컬럼 추가 + 백필 + sparse index

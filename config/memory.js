@@ -1,7 +1,7 @@
 /**
  * 기억 시스템 설정
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-02-25
  * 수정일: 2026-05-22 (morphemeIndex kanaMinChars, enableKuromoji 추가)
  */
@@ -87,17 +87,17 @@ export const MEMORY_CONFIG = {
     intervalMs  : 5000,
     retryLimit  : 3,
     retryDelayMs: 2000,
-    queueKey    : "memento:embedding_queue"
+    queueKey    : "weasley_deepmind:embedding_queue"
   },
   /** batch_remember 비동기 워커 설정 */
   batchRememberWorker: {
     intervalMs : 1000,
     retryLimit : 3,
-    queueKey   : "memento:batch_remember_queue"
+    queueKey   : "weasley_deepmind:batch_remember_queue"
   },
   /** 컨텍스트 주입 설정 */
   contextInjection: {
-    maxAnchorFragments : envInt("MEMENTO_CONTEXT_ANCHOR_LIMIT", 10, 1, 30),
+    maxAnchorFragments : envInt("WEASLEY_DEEPMIND_CONTEXT_ANCHOR_LIMIT", 10, 1, 30),
     maxCoreFragments   : 15,
     maxWmFragments     : 10,
     typeSlots          : {
@@ -141,9 +141,9 @@ export const MEMORY_CONFIG = {
     limit          : 30,
     /** text 없는 keywords-only 쿼리에서 L3 시맨틱 보조 실행 여부.
      *  L1/L2는 저장 keywords 배열만 보므로 content 매칭은 이 경로가 유일하다. */
-    keywordFallback: process.env.MEMENTO_KEYWORD_SEMANTIC_FALLBACK !== "false",
+    keywordFallback: process.env.WEASLEY_DEEPMIND_KEYWORD_SEMANTIC_FALLBACK !== "false",
     /** keywords 보조 L3 실행 상한(ms). 초과 시 빈 배열로 대체해 응답 지연을 차단한다. */
-    keywordFallbackTimeoutMs: envInt("MEMENTO_KEYWORD_FALLBACK_TIMEOUT_MS", 1500, 100, 60000)
+    keywordFallbackTimeoutMs: envInt("WEASLEY_DEEPMIND_KEYWORD_FALLBACK_TIMEOUT_MS", 1500, 100, 60000)
   },
   /** 파편 GC 정책 */
   gc: {
@@ -178,7 +178,7 @@ export const MEMORY_CONFIG = {
   /**
    * ProactiveRecall 자동 링크 정책
    *
-   * 작성자: 최진호
+   * 작성자: Weasley Open Source
    * 수정일: 2026-05-19
    *
    * mode 값:
@@ -187,15 +187,15 @@ export const MEMORY_CONFIG = {
    *   "legacy" — 50% 키워드 오버랩 기준 자동 생성 (workspace/case 무관).
    */
   proactiveRecall: {
-    mode             : process.env.MEMENTO_PROACTIVE_RECALL_MODE ?? "auto",
-    keywordOverlapMin: parseFloat(process.env.MEMENTO_PROACTIVE_KW_OVERLAP_MIN ?? "0.5"),
+    mode             : process.env.WEASLEY_DEEPMIND_PROACTIVE_RECALL_MODE ?? "auto",
+    keywordOverlapMin: parseFloat(process.env.WEASLEY_DEEPMIND_PROACTIVE_KW_OVERLAP_MIN ?? "0.5"),
     // 다른 workspace 파편 간 자동 링크 금지 (mode=auto일 때만 적용)
     requireSameWorkspace : true,
     // caseId 절충 정책:
     //   "both-required"      — 양쪽 모두 caseId 있고 일치해야 통과
     //   "strict-or-adjacent" — null 허용하되 sessionId 동일/24h 인접/workspace 동일 중 하나 요구
     //   "loose"              — 한쪽 null이면 무조건 허용 (legacy 동작)
-    caseIdPolicy         : process.env.MEMENTO_PROACTIVE_CASE_POLICY ?? "strict-or-adjacent",
+    caseIdPolicy         : process.env.WEASLEY_DEEPMIND_PROACTIVE_CASE_POLICY ?? "strict-or-adjacent",
     // strict-or-adjacent에서 시간 인접 판단 폭 (ms)
     adjacencyWindowMs    : 24 * 3600 * 1000,
     // topic/type 일치 요구 — 운영 데이터 검토 후 활성화
@@ -206,7 +206,7 @@ export const MEMORY_CONFIG = {
   /**
    * consolidate 실행 조건 및 위험 stage 활성화 설정
    *
-   * 작성자: 최진호
+   * 작성자: Weasley Open Source
    * 수정일: 2026-05-19
    */
   consolidate: {
@@ -222,16 +222,16 @@ export const MEMORY_CONFIG = {
       pendingCaseFragmentsMin : 5,   // 같은 caseId 미해결 fragment 누적 임계
       recentRelatedLinksMin   : 20,  // 최근 6h 내 생성된 related 링크 수 임계
       fragmentsSinceLastRunMin: 30,  // 마지막 consolidation 이후 INSERT된 fragment 수 임계
-      mode: process.env.MEMENTO_CONSOLIDATE_GATE_MODE ?? "any"
+      mode: process.env.WEASLEY_DEEPMIND_CONSOLIDATE_GATE_MODE ?? "any"
     },
     /**
      * LLM 재작성을 수반하는 위험 stage 활성화 플래그.
      * false로 설정된 stage는 실행 없이 status="skipped"를 반환한다.
      */
     enableRiskyStages: {
-      splitLongFragments  : (process.env.MEMENTO_CONSOLIDATE_SPLIT_LONG ?? "true") === "true",
-      detectContradictions: (process.env.MEMENTO_CONSOLIDATE_DETECT_CONTRADICT ?? "true") === "true",
-      compressOldFragments: (process.env.MEMENTO_CONSOLIDATE_COMPRESS_OLD ?? "false") === "true"
+      splitLongFragments  : (process.env.WEASLEY_DEEPMIND_CONSOLIDATE_SPLIT_LONG ?? "true") === "true",
+      detectContradictions: (process.env.WEASLEY_DEEPMIND_CONSOLIDATE_DETECT_CONTRADICT ?? "true") === "true",
+      compressOldFragments: (process.env.WEASLEY_DEEPMIND_CONSOLIDATE_COMPRESS_OLD ?? "false") === "true"
     }
   },
   /** 긴 파편 분할 정책 (Gemini CLI 사용) */
@@ -253,10 +253,10 @@ export const MEMORY_CONFIG = {
     maxMorphemes      : 10,       // 쿼리에서 추출할 최대 형태소 수
     geminiTimeoutMs   : 60_000,   // 형태소 분리 LLM 타임아웃 (Gemini/Codex/Copilot CLI 공통)
     registerOnRemember: true,     // remember() 시 형태소 자동 등록 여부
-    tokenizer         : process.env.MEMENTO_MORPHEME_TOKENIZER || "local", // "local" | "llm"
+    tokenizer         : process.env.WEASLEY_DEEPMIND_MORPHEME_TOKENIZER || "local", // "local" | "llm"
     /** 가나 런 최소 길이 — 미만이면 kuromoji 로드 없이 문자 분리 */
     kanaMinChars      : 2,
     /** false이면 kuromoji를 절대 로드하지 않는다 (+269MB 상주 방지) */
-    enableKuromoji    : process.env.MEMENTO_ENABLE_KUROMOJI !== "false"
+    enableKuromoji    : process.env.WEASLEY_DEEPMIND_ENABLE_KUROMOJI !== "false"
   }
 };

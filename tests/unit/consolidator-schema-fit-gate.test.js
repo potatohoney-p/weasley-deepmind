@@ -1,7 +1,7 @@
 /**
  * schema-fit gate 및 enableRiskyStages 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-05-19
  *
  * DB 없이 mock pool로 COUNT 결과를 주입하여 gate 평가 로직을 검증한다.
@@ -148,8 +148,8 @@ describe("schema-fit gate — mode=all", () => {
 });
 
 describe("enableRiskyStages — compressOldFragments=false 시 skip", () => {
-  it("MEMENTO_CONSOLIDATE_COMPRESS_OLD 미설정 시 기본값 false", () => {
-    const val = (process.env.MEMENTO_CONSOLIDATE_COMPRESS_OLD ?? "false") === "true";
+  it("WEASLEY_DEEPMIND_CONSOLIDATE_COMPRESS_OLD 미설정 시 기본값 false", () => {
+    const val = (process.env.WEASLEY_DEEPMIND_CONSOLIDATE_COMPRESS_OLD ?? "false") === "true";
     assert.strictEqual(val, false);
   });
 

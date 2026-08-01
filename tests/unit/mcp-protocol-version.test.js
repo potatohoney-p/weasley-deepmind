@@ -1,7 +1,7 @@
-﻿/**
+/**
  * MCP-Protocol-Version 헤더 검증 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-17
  * 수정일: 2026-07-26 — 계약 findings/weasley-deepmind-protocol-mismatch-contract-20260725.md
  *         반영. negotiatedVersion 불일치를 거부(400)하던 옛 계약을 폐기하고,

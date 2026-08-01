@@ -1,7 +1,7 @@
 /**
  * LLM Provider 429 쿨다운 로직 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-24
  *
  * OllamaProvider, OpenAICompatibleProvider 양쪽의

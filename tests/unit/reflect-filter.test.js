@@ -1,7 +1,7 @@
 /**
  * AutoReflect 빈 세션 필터 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-03-28
  *
  * _isEmptySession 판정 로직과 autoReflect의 early-return 동작을 검증한다.

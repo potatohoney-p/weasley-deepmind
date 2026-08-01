@@ -4,7 +4,7 @@
  * 대상: lib/memory/migrations/migration-*.sql
  * cutoff 미만(기존) 파일은 검사에서 제외한다.
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-05-13
  */
 

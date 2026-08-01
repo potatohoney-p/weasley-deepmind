@@ -1,7 +1,7 @@
 /**
  * P2b 회귀 방지: 일관성 점검 경고에 MorphemeBackfill 안내가 포함돼야 한다.
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-16
  */
 import { test } from "node:test";

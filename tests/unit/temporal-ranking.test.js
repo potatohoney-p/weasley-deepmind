@@ -1,7 +1,7 @@
 /**
  * 시간-의미 복합 랭킹 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-03-07
  *
  * FragmentSearch._computeRankScore 의 anchorTime 기반 지수 감쇠 검증

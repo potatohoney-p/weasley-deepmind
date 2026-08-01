@@ -1,7 +1,7 @@
 /**
  * MemoryRememberer.remember() 특성화(characterization) 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-06-15
  *
  * 목적: 리팩터링 전 현재 동작을 고정한다. "이상적인 동작"이 아니라
@@ -28,7 +28,7 @@ import assert from "node:assert/strict";
 // ---------------------------------------------------------------------------
 
 function buildDeps(overrides = {}) {
-  process.env.MEMENTO_REMEMBER_ATOMIC = "false";
+  process.env.WEASLEY_DEEPMIND_REMEMBER_ATOMIC = "false";
 
   const store = {
     findByIdempotencyKey            : async () => null,

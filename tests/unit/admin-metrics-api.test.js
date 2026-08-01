@@ -1,7 +1,7 @@
 /**
  * Admin Metrics API 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-20
  *
  * 테스트 대상:
@@ -42,11 +42,11 @@ const mh = (name, help, labelNames, buckets) =>
 const gaugeStreamable = mg("mcp_active_sessions_streamable", "streamable");
 const gaugeLegacy     = mg("mcp_active_sessions_legacy",     "legacy");
 
-const cntAuthDenied    = mc("memento_auth_denied_total",             "auth denied",    ["reason"]);
-const cntRbacDenied    = mc("memento_rbac_denied_total",             "rbac denied",    ["tool", "reason"]);
-const cntTenant        = mc("memento_tenant_isolation_blocked_total","tenant blocked", ["component"]);
+const cntAuthDenied    = mc("weasley_deepmind_auth_denied_total",             "auth denied",    ["reason"]);
+const cntRbacDenied    = mc("weasley_deepmind_rbac_denied_total",             "rbac denied",    ["tool", "reason"]);
+const cntTenant        = mc("weasley_deepmind_tenant_isolation_blocked_total","tenant blocked", ["component"]);
 const cntErrors        = mc("mcp_errors_total",                      "errors",         ["type", "code"]);
-const cntSymbolic      = mc("memento_symbolic_gate_blocked_total",   "symbolic gate",  ["phase", "reason"]);
+const cntSymbolic      = mc("weasley_deepmind_symbolic_gate_blocked_total",   "symbolic gate",  ["phase", "reason"]);
 const cntOAuth         = mc("mcp_oauth_tokens_issued_total",         "oauth issued",   ["grant_type"]);
 const cntToolExec      = mc("mcp_tool_executions_total",             "tool exec",      ["tool", "success"]);
 
@@ -196,11 +196,11 @@ describe("admin-metrics buildMetricsSummary logic", () => {
                                   sumCounterValues(map.get("mcp_active_sessions_legacy")),
         authDeniedRate5m        : 0,
         rbacDeniedRate5m        : 0,
-        tenantBlockedTotal      : sumCounterValues(map.get("memento_tenant_isolation_blocked_total")),
+        tenantBlockedTotal      : sumCounterValues(map.get("weasley_deepmind_tenant_isolation_blocked_total")),
         rpcLatencyP50           : estimateQuantile(map.get("mcp_rpc_method_duration_seconds"), null, 0.50, 1000),
         rpcLatencyP99           : estimateQuantile(map.get("mcp_rpc_method_duration_seconds"), null, 0.99, 1000),
         toolErrorRate5m         : 0,
-        symbolicGateBlocked     : sumCounterValues(map.get("memento_symbolic_gate_blocked_total")),
+        symbolicGateBlocked     : sumCounterValues(map.get("weasley_deepmind_symbolic_gate_blocked_total")),
         oauthTokensIssuedRate1h : 0
       };
 

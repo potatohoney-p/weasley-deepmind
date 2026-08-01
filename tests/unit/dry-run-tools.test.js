@@ -3,7 +3,7 @@
  *
  * M5: remember / link / forget / amend dryRun 파라미터 동작 검증
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-20
  */
 
@@ -97,7 +97,7 @@ describe("dryRun: remember", () => {
     const rememberer = new MemoryRememberer(deps);
 
     /**
-     * MEMENTO_REMEMBER_ATOMIC=true 환경에서 keyId가 있으면 _rememberAtomic 경로로
+     * WEASLEY_DEEPMIND_REMEMBER_ATOMIC=true 환경에서 keyId가 있으면 _rememberAtomic 경로로
      * 진입하여 실제 DB pool이 필요해진다. master key(_keyId=null)는 atomic 경로를
      * 건너뛰므로(!(atomicRemember && keyId) 가드) store.insert가 정상 호출된다.
      */

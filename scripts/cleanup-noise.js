@@ -2,7 +2,7 @@
 /**
  * cleanup-noise.js — agent_memory.fragments 저품질 파편 탐지·삭제
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 수정일: 2026-04-20 (v2.12.0 문서 현행화 반영)
  *
  * 목적: DB에 축적된 초단문, 빈 세션 요약, NLI 재귀 쓰레기 등 노이즈 파편을

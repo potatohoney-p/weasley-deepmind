@@ -1,6 +1,6 @@
 -- migration-026-case-events.sql
 -- case_events (semantic milestone) + case_event_edges DAG + fragment_evidence
--- 작성자: 최진호
+-- 작성자: Weasley Open Source
 -- 작성일: 2026-04-03
 
 

@@ -1,6 +1,6 @@
 # benchmark-hot-path
 
-작성자: 최진호
+작성자: Weasley Open Source
 작성일: 2026-04-16
 
 ## Purpose
@@ -38,7 +38,7 @@ DATABASE_URL    PostgreSQL 연결 문자열 (필수)
 기본 실행 (결과를 `scripts/baseline-v27.json`에 overwrite):
 
 ```bash
-DATABASE_URL=postgresql://user:pw@localhost:5432/memento_test \
+DATABASE_URL=postgresql://user:pw@localhost:5432/weasley_deepmind_test \
   node scripts/benchmark-hot-path.js
 ```
 
@@ -77,7 +77,7 @@ DATABASE_URL=postgresql://... node scripts/benchmark-hot-path.js \
 ## Safe Execution Order
 
 1. 테스트 DB 환경에서만 실행. 프로덕션 DB 절대 금지.
-2. 기본 플래그 상태(`MEMENTO_SYMBOLIC_ENABLED=false`)로 baseline 확보:
+2. 기본 플래그 상태(`WEASLEY_DEEPMIND_SYMBOLIC_ENABLED=false`)로 baseline 확보:
 
    ```bash
    DATABASE_URL=postgresql://... node scripts/benchmark-hot-path.js
@@ -86,8 +86,8 @@ DATABASE_URL=postgresql://... node scripts/benchmark-hot-path.js \
 3. Symbolic 계층 활성화 후 새 baseline 저장:
 
    ```bash
-   MEMENTO_SYMBOLIC_ENABLED=true \
-   MEMENTO_SYMBOLIC_SHADOW=true \
+   WEASLEY_DEEPMIND_SYMBOLIC_ENABLED=true \
+   WEASLEY_DEEPMIND_SYMBOLIC_SHADOW=true \
    DATABASE_URL=postgresql://... \
      node scripts/benchmark-hot-path.js \
      --output scripts/baseline-symbolic-shadow.json
@@ -101,8 +101,8 @@ DATABASE_URL=postgresql://... node scripts/benchmark-hot-path.js \
 
 | 메트릭 | 설명 |
 |--------|------|
-| `memento_symbolic_latency_seconds` | Symbolic 계층 처리 시간 히스토그램 |
-| `memento_symbolic_claim_total` | claim 추출 누적 건수 |
+| `weasley_deepmind_symbolic_latency_seconds` | Symbolic 계층 처리 시간 히스토그램 |
+| `weasley_deepmind_symbolic_claim_total` | claim 추출 누적 건수 |
 
 benchmark 실행 중 Prometheus 메트릭을 함께 관찰하면 hot path 오버헤드의 원인을 symbolic 계층 내 세부 단계별로 분리할 수 있다.
 

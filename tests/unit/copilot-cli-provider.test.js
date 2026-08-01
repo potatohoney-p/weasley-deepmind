@@ -10,7 +10,7 @@
  *   4. circuit breaker 오픈 시 CLI 호출 없음
  *   5. extractJsonBlock 엣지 케이스
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-18
  */
 

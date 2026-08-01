@@ -1,9 +1,9 @@
-﻿# 벤치마크 리포트
+# 벤치마크 리포트
 
-[LongMemEval-S](https://arxiv.org/abs/2407.15460) 벤치마크 기반. 전체 평가 코드: [longmemeval-memento](https://github.com/potatohoney-p/longmemeval-memento)
+[LongMemEval-S](https://arxiv.org/abs/2407.15460) 벤치마크 기반. 전체 평가 코드: [longmemeval-weasley_deepmind](https://github.com/potatohoney-p/longmemeval-weasley_deepmind)
 
 일자: 2026-03-29
-평가자: 최진호
+평가자: Weasley Open Source
 
 ## 구성
 
@@ -12,7 +12,7 @@
 | 데이터셋 | LongMemEval_S (500개 질문, 6개 유형 + abstention) |
 | 수집 방식 | round_direct (턴 쌍 원문 그대로, 300자 절단) |
 | 저장소 | PostgreSQL bulk INSERT, OpenAI text-embedding-3-small을 통한 pgvector 임베딩 |
-| 검색 | memento-mcp recall API (3계층 캐스케이드: L1 Redis, L2 PostgreSQL GIN, L3 pgvector HNSW) |
+| 검색 | weasley-deepmind recall API (3계층 캐스케이드: L1 Redis, L2 PostgreSQL GIN, L3 pgvector HNSW) |
 | Top-K | 5 |
 | 리더 | Gemini 2.5 Flash (direct 방식, chain-of-thought 미사용) |
 | 평가자 | Gemini 2.5 Flash (LongMemEval 공식 프롬프트 그대로 이식) |

@@ -1,7 +1,7 @@
 /**
  * Pipeline Overhaul 통합 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-03-07
  *
  * 실제 DB 없이 실행 가능한 구조 검증 + 랭킹 로직 검증.

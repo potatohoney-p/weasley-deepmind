@@ -1,7 +1,7 @@
 /**
  * Unit tests: LLM Semaphore
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-24
  *
  * createSemaphore / getSemaphore / resetSemaphores 동작을 검증한다.

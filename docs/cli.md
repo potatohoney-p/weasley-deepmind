@@ -1,11 +1,11 @@
-﻿# CLI
+# CLI
 
 ## 개요
 
-`bin/memento.js`는 서버 없이 터미널에서 메모리 서버를 운영·조회할 수 있는 CLI 진입점이다. 전역 설치 시 `weasley-deepmind` 명령으로 실행하며, `memento-mcp` 명령도 동일하게 동작한다.
+`bin/weasley-deepmind.js`는 서버 없이 터미널에서 메모리 서버를 운영·조회할 수 있는 CLI 진입점이다. 전역 설치 시 `weasley-deepmind` 명령으로 실행하며, `weasley-deepmind` 명령도 동일하게 동작한다.
 
 ```bash
-node bin/memento.js <command> [options]
+node bin/weasley-deepmind.js <command> [options]
 # 또는
 npm run cli -- <command> [options]
 ```
@@ -15,7 +15,7 @@ npm run cli -- <command> [options]
 ```bash
 # 환경변수 로드 후 실행 예시
 export $(grep -v '^#' .env | grep '=' | xargs)
-node bin/memento.js stats
+node bin/weasley-deepmind.js stats
 ```
 
 ---
@@ -29,8 +29,8 @@ node bin/memento.js stats
 | `--help`, `-h` | 서브명령별 상세 도움말 출력 |
 | `--format table\|json\|csv` | 출력 포맷. TTY 환경에서는 기본 `table`, 파이프/리다이렉트 환경에서는 `json` |
 | `--json` | `--format json` 별칭 (하위 호환) |
-| `--remote URL` | 원격 MCP 서버 URL. 미지정 시 `MEMENTO_CLI_REMOTE` 환경변수 사용 |
-| `--key KEY` | 원격 서버 인증용 Bearer API 키. 미지정 시 `MEMENTO_CLI_KEY` 환경변수 사용 |
+| `--remote URL` | 원격 MCP 서버 URL. 미지정 시 `WEASLEY_DEEPMIND_CLI_REMOTE` 환경변수 사용 |
+| `--key KEY` | 원격 서버 인증용 Bearer API 키. 미지정 시 `WEASLEY_DEEPMIND_CLI_KEY` 환경변수 사용 |
 | `--timeout ms` | 원격 HTTP 요청 타임아웃 (기본: 30000ms) |
 | `--verbose` | 에러 시 스택 트레이스 출력 |
 
@@ -38,8 +38,8 @@ node bin/memento.js stats
 
 | 변수 | 설명 |
 |------|------|
-| `MEMENTO_CLI_REMOTE` | `--remote` 미지정 시 사용할 MCP 서버 URL |
-| `MEMENTO_CLI_KEY` | `--key` 미지정 시 사용할 API 키 |
+| `WEASLEY_DEEPMIND_CLI_REMOTE` | `--remote` 미지정 시 사용할 MCP 서버 URL |
+| `WEASLEY_DEEPMIND_CLI_KEY` | `--key` 미지정 시 사용할 API 키 |
 
 ---
 
@@ -83,7 +83,7 @@ node bin/memento.js stats
 MCP 서버를 포그라운드로 시작한다.
 
 ```bash
-node bin/memento.js serve
+node bin/weasley-deepmind.js serve
 # 또는
 npm start
 ```
@@ -93,7 +93,7 @@ npm start
 도움말:
 
 ```bash
-node bin/memento.js serve --help
+node bin/weasley-deepmind.js serve --help
 ```
 
 ### migrate
@@ -101,7 +101,7 @@ node bin/memento.js serve --help
 `lib/memory/migrations/migration-*.sql` 파일을 순서대로 실행한다. 이미 적용된 마이그레이션은 건너뛴다.
 
 ```bash
-node bin/memento.js migrate
+node bin/weasley-deepmind.js migrate
 # 또는
 npm run migrate
 ```
@@ -111,7 +111,7 @@ npm run migrate
 도움말:
 
 ```bash
-node bin/memento.js migrate --help
+node bin/weasley-deepmind.js migrate --help
 ```
 
 ### cleanup
@@ -119,8 +119,8 @@ node bin/memento.js migrate --help
 `util_score`, `importance`, 비활성 기간 조건을 만족하는 노이즈 파편을 삭제한다.
 
 ```bash
-node bin/memento.js cleanup           # dry-run (미리보기만)
-node bin/memento.js cleanup --execute  # 실제 삭제 실행
+node bin/weasley-deepmind.js cleanup           # dry-run (미리보기만)
+node bin/weasley-deepmind.js cleanup --execute  # 실제 삭제 실행
 ```
 
 직접 실행 대안:
@@ -135,7 +135,7 @@ node scripts/cleanup-noise.js --execute
 임베딩이 없는 기존 파편에 임베딩을 생성한다. 임베딩 API 키 또는 로컬 transformers provider가 필요하다.
 
 ```bash
-node bin/memento.js backfill
+node bin/weasley-deepmind.js backfill
 # 또는
 npm run backfill:embeddings
 ```
@@ -146,19 +146,19 @@ npm run backfill:embeddings
 
 ```bash
 # TTY 환경 — table 포맷 (기본)
-node bin/memento.js stats
+node bin/weasley-deepmind.js stats
 
 # JSON 포맷
-node bin/memento.js stats --format json
+node bin/weasley-deepmind.js stats --format json
 
 # CSV 포맷
-node bin/memento.js stats --format csv
+node bin/weasley-deepmind.js stats --format csv
 
 # --json 별칭 (--format json 동일)
-node bin/memento.js stats --json
+node bin/weasley-deepmind.js stats --json
 
 # 원격 서버 조회
-node bin/memento.js stats --remote https://memento.weasley-deepmind.net/mcp --key mmcp_xxx
+node bin/weasley-deepmind.js stats --remote https://deepmind.example.com/mcp --key wdm_xxx
 ```
 
 출력 예시 (`--format table`):
@@ -178,7 +178,7 @@ fragments   anchors   topics
 도움말:
 
 ```bash
-node bin/memento.js stats --help
+node bin/weasley-deepmind.js stats --help
 ```
 
 ### health
@@ -186,8 +186,8 @@ node bin/memento.js stats --help
 DB 연결, Redis 상태, 임베딩 provider 동작 여부를 진단한다.
 
 ```bash
-node bin/memento.js health
-node bin/memento.js health --format json
+node bin/weasley-deepmind.js health
+node bin/weasley-deepmind.js health --format json
 ```
 
 ### recall
@@ -196,25 +196,25 @@ node bin/memento.js health --format json
 
 ```bash
 # 기본 검색
-node bin/memento.js recall "검색어"
+node bin/weasley-deepmind.js recall "검색어"
 
 # 옵션 조합
-node bin/memento.js recall "nginx 에러" --topic my-project --limit 5
+node bin/weasley-deepmind.js recall "nginx 에러" --topic my-project --limit 5
 
 # 시간 범위 필터
-node bin/memento.js recall "2026-01-01 이후 기록" --time-range 2026-01-01,2026-12-31
+node bin/weasley-deepmind.js recall "2026-01-01 이후 기록" --time-range 2026-01-01,2026-12-31
 
 # 출력 포맷 지정
-node bin/memento.js recall "검색어" --format table
-node bin/memento.js recall "검색어" --format json
-node bin/memento.js recall "검색어" --format csv
+node bin/weasley-deepmind.js recall "검색어" --format table
+node bin/weasley-deepmind.js recall "검색어" --format json
+node bin/weasley-deepmind.js recall "검색어" --format csv
 
 # 원격 서버 경유
-node bin/memento.js recall "검색어" --remote https://memento.weasley-deepmind.net/mcp --key mmcp_xxx
+node bin/weasley-deepmind.js recall "검색어" --remote https://deepmind.example.com/mcp --key wdm_xxx
 
 # 환경변수로 원격 설정 후 사용
-MEMENTO_CLI_REMOTE=https://memento.weasley-deepmind.net/mcp MEMENTO_CLI_KEY=mmcp_xxx \
-  node bin/memento.js recall "검색어"
+WEASLEY_DEEPMIND_CLI_REMOTE=https://deepmind.example.com/mcp WEASLEY_DEEPMIND_CLI_KEY=wdm_xxx \
+  node bin/weasley-deepmind.js recall "검색어"
 ```
 
 옵션:
@@ -229,7 +229,7 @@ MEMENTO_CLI_REMOTE=https://memento.weasley-deepmind.net/mcp MEMENTO_CLI_KEY=mmcp
 도움말:
 
 ```bash
-node bin/memento.js recall --help
+node bin/weasley-deepmind.js recall --help
 ```
 
 ### remember
@@ -238,18 +238,18 @@ node bin/memento.js recall --help
 
 ```bash
 # 기본 저장
-node bin/memento.js remember "PostgreSQL 연결 시 pg_hba.conf 설정 필요" --topic infra --type fact
+node bin/weasley-deepmind.js remember "PostgreSQL 연결 시 pg_hba.conf 설정 필요" --topic infra --type fact
 
 # 절차 저장
-node bin/memento.js remember "배포 완료" --topic deploy-2026 --type procedure
+node bin/weasley-deepmind.js remember "배포 완료" --topic deploy-2026 --type procedure
 
 # idempotencyKey 지정 (중복 저장 방지)
-node bin/memento.js remember "nginx 재시작 후 443 포트 정상" --topic infra --type fact \
+node bin/weasley-deepmind.js remember "nginx 재시작 후 443 포트 정상" --topic infra --type fact \
   --idempotency-key "infra-nginx-restart-2026-04-20"
 
 # 원격 서버에 저장
-node bin/memento.js remember "배포 완료" --topic deploy-2026 --type procedure \
-  --remote https://memento.weasley-deepmind.net/mcp --key mmcp_xxx
+node bin/weasley-deepmind.js remember "배포 완료" --topic deploy-2026 --type procedure \
+  --remote https://deepmind.example.com/mcp --key wdm_xxx
 ```
 
 옵션:
@@ -264,7 +264,7 @@ node bin/memento.js remember "배포 완료" --topic deploy-2026 --type procedur
 도움말:
 
 ```bash
-node bin/memento.js remember --help
+node bin/weasley-deepmind.js remember --help
 ```
 
 ### inspect
@@ -272,38 +272,38 @@ node bin/memento.js remember --help
 파편 ID로 전체 메타데이터와 1-hop 링크를 출력한다.
 
 ```bash
-node bin/memento.js inspect frag-00abc123
-node bin/memento.js inspect frag-00abc123 --format json
-node bin/memento.js inspect frag-00abc123 --format table
+node bin/weasley-deepmind.js inspect frag-00abc123
+node bin/weasley-deepmind.js inspect frag-00abc123 --format json
+node bin/weasley-deepmind.js inspect frag-00abc123 --format table
 
 # 원격 서버 조회
-node bin/memento.js inspect frag-00abc123 --remote https://memento.weasley-deepmind.net/mcp --key mmcp_xxx
+node bin/weasley-deepmind.js inspect frag-00abc123 --remote https://deepmind.example.com/mcp --key wdm_xxx
 ```
 
 도움말:
 
 ```bash
-node bin/memento.js inspect --help
+node bin/weasley-deepmind.js inspect --help
 ```
 
 ### session
 
-활성 세션을 조회하고 강제 종료하거나 ID를 재발급한다. 모든 서브명령은 master key(`MEMENTO_ACCESS_KEY`)를 요구한다. 원격 모드(`--remote` / `--key`)로 지정하면 Admin HTTP API를 직접 호출한다.
+활성 세션을 조회하고 강제 종료하거나 ID를 재발급한다. 모든 서브명령은 master key(`WEASLEY_DEEPMIND_ACCESS_KEY`)를 요구한다. 원격 모드(`--remote` / `--key`)로 지정하면 Admin HTTP API를 직접 호출한다.
 
 서브명령 4종.
 
 ```bash
 # 활성 세션 목록 (기본 limit 50)
-memento-mcp session list [--limit N] [--workspace X] [--format table|json|csv]
+weasley-deepmind session list [--limit N] [--workspace X] [--format table|json|csv]
 
 # 단일 세션 상세 (keyId, createdAt, lastAccessedAt, expiresAt, heartbeat)
-memento-mcp session show <sessionId>
+weasley-deepmind session show <sessionId>
 
 # 세션 강제 종료 (autoReflect 포함)
-memento-mcp session delete <sessionId>
+weasley-deepmind session delete <sessionId>
 
 # 세션 ID 회전 (session fixation 대응)
-memento-mcp session rotate <sessionId> [--reason "suspected_leak"]
+weasley-deepmind session rotate <sessionId> [--reason "suspected_leak"]
 ```
 
 `session rotate`는 Redis에 저장된 세션 데이터를 유지하면서 ID만 재바인딩한다. 진행 중이던 작업과 기억 파편은 영향 없다. `reason`은 최대 128자 감사 로그용 문자열이며 기본값은 `explicit_rotate`.
@@ -313,7 +313,7 @@ rotate 엔드포인트 정책:
 - HTTP: `POST /session/rotate` (body: `{ "reason": "..." }`)
 - 인증: `Authorization: Bearer <API key or master key>` + `Mcp-Session-Id` 헤더로 대상 세션 지정
 - CSRF 방어: `Origin` 헤더 필수. 누락 시 403
-- Rate limit: IP당 분당 `MEMENTO_ROTATE_RATE_LIMIT_PER_MIN` (기본 5) 초과 시 429
+- Rate limit: IP당 분당 `WEASLEY_DEEPMIND_ROTATE_RATE_LIMIT_PER_MIN` (기본 5) 초과 시 429
 - 메트릭: `mcp_session_rotation_total` (label: `reason`)
 
 CLI는 초과 시 표준 에러로 `HTTP 429`를 출력한다. 원격 모드에서도 동일한 rate-limit이 적용된다.
@@ -324,15 +324,15 @@ CLI는 초과 시 표준 에러로 `HTTP 429`를 출력한다. 원격 모드에�
 SESSION ID                       KEY ID    WORKSPACE  CREATED              LAST ACCESSED        TTL (min)
 ----------------------------------------------------------------------------------------------------------
 aabbcc11-2233-4455-6677-8899ddee  default   paysvc     2026-04-21T10:12:03  2026-04-21T12:34:56  41520
-bbccdd22-3344-5566-7788-99aaeeff  mmcp_xx   -          2026-04-21T11:00:00  2026-04-21T12:30:00  41500
+bbccdd22-3344-5566-7788-99aaeeff  wdm_xx   -          2026-04-21T11:00:00  2026-04-21T12:30:00  41500
 ```
 
 `--help`로 서브명령별 세부 옵션 확인 가능.
 
 ```bash
-memento-mcp session --help
-memento-mcp session list --help
-memento-mcp session rotate --help
+weasley-deepmind session --help
+weasley-deepmind session list --help
+weasley-deepmind session rotate --help
 ```
 
 ### update
@@ -340,15 +340,15 @@ memento-mcp session rotate --help
 서버 업데이트를 확인하고 선택적으로 적용한다.
 
 ```bash
-node bin/memento.js update              # dry-run: 사용 가능한 업데이트 확인
-node bin/memento.js update --execute    # 업데이트 적용
-node bin/memento.js update --redetect   # 설치 방식 재탐지 후 업데이트
+node bin/weasley-deepmind.js update              # dry-run: 사용 가능한 업데이트 확인
+node bin/weasley-deepmind.js update --execute    # 업데이트 적용
+node bin/weasley-deepmind.js update --redetect   # 설치 방식 재탐지 후 업데이트
 ```
 
 도움말:
 
 ```bash
-node bin/memento.js update --help
+node bin/weasley-deepmind.js update --help
 ```
 
 ### export
@@ -356,9 +356,9 @@ node bin/memento.js update --help
 파편을 JSONL(한 줄당 한 파편) 형식으로 덤프한다. 백업·이관용.
 
 ```bash
-node bin/memento.js export --topic memento-mcp --type fact > out.jsonl
-node bin/memento.js export --since 2026-04-01 --output backup.jsonl
-node bin/memento.js export --key mmcp_xxx --limit 500
+node bin/weasley-deepmind.js export --topic weasley-deepmind --type fact > out.jsonl
+node bin/weasley-deepmind.js export --since 2026-04-01 --output backup.jsonl
+node bin/weasley-deepmind.js export --key wdm_xxx --limit 500
 ```
 
 주요 옵션: `--topic`, `--type`, `--since <ISO>`, `--limit <n>`, `--output <FILE>`, `--json` (배열 출력).
@@ -366,7 +366,7 @@ node bin/memento.js export --key mmcp_xxx --limit 500
 도움말:
 
 ```bash
-node bin/memento.js export --help
+node bin/weasley-deepmind.js export --help
 ```
 
 ### import
@@ -374,9 +374,9 @@ node bin/memento.js export --help
 JSONL 파일 또는 stdin에서 파편을 읽어 `fragments` 테이블에 적재한다.
 
 ```bash
-node bin/memento.js import --input out.jsonl
-cat out.jsonl | node bin/memento.js import
-node bin/memento.js import --input out.jsonl --idempotent --dry-run
+node bin/weasley-deepmind.js import --input out.jsonl
+cat out.jsonl | node bin/weasley-deepmind.js import
+node bin/weasley-deepmind.js import --input out.jsonl --idempotent --dry-run
 ```
 
 `--idempotent`는 `idempotency_key` 또는 `id` 충돌 시 INSERT를 건너뛴다. `--dry-run`은 검증만 수행한다.
@@ -384,7 +384,7 @@ node bin/memento.js import --input out.jsonl --idempotent --dry-run
 도움말:
 
 ```bash
-node bin/memento.js import --help
+node bin/weasley-deepmind.js import --help
 ```
 
 ### completion
@@ -392,9 +392,9 @@ node bin/memento.js import --help
 bash/zsh 자동완성 스크립트를 표준 출력으로 인쇄한다.
 
 ```bash
-node bin/memento.js completion bash >> ~/.bashrc
-node bin/memento.js completion zsh  >> ~/.zshrc
-source <(node bin/memento.js completion bash)
+node bin/weasley-deepmind.js completion bash >> ~/.bashrc
+node bin/weasley-deepmind.js completion zsh  >> ~/.zshrc
+source <(node bin/weasley-deepmind.js completion bash)
 ```
 
 지원 셸: `bash`, `zsh`(bash-compat).
@@ -402,7 +402,7 @@ source <(node bin/memento.js completion bash)
 도움말:
 
 ```bash
-node bin/memento.js completion --help
+node bin/weasley-deepmind.js completion --help
 ```
 
 ---
@@ -413,16 +413,16 @@ node bin/memento.js completion --help
 
 ```bash
 # 직접 지정
-node bin/memento.js recall "배포 기록" \
-  --remote https://memento.weasley-deepmind.net/mcp \
-  --key mmcp_xxx
+node bin/weasley-deepmind.js recall "배포 기록" \
+  --remote https://deepmind.example.com/mcp \
+  --key wdm_xxx
 
 # 환경변수로 설정 후 사용
-export MEMENTO_CLI_REMOTE=https://memento.weasley-deepmind.net/mcp
-export MEMENTO_CLI_KEY=mmcp_xxx
-node bin/memento.js recall "배포 기록"
-node bin/memento.js stats
-node bin/memento.js remember "배포 완료" --topic deploy --type procedure
+export WEASLEY_DEEPMIND_CLI_REMOTE=https://deepmind.example.com/mcp
+export WEASLEY_DEEPMIND_CLI_KEY=wdm_xxx
+node bin/weasley-deepmind.js recall "배포 기록"
+node bin/weasley-deepmind.js stats
+node bin/weasley-deepmind.js remember "배포 완료" --topic deploy --type procedure
 ```
 
 `serve`, `migrate`, `cleanup`, `backfill`, `health`, `update` 명령에서 `--remote`를 사용하면 에러가 반환된다.
@@ -454,7 +454,7 @@ frag-00def456,procedure,deploy-2026,0.70,"배포 완료"
 | 스크립트 | 실행 내용 |
 |---------|---------|
 | `npm start` | `node server.js` (서버 시작) |
-| `npm run cli -- <args>` | `node bin/memento.js <args>` |
+| `npm run cli -- <args>` | `node bin/weasley-deepmind.js <args>` |
 | `npm run migrate` | `node scripts/migrate.js` |
 | `npm run backfill:embeddings` | `node scripts/backfill-embeddings.js` |
 | `npm test` | node:test 단위 테스트 |

@@ -1,6 +1,6 @@
 # maintenance
 
-작성자: 최진호
+작성자: Weasley Open Source
 작성일: 2026-04-19
 수정일: 2026-04-20
 
@@ -10,17 +10,17 @@
 
 ## 외부 노출 점검
 
-memento-mcp가 localhost 밖에 노출되는지와 브라우저 Origin 정책이 의도대로 설정됐는지 확인한다.
+weasley-deepmind가 localhost 밖에 노출되는지와 브라우저 Origin 정책이 의도대로 설정됐는지 확인한다.
 
 ```bash
 ss -ltnp | grep ':57332'
-grep -E '^(MEMENTO_ACCESS_KEY|MCP_STRICT_ORIGIN|ALLOWED_ORIGINS|ADMIN_ALLOWED_ORIGINS|TRUST_PROXY_HOPS)=' .env | sed -E 's/=.*/=<set>/'
+grep -E '^(WEASLEY_DEEPMIND_ACCESS_KEY|MCP_STRICT_ORIGIN|ALLOWED_ORIGINS|ADMIN_ALLOWED_ORIGINS|TRUST_PROXY_HOPS)=' .env | sed -E 's/=.*/=<set>/'
 ```
 
 판단 기준:
 
 - `*:57332` 또는 `0.0.0.0:57332`이면 네트워크 전체 인터페이스에 노출된다.
-- 외부 노출 환경에서는 `MEMENTO_ACCESS_KEY`를 반드시 설정한다.
+- 외부 노출 환경에서는 `WEASLEY_DEEPMIND_ACCESS_KEY`를 반드시 설정한다.
 - 브라우저 기반 MCP 클라이언트를 허용할 때는 `MCP_STRICT_ORIGIN=true`와 `ALLOWED_ORIGINS`를 함께 설정한다.
 - Admin UI를 브라우저에서 열면 `ADMIN_ALLOWED_ORIGINS`를 명시하거나 리버스 프록시/방화벽에서 접근을 제한한다.
 - 리버스 프록시 뒤에서 IP 기반 제한을 쓰면 실제 프록시 hop 수에 맞춰 `TRUST_PROXY_HOPS`를 설정한다.
@@ -54,7 +54,7 @@ curl -si -H 'Origin: https://evil.example' http://localhost:57332/mcp | head
 
 엔드포인트: `GET /v1/internal/model/nothing/metrics-summary`
 
-인증: `Authorization: Bearer <MEMENTO_ACCESS_KEY>` (master 키 전용)
+인증: `Authorization: Bearer <WEASLEY_DEEPMIND_ACCESS_KEY>` (master 키 전용)
 
 응답 구조:
 
@@ -88,7 +88,7 @@ rate 값(authDeniedRate5m, toolErrorRate5m 등)은 서버 메모리의 직전 sn
 
 ### 배치 풀 메트릭
 
-`BATCH_DATABASE_URL`이 설정된 경우 `EmbeddingWorker`와 `BatchRememberProcessor`가 전용 연결 풀(`application_name=memento-mcp:batch`)을 사용한다. 풀 상태는 아래 세 게이지로 관찰한다.
+`BATCH_DATABASE_URL`이 설정된 경우 `EmbeddingWorker`와 `BatchRememberProcessor`가 전용 연결 풀(`application_name=weasley-deepmind:batch`)을 사용한다. 풀 상태는 아래 세 게이지로 관찰한다.
 
 ```
 mcp_batch_pool_active_connections   — 체크아웃된 연결 수
@@ -104,7 +104,7 @@ mcp_batch_pool_waiting_count        — 연결 대기 쿼리 수
 
 ### Grafana 경로
 
-memento-mcp 서버의 `/metrics` 엔드포인트를 scrape한다 (인증 필요, scrape_interval 15초).
+weasley-deepmind 서버의 `/metrics` 엔드포인트를 scrape한다 (인증 필요, scrape_interval 15초).
 
 Prometheus `/metrics` 엔드포인트가 메트릭을 노출한다. 수집 도구는 운영자가 자유롭게 구성한다.
 
@@ -165,7 +165,7 @@ HTTP 응답에 `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`
 nginx access_log 포맷에 헤더를 추가하면 Prometheus `nginx-exporter` 또는 Vector/Fluent Bit 파이프라인으로 수집할 수 있다.
 
 ```nginx
-log_format memento_main '$remote_addr - $upstream_http_x_ratelimit_remaining '
+log_format weasley_deepmind_main '$remote_addr - $upstream_http_x_ratelimit_remaining '
                         '[$time_local] "$request" $status';
 ```
 
@@ -174,11 +174,11 @@ log_format memento_main '$remote_addr - $upstream_http_x_ratelimit_remaining '
 서버의 `/metrics` 엔드포인트(인증 필요)에서 아래 메트릭으로 rate limit 상태를 확인할 수 있다.
 
 ```
-memento_quota_used_total   — 창 내 사용된 파편 수 (레이블: key_id)
-memento_quota_limit        — 설정된 상한 (레이블: key_id)
+weasley_deepmind_quota_used_total   — 창 내 사용된 파편 수 (레이블: key_id)
+weasley_deepmind_quota_limit        — 설정된 상한 (레이블: key_id)
 ```
 
-Grafana 알림 권장 임계값: `memento_quota_used_total / memento_quota_limit > 0.8` 시 경고.
+Grafana 알림 권장 임계값: `weasley_deepmind_quota_used_total / weasley_deepmind_quota_limit > 0.8` 시 경고.
 
 ---
 
@@ -192,10 +192,10 @@ Grafana 알림 권장 임계값: `memento_quota_used_total / memento_quota_limit
 | `scripts/normalize-vectors.js` | 기존 임베딩 벡터 L2 정규화 | 임베딩 제공자 전환 직후 1회 | 조건부 1회 |
 | `scripts/cleanup-noise.js` | 초단문·빈 세션 요약·NLI 재귀 쓰레기 파편 탐지·삭제 | recall 품질 저하 또는 context 토큰 예산 오염 시 | 조건부, 필요 시 월 1회 |
 | `scripts/post-migrate-flexible-embedding-dims.js` | fragments + morpheme_dict 임베딩 컬럼 차원 동시 조정 | EMBEDDING_DIMENSIONS 변경 또는 provider 전환 시 | 조건부 1회 |
-| `scripts/backfill-claims.js` | 기존 코퍼스에 ClaimExtractor 소급 실행 | Shadow mode(MEMENTO_SYMBOLIC_SHADOW=true) 활성화 전 | 일회성 |
+| `scripts/backfill-claims.js` | 기존 코퍼스에 ClaimExtractor 소급 실행 | Shadow mode(WEASLEY_DEEPMIND_SYMBOLIC_SHADOW=true) 활성화 전 | 일회성 |
 | `scripts/benchmark-hot-path.js` | remember/recall/link/reflect 4개 hot path p50/p95/p99 측정 | Symbolic Memory feature flag 전환 전후 회귀 기준선 확보 | 조건부 |
 | `scripts/run-e2e-tests.sh` | Docker 기반 E2E 테스트 실행 | CI/CD 파이프라인 또는 대규모 리팩터링 후 회귀 검증 | CI마다 또는 릴리즈 전 |
-| `scripts/smoke-test-symbolic.sh` | Symbolic Memory end-to-end smoke 검증 | MEMENTO_SYMBOLIC_* 플래그 전환 후 | 조건부 |
+| `scripts/smoke-test-symbolic.sh` | Symbolic Memory end-to-end smoke 검증 | WEASLEY_DEEPMIND_SYMBOLIC_* 플래그 전환 후 | 조건부 |
 | `scripts/test-llm-callers.mjs` | AutoReflect/ConsolidatorGC/ContradictionDetector/MemoryEvaluator LLM 스키마 E2E 검증 | LLM provider 교체 또는 프롬프트 수정 후 | 조건부 |
 
 ---
@@ -278,7 +278,7 @@ DATABASE_URL=postgresql://... node scripts/cleanup-noise.js --execute --include-
 ### 선행 조건
 
 - `DATABASE_URL` 환경변수 설정 (테스트 DB 전용. 프로덕션 DB 사용 금지)
-- baseline 확보 시 `MEMENTO_SYMBOLIC_ENABLED=false`(기본값) 상태로 실행
+- baseline 확보 시 `WEASLEY_DEEPMIND_SYMBOLIC_ENABLED=false`(기본값) 상태로 실행
 
 ### 실행 명령
 
@@ -292,7 +292,7 @@ DATABASE_URL=postgresql://... node scripts/benchmark-hot-path.js \
   --output scripts/baseline-custom.json
 
 # Symbolic 계층 활성화 후 비교 측정
-MEMENTO_SYMBOLIC_ENABLED=true \
+WEASLEY_DEEPMIND_SYMBOLIC_ENABLED=true \
 DATABASE_URL=postgresql://... node scripts/benchmark-hot-path.js \
   --output scripts/baseline-symbolic.json
 ```
@@ -331,12 +331,12 @@ DATABASE_URL=postgresql://... node scripts/backfill-claims.js \
 
 # 특정 테넌트만 처리
 DATABASE_URL=postgresql://... node scripts/backfill-claims.js \
-  --tenant-key mmcp_xxx --dry-run --verbose
+  --tenant-key wdm_xxx --dry-run --verbose
 ```
 
 ### 권장 빈도
 
-일회성. Shadow mode 활성화(`MEMENTO_SYMBOLIC_SHADOW=true`) 전 1회 실행.
+일회성. Shadow mode 활성화(`WEASLEY_DEEPMIND_SYMBOLIC_SHADOW=true`) 전 1회 실행.
 
 ---
 

@@ -1,7 +1,7 @@
 /**
  * check-embedding-consistency.js — 임베딩 차원 일관성 startup 검증
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-18
  * 수정일: 2026-04-29 (v3.2.0: morpheme_indexed=false Consistency Gate 카운트 추가)
  *

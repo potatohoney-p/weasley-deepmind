@@ -1,7 +1,7 @@
 /**
  * P3: extractKeywords 조사 스트리핑 + 코드 식별자 보존 검증.
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-16
  */
 import { test }          from "node:test";

@@ -1,7 +1,7 @@
-﻿/**
- * Memento MCP Admin Console — 레이아웃 (스캐폴드 / 사이드바 / 커맨드바)
+/**
+ * Weasley DeepMind Admin Console — 레이아웃 (스캐폴드 / 사이드바 / 커맨드바)
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-07
  */
 

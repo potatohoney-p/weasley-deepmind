@@ -1,7 +1,7 @@
 /**
  * Winston 로그 redactor 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-10
  *
  * redactorFormat이 Bearer 토큰, API 키, Cookie, OAuth 파라미터,
@@ -46,33 +46,33 @@ describe("redactorFormat — Bearer 토큰 마스킹", () => {
 });
 
 // ---------------------------------------------------------------------------
-// mmcp_ API 키 마스킹
+// wdm_ API 키 마스킹
 // ---------------------------------------------------------------------------
 
-describe("redactorFormat — mmcp_ API 키 마스킹", () => {
-  it("message 내 mmcp_ 키를 마스킹한다", () => {
-    const result = applyRedactor({ message: "API key used: mmcp_abc123XYZ" });
-    assert.ok(result.message.includes("mmcp_****"), `expected mmcp_****, got: ${result.message}`);
-    assert.ok(!result.message.includes("mmcp_abc123XYZ"), "원본 키가 노출됨");
+describe("redactorFormat — wdm_ API 키 마스킹", () => {
+  it("message 내 wdm_ 키를 마스킹한다", () => {
+    const result = applyRedactor({ message: "API key used: wdm_abc123XYZ" });
+    assert.ok(result.message.includes("wdm_****"), `expected wdm_****, got: ${result.message}`);
+    assert.ok(!result.message.includes("wdm_abc123XYZ"), "원본 키가 노출됨");
   });
 
-  it("메타 내 mmcp_ 키를 마스킹한다", () => {
-    const result = applyRedactor({ message: "key check", apiKey: "mmcp_deadbeef00" });
-    assert.strictEqual(result.apiKey, "mmcp_****");
+  it("메타 내 wdm_ 키를 마스킹한다", () => {
+    const result = applyRedactor({ message: "key check", apiKey: "wdm_deadbeef00" });
+    assert.strictEqual(result.apiKey, "wdm_****");
   });
 });
 
 // ---------------------------------------------------------------------------
-// Cookie mmcp_session 마스킹
+// Cookie wdm_session 마스킹
 // ---------------------------------------------------------------------------
 
-describe("redactorFormat — Cookie mmcp_session 마스킹", () => {
-  it("Cookie 헤더의 mmcp_session 값을 마스킹한다", () => {
+describe("redactorFormat — Cookie wdm_session 마스킹", () => {
+  it("Cookie 헤더의 wdm_session 값을 마스킹한다", () => {
     const result = applyRedactor({
       message : "Incoming request",
-      cookie  : "mmcp_session=abcdef1234567890; other=value"
+      cookie  : "wdm_session=abcdef1234567890; other=value"
     });
-    assert.ok(result.cookie.includes("mmcp_session=****"), `got: ${result.cookie}`);
+    assert.ok(result.cookie.includes("wdm_session=****"), `got: ${result.cookie}`);
     assert.ok(!result.cookie.includes("abcdef1234567890"), "세션 값이 노출됨");
   });
 });

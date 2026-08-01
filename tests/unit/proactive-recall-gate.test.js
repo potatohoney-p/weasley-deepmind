@@ -1,7 +1,7 @@
 /**
  * ProactiveRecall gate 통합 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-05-19
  *
  * mode/workspace/caseIdPolicy 조합 8가지 시나리오 검증.
@@ -13,8 +13,8 @@ import assert from "node:assert/strict";
 
 import { teardownTestResources } from "../_lifecycle.js";
 
-process.env.MEMENTO_SYMBOLIC_ENABLED = "true";
-process.env.MEMENTO_SYMBOLIC_PROACTIVE_GATE = "true";
+process.env.WEASLEY_DEEPMIND_SYMBOLIC_ENABLED = "true";
+process.env.WEASLEY_DEEPMIND_SYMBOLIC_PROACTIVE_GATE = "true";
 
 after(async () => { await teardownTestResources(); });
 

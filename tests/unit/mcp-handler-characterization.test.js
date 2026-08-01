@@ -1,7 +1,7 @@
 /**
  * mcp-handler.js 특성화(characterization) 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-06-15
  *
  * 목적: handleMcpPost()를 분해하기 전에 현재 동작을 고정한다.
@@ -16,7 +16,7 @@
  *
  *  B. deriveTokenKey() — 기존 session-linker-token-reuse.test.js가 없는 분기
  *     - 동일 토큰 + keyId null(master) → "master:hash" 형식
- *     - memento-access-key 헤더 + keyId null → 정상 hash 생성
+ *     - weasley_deepmind-access-key 헤더 + keyId null → 정상 hash 생성
  *
  *  C. _resolveMode() — 완전 미테스트 (모듈 내부 private. 순수 함수 로직을 재현 검증)
  *     - 헤더 우선 > initialize params.mode > DB default_mode > null
@@ -173,8 +173,8 @@ describe("deriveTokenKey — 미커버 분기 보강", () => {
     assert.strictEqual(key.split(":")[1].length, 16, "hash는 16자");
   });
 
-  it("memento-access-key 헤더 + keyId=null → 'master:hash'", () => {
-    const req = { headers: { "memento-access-key": "ak-test-123" } };
+  it("weasley_deepmind-access-key 헤더 + keyId=null → 'master:hash'", () => {
+    const req = { headers: { "weasley_deepmind-access-key": "ak-test-123" } };
     const key = deriveTokenKey(req, {}, { keyId: null });
 
     assert.ok(key.startsWith("master:"), `'master:' prefix: ${key}`);
@@ -222,7 +222,7 @@ describe("deriveTokenKey — 미커버 분기 보강", () => {
 
 /**
  * _resolveMode 로직 재현.
- * 우선순위: X-Memento-Mode 헤더 > initialize params.mode > dbDefaultMode > null
+ * 우선순위: X-Weasley DeepMind-Mode 헤더 > initialize params.mode > dbDefaultMode > null
  * 알 수 없는 preset 이름이면 null 반환.
  */
 function simulateResolveMode(headerMode, msgMode, dbDefaultMode, knownPresets) {

@@ -1,5 +1,5 @@
 -- Migration 003: API 키 관리 테이블
--- 작성자: 최진호 / 2026-03-03
+-- 작성자: Weasley Open Source / 2026-03-03
 
 
 -- API 키 마스터 테이블

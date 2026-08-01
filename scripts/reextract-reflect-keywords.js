@@ -1,7 +1,7 @@
 /**
  * reextract-reflect-keywords.js — session_reflect 파편 keywords 재추출.
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-16
  *
  * 사용: node scripts/reextract-reflect-keywords.js [--execute]

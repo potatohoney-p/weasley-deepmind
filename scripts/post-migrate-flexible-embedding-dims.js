@@ -2,7 +2,7 @@
 /**
  * post-migrate-flexible-embedding-dims.js — embedding 컬럼 차원 동시 조정
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-03-08
  * 수정일: 2026-04-20 (v2.12.0 문서 현행화 반영)
  *

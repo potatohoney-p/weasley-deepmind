@@ -1,6 +1,6 @@
 /**
  * batch-status.test.js
- * 작성자: 최진호 / 작성일: 2026-06-19
+ * 작성자: Weasley Open Source / 작성일: 2026-06-19
  */
 import { test, describe, beforeEach, afterEach } from "node:test";
 import assert from "node:assert/strict";

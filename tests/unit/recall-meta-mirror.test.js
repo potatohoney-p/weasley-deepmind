@@ -1,17 +1,17 @@
 /**
  * v3.1.0 응답 메타 _meta 단일 경로 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-21
  *
- * v3.0.0까지 제공되던 top-level mirror 필드(_searchEventId / _memento_hint / _suggestion)가
+ * v3.0.0까지 제공되던 top-level mirror 필드(_searchEventId / _weasley_deepmind_hint / _suggestion)가
  * v3.1.0에서 제거됐음을 검증한다. tool_recall / tool_context 응답은 `_meta.*` 경로로만
  * 해당 값을 노출해야 한다.
  *
  * 검증 항목:
- *  1. recall 일반 응답: top-level _searchEventId / _memento_hint 부재
+ *  1. recall 일반 응답: top-level _searchEventId / _weasley_deepmind_hint 부재
  *  2. recall caseMode 응답: top-level mirror 부재, _meta 단독 제공
- *  3. context 응답: top-level _memento_hint / _searchEventId / _suggestion 부재
+ *  3. context 응답: top-level _weasley_deepmind_hint / _searchEventId / _suggestion 부재
  *  4. _suggestion 값은 _meta.suggestion으로만 전달
  *  5. hint 없으면 _meta.hints = []
  */
@@ -66,13 +66,13 @@ function applyRecallMeta(result, args, fragments) {
  * v3.1.0 tool_context 응답 조립 로직 (destructure로 내부 필드를 응답 shape에서 분리).
  */
 function applyContextMeta(result) {
-  const { _memento_hint, _searchEventId, _suggestion, ...restResult } = result;
+  const { _weasley_deepmind_hint, _searchEventId, _suggestion, ...restResult } = result;
   return {
     success: true,
     ...restResult,
     _meta: {
       searchEventId: _searchEventId ?? null,
-      hints        : _memento_hint ? [_memento_hint] : [],
+      hints        : _weasley_deepmind_hint ? [_weasley_deepmind_hint] : [],
       suggestion   : _suggestion ?? undefined
     }
   };
@@ -82,7 +82,7 @@ function applyContextMeta(result) {
 
 describe("v3.1.0 _meta 단일 경로 — recall 일반 응답", () => {
 
-  it("top-level _searchEventId / _memento_hint 부재, _meta.searchEventId만 존재", () => {
+  it("top-level _searchEventId / _weasley_deepmind_hint 부재, _meta.searchEventId만 존재", () => {
     const result = {
       _searchEventId: 42,
       _suggestion   : null,
@@ -95,7 +95,7 @@ describe("v3.1.0 _meta 단일 경로 — recall 일반 응답", () => {
 
     assert.ok(res.success);
     assert.ok(!("_searchEventId" in res), "top-level _searchEventId 제거 확인");
-    assert.ok(!("_memento_hint"  in res), "top-level _memento_hint 제거 확인");
+    assert.ok(!("_weasley_deepmind_hint"  in res), "top-level _weasley_deepmind_hint 제거 확인");
     assert.ok(!("_suggestion"    in res), "top-level _suggestion 제거 확인");
     assert.equal(res._meta.searchEventId, 42);
     assert.ok(Array.isArray(res._meta.hints));
@@ -113,7 +113,7 @@ describe("v3.1.0 _meta 단일 경로 — recall 일반 응답", () => {
 
     assert.deepEqual(res._meta.hints, []);
     assert.equal(res._meta.searchEventId, 7);
-    assert.ok(!("_memento_hint"  in res));
+    assert.ok(!("_weasley_deepmind_hint"  in res));
     assert.ok(!("_searchEventId" in res));
   });
 
@@ -129,7 +129,7 @@ describe("v3.1.0 _meta 단일 경로 — recall 일반 응답", () => {
     const res = applyRecallMeta(result, {}, fragments);
 
     assert.ok(res._meta.hints.length > 0);
-    assert.ok(!("_memento_hint" in res), "top-level _memento_hint mirror 제거 확인");
+    assert.ok(!("_weasley_deepmind_hint" in res), "top-level _weasley_deepmind_hint mirror 제거 확인");
     assert.equal(res._meta.hints[0].trigger, "recall");
   });
 
@@ -180,7 +180,7 @@ describe("v3.1.0 _meta 단일 경로 — recall caseMode 응답", () => {
     assert.equal(res._meta.searchEventId, 55);
     assert.ok(Array.isArray(res._meta.hints));
     assert.ok(!("_searchEventId" in res), "caseMode top-level _searchEventId 제거 확인");
-    assert.ok(!("_memento_hint"  in res), "caseMode top-level _memento_hint 제거 확인");
+    assert.ok(!("_weasley_deepmind_hint"  in res), "caseMode top-level _weasley_deepmind_hint 제거 확인");
   });
 });
 
@@ -197,23 +197,23 @@ describe("v3.1.0 _meta 단일 경로 — context 응답", () => {
     assert.ok(res.success);
     assert.equal(res._meta.searchEventId, null);
     assert.deepEqual(res._meta.hints, []);
-    assert.ok(!("_memento_hint"  in res));
+    assert.ok(!("_weasley_deepmind_hint"  in res));
     assert.ok(!("_searchEventId" in res));
     assert.ok(!("_suggestion"    in res));
   });
 
-  it("ContextBuilder가 반환한 _memento_hint는 _meta.hints[0]으로만 전달되고 응답 최상위에서 제거됨", () => {
+  it("ContextBuilder가 반환한 _weasley_deepmind_hint는 _meta.hints[0]으로만 전달되고 응답 최상위에서 제거됨", () => {
     const hint = { trigger: "recall", suggestion: "더 많은 키워드를 사용하세요" };
     const res = applyContextMeta({
       fragments    : [],
       totalTokens  : 0,
       count        : 0,
       injectionText: "",
-      _memento_hint: hint
+      _weasley_deepmind_hint: hint
     });
 
     assert.deepEqual(res._meta.hints[0], hint);
-    assert.ok(!("_memento_hint" in res), "top-level _memento_hint mirror 제거 확인");
+    assert.ok(!("_weasley_deepmind_hint" in res), "top-level _weasley_deepmind_hint mirror 제거 확인");
   });
 
   it("context _meta.suggestion은 _suggestion 값이 있으면 그대로 전달", () => {

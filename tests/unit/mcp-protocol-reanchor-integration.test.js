@@ -1,4 +1,4 @@
-﻿/**
+/**
  * MCP protocol-version 자가치유 — 실제 핸들러 통합 테스트
  *
  * 작성자: codex (계약 위임 구현)
@@ -22,7 +22,7 @@
  * 삭제를 인메모리로 재현). saveSession/getSession/deleteSession/bindTokenToSession/
  * getSessionIdByToken은 sessions.js·mcp-handler.js가 상수 redisClient를 직접
  * 참조하므로 `__setRedisClientForTest`로는 가로챌 수 없다 — 모듈 자체를 mock한다.
- * 인증은 master key(MEMENTO_ACCESS_KEY) 경로를 사용해 DB(admin/ApiKeyStore.js,
+ * 인증은 master key(WEASLEY_DEEPMIND_ACCESS_KEY) 경로를 사용해 DB(admin/ApiKeyStore.js,
  * getGroupKeyIds)와 rate-limit 캐시(getRateLimitUsageCached)가 전혀 호출되지
  * 않도록 한다(keyId=null이면 두 경로 모두 가드로 스킵됨) — 그 외 로직은 전부 실물이다.
  */
@@ -37,9 +37,9 @@ import { Readable } from "node:stream";
  * 파일 최상단에서 먼저 평가되므로, config.js를 정적 import하는 대신 이후 모든
  * 관련 모듈을 동적 import로 불러온다).
  */
-process.env.MEMENTO_ACCESS_KEY      = "reanchor-it-master-key-20260726";
+process.env.WEASLEY_DEEPMIND_ACCESS_KEY      = "reanchor-it-master-key-20260726";
 process.env.REDIS_ENABLED           = "true";
-process.env.MEMENTO_METRICS_DEFAULT = "off";
+process.env.WEASLEY_DEEPMIND_METRICS_DEFAULT = "off";
 
 /** ------------------------------------------------------------------
  *  인메모리 fake Redis — lib/redis.js 전체를 대체한다.
@@ -152,7 +152,7 @@ const { handleMcpPost }                         = await import("../../lib/handle
 const { streamableSessions }                    = await import("../../lib/sessions.js");
 const { protocolVersionReanchoredTotal }        = await import("../../lib/metrics.js");
 
-const MASTER_KEY   = process.env.MEMENTO_ACCESS_KEY;
+const MASTER_KEY   = process.env.WEASLEY_DEEPMIND_ACCESS_KEY;
 const rateLimiter  = { allow: () => true };
 const SUPPORTED    = ["2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"];
 

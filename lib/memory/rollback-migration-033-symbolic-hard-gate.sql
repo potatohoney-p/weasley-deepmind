@@ -1,7 +1,7 @@
 /*
  * rollback-migration-033-symbolic-hard-gate.sql
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-15
  *
  * migration-033 롤백: api_keys.symbolic_hard_gate 컬럼 제거.

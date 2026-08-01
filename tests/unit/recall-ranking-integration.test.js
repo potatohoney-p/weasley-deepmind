@@ -1,7 +1,7 @@
 /**
  * recall 정렬 안정성 통합 검증
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-05-15
  */
 
@@ -31,10 +31,10 @@ describe("recall 정렬 안정성", () => {
     const frags = Array.from({ length: 20 }, (_, i) => ({
       id: `f${i}`,
       rerankerScore: 0.5 + (i % 5) * 0.05,
-      topic: i % 3 === 0 ? "memento-mcp" : "other",
+      topic: i % 3 === 0 ? "weasley-deepmind" : "other",
       created_at: new Date(now - i * 86400000).toISOString()
     }));
-    const ctx = { lexicalQuery: { topic: "memento-mcp" }, anchorTime: now, config: MEMORY_CONFIG };
+    const ctx = { lexicalQuery: { topic: "weasley-deepmind" }, anchorTime: now, config: MEMORY_CONFIG };
     const run1 = sortBy(frags, ctx).map(f => f.id);
     const run2 = sortBy(frags, ctx).map(f => f.id);
     assert.deepEqual(run1, run2, "정렬은 결정적이어야 cursor 페이지네이션이 안정적");
@@ -43,14 +43,14 @@ describe("recall 정렬 안정성", () => {
   it("연결 파편이 동점 직접 파편을 밀어내지 못한다", () => {
     const now = Date.now();
     const direct = {
-      id: "direct", topic: "memento-mcp", importance: 0.5, similarity: 0,
+      id: "direct", topic: "weasley-deepmind", importance: 0.5, similarity: 0,
       created_at: new Date(now).toISOString()
     };
     const linked = {
-      id: "linked", topic: "memento-mcp", importance: 0.5, similarity: 0,
+      id: "linked", topic: "weasley-deepmind", importance: 0.5, similarity: 0,
       created_at: new Date(now).toISOString(), _source: "linked"
     };
-    const ctx = { lexicalQuery: { topic: "memento-mcp" }, anchorTime: now, config: MEMORY_CONFIG };
+    const ctx = { lexicalQuery: { topic: "weasley-deepmind" }, anchorTime: now, config: MEMORY_CONFIG };
     const sorted = sortBy([linked, direct], ctx).map(f => f.id);
     assert.deepEqual(sorted, ["direct", "linked"]);
   });

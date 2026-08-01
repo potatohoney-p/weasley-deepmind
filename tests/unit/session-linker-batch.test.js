@@ -1,7 +1,7 @@
 /**
  * SessionLinker 배치 링크 생성 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-27
  * 수정일: 2026-05-19 (1:1 schema-fit 매칭 기대값으로 갱신)
  *

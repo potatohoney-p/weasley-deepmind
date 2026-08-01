@@ -1,4 +1,4 @@
-﻿# weasley-deepmind 관리자 콘솔 사용 안내
+# weasley-deepmind 관리자 콘솔 사용 안내
 
 ## 접속
 
@@ -8,7 +8,7 @@
 https://{도메인}/v1/internal/model/nothing/
 ```
 
-마스터 키 입력 화면이 나타나면 `MEMENTO_ACCESS_KEY` 환경변수에 설정한 키를 입력한다. 인증에 성공하면 HttpOnly 세션 쿠키가 발급되어 24시간 동안 유지된다.
+마스터 키 입력 화면이 나타나면 `WEASLEY_DEEPMIND_ACCESS_KEY` 환경변수에 설정한 키를 입력한다. 인증에 성공하면 HttpOnly 세션 쿠키가 발급되어 24시간 동안 유지된다.
 
 ---
 
@@ -103,7 +103,7 @@ assets/admin/
 
 키 행을 클릭하면 우측에 상세 패널이 열린다:
 - Daily Rate Limit -- 일일 호출 제한을 인라인으로 편집한다. 숫자 입력 필드에 값을 입력하면 변경 즉시 `PUT /v1/internal/model/nothing/keys/:id/daily-limit` API로 저장된다.
-- Default Mode -- API 키의 기본 mode preset을 설정한다. 값: `recall-only`, `write-only`, `onboarding`, `audit`, 또는 미설정(전체 도구 노출). 설정 시 해당 키로 연결된 세션의 기본 도구 집합이 제한된다. `X-Memento-Mode` 헤더가 있으면 DB 설정보다 우선한다.
+- Default Mode -- API 키의 기본 mode preset을 설정한다. 값: `recall-only`, `write-only`, `onboarding`, `audit`, 또는 미설정(전체 도구 노출). 설정 시 해당 키로 연결된 세션의 기본 도구 집합이 제한된다. `X-Weasley DeepMind-Mode` 헤더가 있으면 DB 설정보다 우선한다.
 - 소속 그룹 관리:
   - ADD GROUP 버튼을 클릭하면 모달이 열리며 그룹을 선택할 수 있다.
   - Groups Directory 섹션의 각 그룹 행에 ASSIGN 버튼이 표시되며, 클릭 시 해당 키를 그룹에 추가한다.
@@ -234,12 +234,12 @@ Prometheus 기반 핵심 지표를 한 화면에서 확인하는 대시보드다
 | 카드 | 설명 | 소스 메트릭 |
 |-|-|-|
 | Active Sessions | 현재 연결된 세션 수 | mcp_active_sessions_streamable + mcp_active_sessions_legacy |
-| Auth Denied (5m) | 인증 거부 발생률 (건/분) | memento_auth_denied_total rate |
-| RBAC Denied (5m) | 권한 거부 발생률 (건/분) | memento_rbac_denied_total rate |
-| Tenant Blocked | 테넌트 격리 차단 누적 수 | memento_tenant_isolation_blocked_total |
+| Auth Denied (5m) | 인증 거부 발생률 (건/분) | weasley_deepmind_auth_denied_total rate |
+| RBAC Denied (5m) | 권한 거부 발생률 (건/분) | weasley_deepmind_rbac_denied_total rate |
+| Tenant Blocked | 테넌트 격리 차단 누적 수 | weasley_deepmind_tenant_isolation_blocked_total |
 | RPC p50 / p99 | JSON-RPC 레이턴시 백분위 (ms) | mcp_rpc_method_duration_seconds histogram |
 | Tool Errors (5m) | 도구 에러 발생률 (건/분) | mcp_errors_total{type="tool"} rate |
-| Symbolic Gate Blocked | Symbolic hard-gate 차단 누적 수 | memento_symbolic_gate_blocked_total |
+| Symbolic Gate Blocked | Symbolic hard-gate 차단 누적 수 | weasley_deepmind_symbolic_gate_blocked_total |
 | OAuth Tokens (1h) | OAuth 토큰 발급률 (건/시간) | mcp_oauth_tokens_issued_total rate |
 
 도구별 호출 통계 테이블 (하단 좌):

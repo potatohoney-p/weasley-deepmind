@@ -1,7 +1,7 @@
 /**
  * keywords-only 정확 일치 랭킹 가산 검증
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-27
  *
  * 이슈 #30: keywords-only recall에서 정확 키워드 히트가 semantic 보조(supplement)

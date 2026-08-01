@@ -1,7 +1,7 @@
 /**
  * lexical 일치 점수 / implicit keyword 추출 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-05-15
  */
 
@@ -11,14 +11,14 @@ import { lexicalMatchScore, deriveImplicitKeywords } from "../../lib/memory/read
 
 describe("lexicalMatchScore", () => {
   it("topic 완전 일치에 가장 높은 점수", () => {
-    const frag = { topic: "memento-mcp", keywords: [], content: "" };
-    const score = lexicalMatchScore(frag, { topic: "memento-mcp" });
+    const frag = { topic: "weasley-deepmind", keywords: [], content: "" };
+    const score = lexicalMatchScore(frag, { topic: "weasley-deepmind" });
     assert.ok(score >= 4, `topic exact 최소 4점 기대, got ${score}`);
   });
 
   it("keyword가 content에만 있으면 낮은 점수", () => {
-    const frag = { topic: "other", keywords: [], content: "memento 회상 문제" };
-    const score = lexicalMatchScore(frag, { keywords: ["memento"] });
+    const frag = { topic: "other", keywords: [], content: "weasley_deepmind 회상 문제" };
+    const score = lexicalMatchScore(frag, { keywords: ["weasley_deepmind"] });
     assert.ok(score > 0 && score <= 1.5, `content-only 매치는 약한 신호여야, got ${score}`);
   });
 
@@ -37,8 +37,8 @@ describe("lexicalMatchScore", () => {
 
 describe("deriveImplicitKeywords", () => {
   it("text-only 질의에서 키워드 추출", () => {
-    const kws = deriveImplicitKeywords({ text: "memento-mcp recall 정렬 버그" });
-    assert.ok(kws.includes("memento-mcp"));
+    const kws = deriveImplicitKeywords({ text: "weasley-deepmind recall 정렬 버그" });
+    assert.ok(kws.includes("weasley-deepmind"));
   });
 
   it("keywords/topic 있으면 빈 배열 (명시 신호 우선)", () => {

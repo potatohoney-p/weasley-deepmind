@@ -2,7 +2,7 @@
 /**
  * backfill-embeddings.js — 기존 파편 임베딩 일괄 생성
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-03-07
  * 수정일: 2026-04-29 (v3.2.0: EmbeddingWorker batch 경로 사용)
  *

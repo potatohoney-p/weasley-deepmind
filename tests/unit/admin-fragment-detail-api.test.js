@@ -1,7 +1,7 @@
 /**
  * Admin 파편 상세/본문 검색/Export 안전장치 API 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-14
  *
  * GET /memory/fragments/:id, /memory/fragments?q=, /export 필수 필터를

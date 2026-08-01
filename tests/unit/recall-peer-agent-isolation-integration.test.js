@@ -1,7 +1,7 @@
 /**
  * recall agent/workspace 격리 우회 통합 회귀 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-25
  *
  * Hot Cache, L2.5 Graph, 기본 includeLinks 병합이 SQL 및 최종 결과에서

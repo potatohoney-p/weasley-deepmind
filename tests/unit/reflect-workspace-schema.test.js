@@ -1,7 +1,7 @@
 /**
  * reflect 스키마 workspace 파라미터 노출 검증
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-26
  */
 

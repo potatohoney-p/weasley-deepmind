@@ -1,7 +1,7 @@
 /**
  * idempotency-remember 단위 테스트 (migration-034-v2.16.0-bundle)
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-20
  *
  * 검증 항목:
@@ -19,11 +19,11 @@ import assert from "node:assert/strict";
 
 /**
  * MemoryRememberer 단위 테스트용 최소 mock 의존성을 생성한다.
- * MEMENTO_REMEMBER_ATOMIC은 DB pool이 필요하므로 테스트에서는 false로 고정한다.
+ * WEASLEY_DEEPMIND_REMEMBER_ATOMIC은 DB pool이 필요하므로 테스트에서는 false로 고정한다.
  * @param {Object} storeOverrides - store 메서드 오버라이드
  */
 function buildDeps(storeOverrides = {}) {
-  process.env.MEMENTO_REMEMBER_ATOMIC = "false";
+  process.env.WEASLEY_DEEPMIND_REMEMBER_ATOMIC = "false";
   const insertedIds = [];
 
   const store = {

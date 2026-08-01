@@ -1,7 +1,7 @@
 /**
  * FragmentSearch 부작용 모듈 외부화 회귀 가드
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-05-13
  *
  * 검색 이벤트 영속화와 SearchParamAdaptor 학습은 lib/memory/read/SearchSideEffects.js의

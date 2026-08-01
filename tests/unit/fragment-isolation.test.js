@@ -1,7 +1,7 @@
 /**
  * fragment-isolation.test.js — Phase 1 cross-tenant 격리 단위 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-10
  *
  * 두 보안 task의 회귀 검증을 통합:

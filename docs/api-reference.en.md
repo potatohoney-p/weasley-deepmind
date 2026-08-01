@@ -1,4 +1,4 @@
-﻿# API Reference
+# API Reference
 
 For MCP tool details, see [SKILL.md](../SKILL.md).
 
@@ -63,7 +63,7 @@ For MCP tool details, see [SKILL.md](../SKILL.md).
 
 Even when Redis is disabled (`REDIS_ENABLED=false`) or connection fails, the server returns healthy (200). L1 cache and Working Memory are deactivated, but core memory storage/retrieval operates fully on PostgreSQL alone.
 
-Two authentication methods are available. Streamable HTTP authenticates via `Authorization: Bearer <MEMENTO_ACCESS_KEY>` header on the `initialize` request, then maintains the session. Legacy SSE authenticates via `/sse?accessKey=<MEMENTO_ACCESS_KEY>` query parameter.
+Two authentication methods are available. Streamable HTTP authenticates via `Authorization: Bearer <WEASLEY_DEEPMIND_ACCESS_KEY>` header on the `initialize` request, then maintains the session. Legacy SSE authenticates via `/sse?accessKey=<WEASLEY_DEEPMIND_ACCESS_KEY>` query parameter.
 
 ### HTTP Response Headers — Rate Limit
 
@@ -89,8 +89,8 @@ X-RateLimit-Resource: fragments
 
 All MCP tool calls must pass RBAC validation.
 
-- Master key (`MEMENTO_ACCESS_KEY`): treated as `permissions=null`, granting access to all tools.
-- API key (`mmcp_xxx`): tool access is restricted based on the `permissions` array specified at key creation time. Requests for tools not included in the array are immediately denied.
+- Master key (`WEASLEY_DEEPMIND_ACCESS_KEY`): treated as `permissions=null`, granting access to all tools.
+- API key (`wdm_xxx`): tool access is restricted based on the `permissions` array specified at key creation time. Requests for tools not included in the array are immediately denied.
 - Tools registered in the `TOOL_PERMISSIONS` map require the corresponding permission level. Unregistered tool names are treated as `required=null` and pass the permission check. To bring a new tool into the RBAC boundary, register it explicitly in the `TOOL_PERMISSIONS` map.
 - Three permission levels exist: `read` (recall/context/memory_stats etc.), `write` (remember/forget/amend etc.), `admin` (memory_consolidate/apply_update etc.). A key with `admin` permission can invoke tools at all levels.
 - When a forget/amend/link request targets a fragment owned by another tenant (different API key), a `"Fragment not found"` error is returned. Isolation is enforced at the SQL level via `key_id` conditions, so the fragment's existence is never exposed.
@@ -99,7 +99,7 @@ Accessing a protected resource without authentication returns `401 Unauthorized`
 
 ### Mode Preset
 
-The session behavior mode can be set via the `X-Memento-Mode` header or `params.mode` in the `initialize` request. Setting `api_keys.default_mode` in the admin console pins a per-key default.
+The session behavior mode can be set via the `X-Weasley DeepMind-Mode` header or `params.mode` in the `initialize` request. Setting `api_keys.default_mode` in the admin console pins a per-key default.
 
 | Preset | Description | Allowed Tools |
 |--------|-------------|---------------|
@@ -110,7 +110,7 @@ The session behavior mode can be set via the `X-Memento-Mode` header or `params.
 
 Via HTTP header:
 ```
-X-Memento-Mode: recall-only
+X-Weasley DeepMind-Mode: recall-only
 ```
 
 Via `initialize` parameters:
@@ -160,10 +160,10 @@ Policy:
 
 - Auth: `Authorization: Bearer` required; ownership mismatch with the target session returns 403
 - CSRF guard: `Origin` header required; missing or non-allowlisted Origin returns 403
-- Rate limit: `MEMENTO_ROTATE_RATE_LIMIT_PER_MIN` requests per IP per minute (default 5); exceeding returns 429
+- Rate limit: `WEASLEY_DEEPMIND_ROTATE_RATE_LIMIT_PER_MIN` requests per IP per minute (default 5); exceeding returns 429
 - `reason` is an audit-log field (max 128 chars); defaults to `explicit_rotate` when omitted
 - Metrics: `mcp_session_rotation_total{reason}` counter + `mcp_rotate_rate_limited_total` counter
-- CLI: use `memento-mcp session rotate <sessionId>` for the same capability; see `docs/cli.en.md` for details
+- CLI: use `weasley-deepmind session rotate <sessionId>` for the same capability; see `docs/cli.en.md` for details
 
 ### tools/list Response — meta Field
 
@@ -188,7 +188,7 @@ Each tool entry in the `tools/list` response includes a `meta` field.
 |-------|------|-------------|
 | `capabilities` | string[] | List of feature tags supported by this tool |
 | `riskLevel` | string | Tool risk tier. `read` / `write` / `admin` |
-| `requiresMaster` | boolean | Whether the tool requires the master key (MEMENTO_ACCESS_KEY) |
+| `requiresMaster` | boolean | Whether the tool requires the master key (WEASLEY_DEEPMIND_ACCESS_KEY) |
 | `beta` | boolean | Whether this is an experimental feature. When true, the interface may change |
 | `idempotent` | boolean | Whether repeated calls with the same parameters produce no side effects |
 
@@ -231,7 +231,7 @@ Response 201:
 
 ```json
 {
-  "client_id": "mmcp_...",
+  "client_id": "wdm_...",
   "client_name": "Claude",
   "redirect_uris": ["https://claude.ai/api/mcp/auth_callback"],
   "grant_types": ["authorization_code"],
@@ -239,7 +239,7 @@ Response 201:
 }
 ```
 
-> API keys (mmcp_xxx) can be used directly as `client_id`. This applies when reusing an existing API key as an OAuth client in Claude.ai Web Integration.
+> API keys (wdm_xxx) can be used directly as `client_id`. This applies when reusing an existing API key as an OAuth client in Claude.ai Web Integration.
 
 ### GET /authorize
 
@@ -399,7 +399,7 @@ Each returned fragment includes a `key_id` field. When called with a master key,
 | `large_limit_no_budget` | pageSize=50 requested and tokenBudget not specified | Explicitly set tokenBudget to control response size |
 | `no_type_filter_noisy` | 10+ fragments returned without type filter and no depth specified | Add type or depth filter |
 
-`explanation` (included only when `MEMENTO_SYMBOLIC_EXPLAIN=true`): Explains why the fragment was included in the search results, using up to 3 reason codes.
+`explanation` (included only when `WEASLEY_DEEPMIND_SYMBOLIC_EXPLAIN=true`): Explains why the fragment was included in the search results, using up to 3 reason codes.
 
 ```json
 {
@@ -539,7 +539,7 @@ Normal response:
 }
 ```
 
-`validation_warnings`: Array of PolicyRules soft gating violation rule names (string[]). The field is omitted when there are no violations. When `MEMENTO_SYMBOLIC_POLICY_RULES=false` (default), always omitted. Both the atomic path (`MEMENTO_REMEMBER_ATOMIC=true`) and the non-atomic path share the same `_runPolicyGate` call, so the format is identical on both paths. When enabled, failed predicates accumulate from the following 5:
+`validation_warnings`: Array of PolicyRules soft gating violation rule names (string[]). The field is omitted when there are no violations. When `WEASLEY_DEEPMIND_SYMBOLIC_POLICY_RULES=false` (default), always omitted. Both the atomic path (`WEASLEY_DEEPMIND_REMEMBER_ATOMIC=true`) and the non-atomic path share the same `_runPolicyGate` call, so the format is identical on both paths. When enabled, failed predicates accumulate from the following 5:
 
 - `decisionHasRationale` — decision type lacks 2+ linked_to references or rationale keywords
 - `errorHasResolutionPath` — error type lacks cause/fix keywords or resolution_status
@@ -837,7 +837,7 @@ Return only id, content, importance to reduce token usage:
 
 ```bash
 curl -X POST https://weasley-deepmind.example.com/mcp \
-  -H "Authorization: Bearer $MEMENTO_KEY" \
+  -H "Authorization: Bearer $WEASLEY_DEEPMIND_KEY" \
   -H "Mcp-Session-Id: $SESSION" \
   -H "Content-Type: application/json" \
   -d '{
@@ -921,10 +921,10 @@ Response:
 
 | Variable | Default | Scope of Impact |
 |-|-|-|
-| `MEMENTO_REMEMBER_ATOMIC` | `false` | When `true`, the remember path switches to `_rememberAtomic`. Quota re-validation and INSERT are handled atomically within a single BEGIN/COMMIT transaction using `SELECT api_keys FOR UPDATE`. `_runPolicyGate` runs identically on both paths, so the `validation_warnings` format is unchanged. |
-| `MEMENTO_CASE_BACKPROP_ENABLED` | `false` | When `true`, amending a fragment with a case_id (specifically changing resolutionStatus) triggers importance backpropagation to all fragments sharing the same caseId. Exported as the `CASE_BACKPROP_ENABLED` constant in `lib/config.js`. Boosts activation scores of related fragments after case resolution, improving subsequent recall precision. |
-| `MEMENTO_STORAGE` | `pgvector` | Selects the storage adapter. `pgvector` (default, production PgVectorStore) or `sqlite-vec` (SqliteVecStore). The `transaction(fn)` interface is preserved across adapters, so write-path concurrency semantics remain consistent. |
-| `MEMENTO_SYMBOLIC_POLICY_RULES` | `false` | When `true`, `_runPolicyGate` evaluates PolicyRules soft gates and accumulates failed rule names into `validation_warnings`. |
+| `WEASLEY_DEEPMIND_REMEMBER_ATOMIC` | `false` | When `true`, the remember path switches to `_rememberAtomic`. Quota re-validation and INSERT are handled atomically within a single BEGIN/COMMIT transaction using `SELECT api_keys FOR UPDATE`. `_runPolicyGate` runs identically on both paths, so the `validation_warnings` format is unchanged. |
+| `WEASLEY_DEEPMIND_CASE_BACKPROP_ENABLED` | `false` | When `true`, amending a fragment with a case_id (specifically changing resolutionStatus) triggers importance backpropagation to all fragments sharing the same caseId. Exported as the `CASE_BACKPROP_ENABLED` constant in `lib/config.js`. Boosts activation scores of related fragments after case resolution, improving subsequent recall precision. |
+| `WEASLEY_DEEPMIND_STORAGE` | `pgvector` | Selects the storage adapter. `pgvector` (default, production PgVectorStore) or `sqlite-vec` (SqliteVecStore). The `transaction(fn)` interface is preserved across adapters, so write-path concurrency semantics remain consistent. |
+| `WEASLEY_DEEPMIND_SYMBOLIC_POLICY_RULES` | `false` | When `true`, `_runPolicyGate` evaluates PolicyRules soft gates and accumulates failed rule names into `validation_warnings`. |
 
 ---
 

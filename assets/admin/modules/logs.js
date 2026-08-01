@@ -1,7 +1,7 @@
 /**
- * Memento MCP Admin Console — Logs 뷰 렌더러
+ * Weasley DeepMind Admin Console — Logs 뷰 렌더러
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-07
  */
 

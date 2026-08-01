@@ -1,4 +1,4 @@
-﻿# Configuration
+# Configuration
 
 ---
 
@@ -8,9 +8,10 @@
 
 | 변수 | 기본값 | 설명 |
 |------|--------|------|
+| WEASLEY_DEEPMIND_HOST | 127.0.0.1 | HTTP 리슨 주소. 보호된 네트워크 경계를 통해 의도적으로 공개할 때만 `0.0.0.0`으로 설정 (`HOST`는 호환용 폴백) |
 | PORT | 57332 | HTTP 리슨 포트 |
-| MEMENTO_ACCESS_KEY | (없음) | Bearer 인증 키. 미설정 시 서버는 "Authentication: DISABLED" 로그를 출력하고 모든 요청을 master 권한으로 처리한다. 명시적 비활성화 선언을 위해 `MEMENTO_AUTH_DISABLED=true`를 병기할 수 있다 |
-| MEMENTO_AUTH_DISABLED | false | `true`로 설정 시 인증을 완전히 비활성화하여 모든 요청을 master 권한으로 처리. 개발/테스트 전용. `MEMENTO_ACCESS_KEY`가 비어 있을 때만 유효 |
+| WEASLEY_DEEPMIND_ACCESS_KEY | (없음) | Bearer 인증 키. 미설정 시 `WEASLEY_DEEPMIND_AUTH_DISABLED=true`를 명시하지 않는 한 요청을 거부한다 |
+| WEASLEY_DEEPMIND_AUTH_DISABLED | false | 루프백 개발/테스트에서만 인증을 비활성화. `WEASLEY_DEEPMIND_ACCESS_KEY` 없이 비루프백 주소에 적용하면 서버 시작을 거부 |
 | SESSION_TTL_MINUTES | 43200 | 세션 유효 시간 (분). 기본값 30일. 슬라이딩 윈도우 방식으로 도구 사용 시마다 갱신 |
 | LOG_DIR | ./logs | Winston 로그 파일 저장 디렉토리 |
 | ALLOWED_ORIGINS | (없음) | 허용할 Origin 목록. 쉼표로 구분. 미설정 시 모든 Origin 허용 (MCP 클라이언트 호환성 우선) |
@@ -42,23 +43,23 @@
 | ENABLE_RECONSOLIDATION | false | ReconsolidationEngine 활성화. true 시 tool_feedback과 contradicts 감지 시 fragment_links weight/confidence를 동적 갱신한다 |
 | ENABLE_SPREADING_ACTIVATION | false | SpreadingActivation 활성화. true 시 recall의 contextText 파라미터로 관련 파편을 선제적 활성화한다. 레이턴시 영향 측정 후 활성화 권장 |
 | ENABLE_PATTERN_ABSTRACTION | false | 패턴 추상화 활성화. 데이터 충분 축적 후 활성화 예정 (현재 미구현) |
-| MEMENTO_REMEMBER_ATOMIC | false | true 시 remember()의 quota check + INSERT를 단일 트랜잭션으로 원자화. BEGIN → api_keys FOR UPDATE(quota 재검증) → INSERT → COMMIT 순서로 TOCTOU를 완전 차단. false(기본)는 선제 quota check만 수행하며 동시 요청이 드문 환경에 적합 |
-| MEMENTO_CASE_BACKPROP_ENABLED | false | true 시 CaseRewardBackprop 활성화. case verification 이벤트마다 증거 파편 importance를 자동 역전파. 비활성 시 호출 자체가 no-op(DB·메트릭 영향 0). DAG 일관성 베이스라인 확보 후 활성화 권장 |
-| MEMENTO_STORAGE | pgvector | storage 어댑터 선택. `pgvector`(기본, PgVectorStore) 또는 `sqlite-vec`(SqliteVecStore). 변경 시 서버 재시작 필요 |
-| MEMENTO_KEYWORD_SEMANTIC_FALLBACK | true | `false` 설정 시 text 없는 keywords-only recall의 L3 시맨틱 보조 경로를 비활성화. 활성 시 정규화된 keywords 합성 텍스트 임베딩 1회가 L2와 병렬 수행되어 저장 keywords에 없는 용어도 content 기반으로 회수된다 |
-| MEMENTO_KEYWORD_FALLBACK_TIMEOUT_MS | 1500 | keywords 보조 L3 실행 상한(ms, 100~60000 클램프). 초과 시 빈 결과로 대체하고 searchPath에 `L3kw:timeout`을 남긴다 |
-| MEMENTO_CONTEXT_ANCHOR_LIMIT | 10 | context 응답에 항상 포함되는 앵커(isAnchor) 파편의 최대 개수. 1~30 범위로 클램프되며 파싱 실패 시 10. 앵커는 tokenBudget 절삭 대상이 아니므로 이 개수 상한이 유일한 주입량 제한이다 |
-| MEMENTO_RECALL_MIN_SIM_FLOOR | (없음) | `SearchParamAdaptor.getMinSimilarity`가 반환하는 적응형 임계값에 옵트인 하한을 강제. 예: `0.45` 설정 시 학습값이 0.45 미만이어도 0.45 반환. 미설정 시 기존 동작 그대로 |
+| WEASLEY_DEEPMIND_REMEMBER_ATOMIC | false | true 시 remember()의 quota check + INSERT를 단일 트랜잭션으로 원자화. BEGIN → api_keys FOR UPDATE(quota 재검증) → INSERT → COMMIT 순서로 TOCTOU를 완전 차단. false(기본)는 선제 quota check만 수행하며 동시 요청이 드문 환경에 적합 |
+| WEASLEY_DEEPMIND_CASE_BACKPROP_ENABLED | false | true 시 CaseRewardBackprop 활성화. case verification 이벤트마다 증거 파편 importance를 자동 역전파. 비활성 시 호출 자체가 no-op(DB·메트릭 영향 0). DAG 일관성 베이스라인 확보 후 활성화 권장 |
+| WEASLEY_DEEPMIND_STORAGE | pgvector | storage 어댑터 선택. `pgvector`(기본, PgVectorStore) 또는 `sqlite-vec`(SqliteVecStore). 변경 시 서버 재시작 필요 |
+| WEASLEY_DEEPMIND_KEYWORD_SEMANTIC_FALLBACK | true | `false` 설정 시 text 없는 keywords-only recall의 L3 시맨틱 보조 경로를 비활성화. 활성 시 정규화된 keywords 합성 텍스트 임베딩 1회가 L2와 병렬 수행되어 저장 keywords에 없는 용어도 content 기반으로 회수된다 |
+| WEASLEY_DEEPMIND_KEYWORD_FALLBACK_TIMEOUT_MS | 1500 | keywords 보조 L3 실행 상한(ms, 100~60000 클램프). 초과 시 빈 결과로 대체하고 searchPath에 `L3kw:timeout`을 남긴다 |
+| WEASLEY_DEEPMIND_CONTEXT_ANCHOR_LIMIT | 10 | context 응답에 항상 포함되는 앵커(isAnchor) 파편의 최대 개수. 1~30 범위로 클램프되며 파싱 실패 시 10. 앵커는 tokenBudget 절삭 대상이 아니므로 이 개수 상한이 유일한 주입량 제한이다 |
+| WEASLEY_DEEPMIND_RECALL_MIN_SIM_FLOOR | (없음) | `SearchParamAdaptor.getMinSimilarity`가 반환하는 적응형 임계값에 옵트인 하한을 강제. 예: `0.45` 설정 시 학습값이 0.45 미만이어도 0.45 반환. 미설정 시 기존 동작 그대로 |
 | MIGRATION_LINT_FROM | (없음) | `npm run lint:migrations` 검사 cutoff override. 지정 마이그레이션 번호 이후분만 검사. 미설정 시 전체 검사 |
-| MEMENTO_MORPHEME_TOKENIZER | local | 형태소 토크나이저 경로 선택. `local`: garu-ko(한글)·natural PorterStemmer(영어)·@node-rs/jieba(중국어)·kuromoji(일본어) 로컬 CPU 분석기 사용(기본). `llm`: LLM 서브프로세스 경로(`MorphemeIndex._tokenizeViaLLM()`)로 전환. |
-| MEMENTO_ENABLE_KUROMOJI | true | `false` 설정 시 kuromoji 일본어 분석기 로딩 생략. 일본어 파편이 없는 환경에서 상주 메모리 약 269MB 절감. `config/memory.js` `morphemeIndex.enableKuromoji`와 동기화됨. |
+| WEASLEY_DEEPMIND_MORPHEME_TOKENIZER | local | 형태소 토크나이저 경로 선택. `local`: garu-ko(한글)·natural PorterStemmer(영어)·@node-rs/jieba(중국어)·kuromoji(일본어) 로컬 CPU 분석기 사용(기본). `llm`: LLM 서브프로세스 경로(`MorphemeIndex._tokenizeViaLLM()`)로 전환. |
+| WEASLEY_DEEPMIND_ENABLE_KUROMOJI | true | `false` 설정 시 kuromoji 일본어 분석기 로딩 생략. 일본어 파편이 없는 환경에서 상주 메모리 약 269MB 절감. `config/memory.js` `morphemeIndex.enableKuromoji`와 동기화됨. |
 
 #### CLI 원격 접속
 
 | 변수 | 기본값 | 설명 |
 |------|--------|------|
-| MEMENTO_CLI_REMOTE | (없음) | CLI `--remote` 플래그 미지정 시 사용할 원격 MCP 서버 URL. 예: `https://memento.weasley-deepmind.net/mcp` |
-| MEMENTO_CLI_KEY | (없음) | CLI `--key` 플래그 미지정 시 사용할 원격 서버 인증용 API 키 |
+| WEASLEY_DEEPMIND_CLI_REMOTE | (없음) | CLI `--remote` 플래그 미지정 시 사용할 원격 MCP 서버 URL. 예: `https://deepmind.example.com/mcp` |
+| WEASLEY_DEEPMIND_CLI_KEY | (없음) | CLI `--key` 플래그 미지정 시 사용할 원격 서버 인증용 API 키 |
 
 #### Symbolic Memory (opt-in)
 
@@ -66,18 +67,18 @@
 
 | 변수 | 기본값 | Phase | 설명 |
 |------|--------|-------|------|
-| MEMENTO_SYMBOLIC_ENABLED | false | 0 | 전체 symbolic 서브시스템 on/off (마스터 킬 스위치) |
-| MEMENTO_SYMBOLIC_SHADOW | false | 1 | shadow mode: symbolic 결과를 기록만 하고 미적용 |
-| MEMENTO_SYMBOLIC_CLAIM_EXTRACTION | false | 1 | RememberPostProcessor에서 ClaimExtractor 호출 |
-| MEMENTO_SYMBOLIC_EXPLAIN | false | 2 | recall 응답 fragment에 `explanations: [{code, detail, ruleVersion}]` 필드 포함 (violations 있을 때만) |
-| MEMENTO_SYMBOLIC_LINK_CHECK | false | 3 | LinkIntegrityChecker advisory 경로 활성화 |
-| MEMENTO_SYMBOLIC_POLARITY_CONFLICT | false | 3 | ClaimConflictDetector advisory warning 기록 |
-| MEMENTO_SYMBOLIC_POLICY_RULES | false | 4 | PolicyRules soft gating — `remember` 응답에 `validation_warnings: string[]` (violations 있을 때만 포함), DB 영속화 |
-| MEMENTO_SYMBOLIC_CBR_FILTER | false | 5 | CaseRecall symbolic 필터 적용 |
-| MEMENTO_SYMBOLIC_PROACTIVE_GATE | false | 6 | ProactiveRecall polarity gate |
-| MEMENTO_SYMBOLIC_RULE_VERSION | v1 | - | 규칙 패키지 버전 식별자 (fragment_claims.rule_version 컬럼) |
-| MEMENTO_SYMBOLIC_TIMEOUT_MS | 50 | - | SymbolicOrchestrator 단일 호출 timeout (ms) |
-| MEMENTO_SYMBOLIC_MAX_CANDIDATES | 32 | - | symbolic 처리 대상 후보 수 상한 |
+| WEASLEY_DEEPMIND_SYMBOLIC_ENABLED | false | 0 | 전체 symbolic 서브시스템 on/off (마스터 킬 스위치) |
+| WEASLEY_DEEPMIND_SYMBOLIC_SHADOW | false | 1 | shadow mode: symbolic 결과를 기록만 하고 미적용 |
+| WEASLEY_DEEPMIND_SYMBOLIC_CLAIM_EXTRACTION | false | 1 | RememberPostProcessor에서 ClaimExtractor 호출 |
+| WEASLEY_DEEPMIND_SYMBOLIC_EXPLAIN | false | 2 | recall 응답 fragment에 `explanations: [{code, detail, ruleVersion}]` 필드 포함 (violations 있을 때만) |
+| WEASLEY_DEEPMIND_SYMBOLIC_LINK_CHECK | false | 3 | LinkIntegrityChecker advisory 경로 활성화 |
+| WEASLEY_DEEPMIND_SYMBOLIC_POLARITY_CONFLICT | false | 3 | ClaimConflictDetector advisory warning 기록 |
+| WEASLEY_DEEPMIND_SYMBOLIC_POLICY_RULES | false | 4 | PolicyRules soft gating — `remember` 응답에 `validation_warnings: string[]` (violations 있을 때만 포함), DB 영속화 |
+| WEASLEY_DEEPMIND_SYMBOLIC_CBR_FILTER | false | 5 | CaseRecall symbolic 필터 적용 |
+| WEASLEY_DEEPMIND_SYMBOLIC_PROACTIVE_GATE | false | 6 | ProactiveRecall polarity gate |
+| WEASLEY_DEEPMIND_SYMBOLIC_RULE_VERSION | v1 | - | 규칙 패키지 버전 식별자 (fragment_claims.rule_version 컬럼) |
+| WEASLEY_DEEPMIND_SYMBOLIC_TIMEOUT_MS | 50 | - | SymbolicOrchestrator 단일 호출 timeout (ms) |
+| WEASLEY_DEEPMIND_SYMBOLIC_MAX_CANDIDATES | 32 | - | symbolic 처리 대상 후보 수 상한 |
 
 `api_keys.symbolic_hard_gate` 컬럼 (migration-033)으로 키 단위 hard gate 전환 가능. 기본 false. true로 설정 시 PolicyRules violations 발생 시 저장이 거부되고 JSON-RPC **프로토콜 레벨** 에러 `-32003`으로 응답한다 (MCP 도구 에러 아님 — `error.data.violations: string[]` 포함). 마스터 키(keyId=NULL) 제외. 캐시 TTL 30초.
 
@@ -156,7 +157,7 @@ gemini-cli, anthropic, openai, google-gemini-api, groq, openrouter, xai, ollama,
 
 **geminiTimeoutMs**: `config/memory.js`의 `morphemeIndex.geminiTimeoutMs` 기본값은 **60000ms**이다. Gemini CLI 및 Ollama Cloud 환경에서는 응답 지연이 20~40s에 달할 수 있어 "all LLM providers failed" 오류를 피하기 위해 이 값으로 설정되어 있다.
 
-이 값은 `MEMENTO_MORPHEME_TOKENIZER=llm` 설정 시 `MorphemeIndex._tokenizeViaLLM()` 내부의 `geminiCLIJson(userPrompt, { timeoutMs: cfg.geminiTimeoutMs })` 호출에 전달된다. 기본값(`MEMENTO_MORPHEME_TOKENIZER=local`)에서는 로컬 분석기(MorphemeTokenizer)를 사용하므로 이 값은 참조되지 않는다. LLM 경로에서 tokenize가 실패하면 형태소 추출 결과가 없으므로 L3 morpheme 검색(recall의 전문 검색 경로)이 비활성화된 것과 동일하게 동작한다 (`_fallbackTokenize` 로 graceful degrade).
+이 값은 `WEASLEY_DEEPMIND_MORPHEME_TOKENIZER=llm` 설정 시 `MorphemeIndex._tokenizeViaLLM()` 내부의 `geminiCLIJson(userPrompt, { timeoutMs: cfg.geminiTimeoutMs })` 호출에 전달된다. 기본값(`WEASLEY_DEEPMIND_MORPHEME_TOKENIZER=local`)에서는 로컬 분석기(MorphemeTokenizer)를 사용하므로 이 값은 참조되지 않는다. LLM 경로에서 tokenize가 실패하면 형태소 추출 결과가 없으므로 L3 morpheme 검색(recall의 전문 검색 경로)이 비활성화된 것과 동일하게 동작한다 (`_fallbackTokenize` 로 graceful degrade).
 
 **GEMINI_TIMEOUT_MS**: `lib/memory/processors/AutoReflect.js`의 LLM chain 호출 timeout은 30,000 ms로 고정된다(`GEMINI_TIMEOUT_MS = 30_000` 코드 상수, `process.env` 참조 없음). 값을 변경하려면 해당 파일의 상수를 직접 수정해야 한다. MorphemeIndex의 `geminiTimeoutMs`(config/memory.js, 기본 60000)와 별개임에 주의한다.
 
@@ -199,15 +200,15 @@ POSTGRES_* 접두어가 DB_* 접두어보다 우선한다. 두 형식을 혼용�
 | DB_IDLE_TIMEOUT_MS | 유휴 연결 반환 대기 시간 ms. 기본 30000 |
 | DB_CONN_TIMEOUT_MS | 연결 획득 타임아웃 ms. 기본 10000 |
 | DB_QUERY_TIMEOUT | 쿼리 타임아웃 ms. 기본 30000 |
-| BATCH_DATABASE_URL | (없음, 선택) batchPool 전용 PostgreSQL URL. 미설정 시 기본 `DATABASE_URL`을 공유한다. batchPool은 multi-row INSERT 등 무거운 트랜잭션을 전용 풀에서 처리하여 recall 요청의 스타베이션을 방지한다. 풀 크기는 `primaryMax × 0.3`(최소 2)으로 결정되고, `application_name='memento-mcp:batch'`가 pg_stat_activity 분리 모니터링에 사용된다. 풀 크기와 application_name은 코드 내부에서 결정되며 환경변수로 override할 수 없다 |
+| BATCH_DATABASE_URL | (없음, 선택) batchPool 전용 PostgreSQL URL. 미설정 시 기본 `DATABASE_URL`을 공유한다. batchPool은 multi-row INSERT 등 무거운 트랜잭션을 전용 풀에서 처리하여 recall 요청의 스타베이션을 방지한다. 풀 크기는 `primaryMax × 0.3`(최소 2)으로 결정되고, `application_name='weasley-deepmind:batch'`가 pg_stat_activity 분리 모니터링에 사용된다. 풀 크기와 application_name은 코드 내부에서 결정되며 환경변수로 override할 수 없다 |
 
 ### batch_remember 비동기 모드
 
-`batch_remember` 도구의 `async=true` 요청은 Redis 큐(`memento:batch_remember_queue`)를 통해 비동기 처리된다.
+`batch_remember` 도구의 `async=true` 요청은 Redis 큐(`weasley_deepmind:batch_remember_queue`)를 통해 비동기 처리된다.
 
 | 항목 | 값 |
 |-|-|
-| 큐 키 | `memento:batch_remember_queue` |
+| 큐 키 | `weasley_deepmind:batch_remember_queue` |
 | 워커 폴링 간격 | 1000ms |
 | Redis 비활성 시 폴백 | 동기 모드로 자동 전환 |
 | 자동 재처리 | 없음 (큐 유실 시 재처리 없음) |
@@ -336,7 +337,7 @@ export const MEMORY_CONFIG = {
     intervalMs     : 5000,    // 폴링 간격 (ms)
     retryLimit     : 3,       // 실패 시 재시도 횟수
     retryDelayMs   : 2000,    // 재시도 간격 (ms)
-    queueKey       : "memento:embedding_queue"
+    queueKey       : "weasley_deepmind:embedding_queue"
   },
   contextInjection: {
     maxCoreFragments   : 15,     // Core Memory 최대 파편 수
@@ -382,8 +383,8 @@ export const MEMORY_CONFIG = {
   semanticSearch: {
     minSimilarity  : 0.4,        // L3 pgvector 검색 최소 유사도 (기본 0.4)
     limit          : 30,         // L3 반환 최대 건수
-    keywordFallback: true,       // text 없는 keywords-only 쿼리에서 L3 시맨틱 보조 실행 (env MEMENTO_KEYWORD_SEMANTIC_FALLBACK=false로 비활성)
-    keywordFallbackTimeoutMs: 1500 // keywords 보조 L3 실행 상한 (env MEMENTO_KEYWORD_FALLBACK_TIMEOUT_MS)
+    keywordFallback: true,       // text 없는 keywords-only 쿼리에서 L3 시맨틱 보조 실행 (env WEASLEY_DEEPMIND_KEYWORD_SEMANTIC_FALLBACK=false로 비활성)
+    keywordFallbackTimeoutMs: 1500 // keywords 보조 L3 실행 상한 (env WEASLEY_DEEPMIND_KEYWORD_FALLBACK_TIMEOUT_MS)
   },
   temperatureBoost: {
     warmWindowDays     : 7,      // 이 기간 내 접근 파편에 warmBoost 적용
@@ -403,14 +404,14 @@ importanceWeight + recencyWeight + semanticWeight의 합은 1.0이어야 한다.
 
 | 키 | ENV | 기본값 | 설명 |
 |-|-|-|-|
-| `mode` | `MEMENTO_PROACTIVE_RECALL_MODE` | `"auto"` | `"auto"`: 조건 충족 시 자동 실행. `"off"`: 비활성화 |
-| `keywordOverlapMin` | `MEMENTO_PROACTIVE_KW_OVERLAP_MIN` | `0.5` | 키워드 중복 비율 하한. 저장 파편과 후보 파편 간 공통 키워드 비율이 이 값 이상이어야 링크 생성 대상이 됨 |
+| `mode` | `WEASLEY_DEEPMIND_PROACTIVE_RECALL_MODE` | `"auto"` | `"auto"`: 조건 충족 시 자동 실행. `"off"`: 비활성화 |
+| `keywordOverlapMin` | `WEASLEY_DEEPMIND_PROACTIVE_KW_OVERLAP_MIN` | `0.5` | 키워드 중복 비율 하한. 저장 파편과 후보 파편 간 공통 키워드 비율이 이 값 이상이어야 링크 생성 대상이 됨 |
 | `requireSameWorkspace` | — | `true` | workspace가 다른 파편은 ProactiveRecall 대상에서 제외 |
-| `caseIdPolicy` | `MEMENTO_PROACTIVE_CASE_POLICY` | `"strict-or-adjacent"` | `"both-required"`: 두 파편 모두 동일 case_id 필요. `"strict-or-adjacent"`: 동일 case_id 또는 adjacencyWindowMs 이내 다른 케이스 허용. `"loose"`: case_id 불일치 시도 허용 |
+| `caseIdPolicy` | `WEASLEY_DEEPMIND_PROACTIVE_CASE_POLICY` | `"strict-or-adjacent"` | `"both-required"`: 두 파편 모두 동일 case_id 필요. `"strict-or-adjacent"`: 동일 case_id 또는 adjacencyWindowMs 이내 다른 케이스 허용. `"loose"`: case_id 불일치 시도 허용 |
 | `adjacencyWindowMs` | — | `86400000` (24h) | `"strict-or-adjacent"` 정책에서 인접 케이스 허용 시간 범위 (ms) |
 | `requireSameTopicOrType` | — | `false` | true 설정 시 topic 또는 type이 동일한 파편끼리만 링크 |
 
-`proactive-gate.js` symbolic 게이트는 `workspace_mismatch`와 `case_policy` 차단 사유를 평가하며, `MEMENTO_SYMBOLIC_PROACTIVE_GATE=true` 환경변수로 활성화된다. proactiveRecall 블록의 caseIdPolicy와 keywordOverlapMin은 런타임 중 환경변수로 변경 가능하다 — 서버 재시작 없이 MEMENTO_PROACTIVE_CASE_POLICY 값을 갱신하면 다음 호출부터 즉시 반영된다. proactiveRecall 비활성화는 mode를 `"off"`로 설정한다.
+`proactive-gate.js` symbolic 게이트는 `workspace_mismatch`와 `case_policy` 차단 사유를 평가하며, `WEASLEY_DEEPMIND_SYMBOLIC_PROACTIVE_GATE=true` 환경변수로 활성화된다. proactiveRecall 블록의 caseIdPolicy와 keywordOverlapMin은 런타임 중 환경변수로 변경 가능하다 — 서버 재시작 없이 WEASLEY_DEEPMIND_PROACTIVE_CASE_POLICY 값을 갱신하면 다음 호출부터 즉시 반영된다. proactiveRecall 비활성화는 mode를 `"off"`로 설정한다.
 
 ### consolidate.schemaFit
 
@@ -421,7 +422,7 @@ MemoryConsolidator 자동 실행 전 충분한 변경 누적 여부를 평가하
 | `pendingCaseFragmentsMin` | `5` | 미처리 케이스 파편이 이 수 이상이면 조건 충족 |
 | `recentRelatedLinksMin` | `20` | 최근 생성된 related 링크가 이 수 이상이면 조건 충족 |
 | `fragmentsSinceLastRunMin` | `30` | 마지막 실행 이후 새 파편 수가 이 수 이상이면 조건 충족 |
-| `mode` | `"any"` | `"any"`: 3개 조건 중 1개 이상 충족 시 실행. `"all"`: 3개 모두 충족 시 실행. `"off"`: 게이트 비활성화(항상 실행). ENV: `MEMENTO_CONSOLIDATE_GATE_MODE` |
+| `mode` | `"any"` | `"any"`: 3개 조건 중 1개 이상 충족 시 실행. `"all"`: 3개 모두 충족 시 실행. `"off"`: 게이트 비활성화(항상 실행). ENV: `WEASLEY_DEEPMIND_CONSOLIDATE_GATE_MODE` |
 
 consolidateIntervalMs(기본 6h = 21600000ms) 주기 타이머가 실행될 때마다 이 게이트를 평가한다. 게이트 미통과 시 해당 실행 주기를 건너뛴다. `consolidateIntervalMs`는 `CONSOLIDATE_INTERVAL_MS` 환경변수로 제어한다. proactiveRecall의 caseIdPolicy와 달리 schemaFit.mode는 런타임 변경이 반영되지 않으며 서버 재시작이 필요하다.
 
@@ -431,9 +432,9 @@ LLM 재작성이 수반되어 파편 내용을 변경할 수 있는 3개 stage�
 
 | 키 | ENV | 기본값 | 해당 stage | 설명 |
 |-|-|-|-|-|
-| `splitLongFragments` | `MEMENTO_CONSOLIDATE_SPLIT_LONG` | `true` | stage 5 | 긴 파편을 2~3개 원자 파편으로 분할. LLM으로 분할 경계 결정 |
-| `detectContradictions` | `MEMENTO_CONSOLIDATE_DETECT_CONTRADICT` | `true` | stage 14 | NLI + LLM 하이브리드 모순 감지 및 contradicts 링크 생성 |
-| `compressOldFragments` | `MEMENTO_CONSOLIDATE_COMPRESS_OLD` | `false` | stage 8 | 오래된 파편 그룹을 LLM으로 압축 요약. 기본 비활성 |
+| `splitLongFragments` | `WEASLEY_DEEPMIND_CONSOLIDATE_SPLIT_LONG` | `true` | stage 5 | 긴 파편을 2~3개 원자 파편으로 분할. LLM으로 분할 경계 결정 |
+| `detectContradictions` | `WEASLEY_DEEPMIND_CONSOLIDATE_DETECT_CONTRADICT` | `true` | stage 14 | NLI + LLM 하이브리드 모순 감지 및 contradicts 링크 생성 |
+| `compressOldFragments` | `WEASLEY_DEEPMIND_CONSOLIDATE_COMPRESS_OLD` | `false` | stage 8 | 오래된 파편 그룹을 LLM으로 압축 요약. 기본 비활성 |
 
 플래그가 `false`인 stage는 실행 시 `status: "skipped"` 이벤트를 emit하고 다음 stage로 진행한다. `compressOldFragments`는 원본 파편 내용을 변경하므로 기본값이 `false`다.
 
@@ -454,7 +455,7 @@ LLM 재작성이 수반되어 파편 내용을 변경할 수 있는 3개 stage�
 
 분할 자식 품질 게이트(`split-gate.js`): 최소 길이(`minChildLength`) 미달·대체 문자(`�`) 포함·CJK/가나 혼입(한글 본문 기준)·대명사/메타 시작 토큰이면 reject. fact 타입 자식의 importance가 클램프 후 0.4 미만이면 저장 차단.
 
-Phase 1(gate-only)에서 통과 자식 수 < `minItems`이면 DB insert 없이 해당 파편의 `split_attempt_failed_at`을 갱신하고 `memento_consolidate_split_skipped_total{reason="low_yield"}`를 증가시킨다. 분할 성공 시 원본은 `valid_to = NOW()`, `ttl_tier = 'cold'`, `importance = GREATEST(0.2, importance × 0.3)` 처리된다.
+Phase 1(gate-only)에서 통과 자식 수 < `minItems`이면 DB insert 없이 해당 파편의 `split_attempt_failed_at`을 갱신하고 `weasley_deepmind_consolidate_split_skipped_total{reason="low_yield"}`를 증가시킨다. 분할 성공 시 원본은 `valid_to = NOW()`, `ttl_tier = 'cold'`, `importance = GREATEST(0.2, importance × 0.3)` 처리된다.
 
 ### SearchParamAdaptor (자동 검색 파라미터 학습)
 
@@ -845,7 +846,7 @@ EMBEDDING_DIMENSIONS=768
 
 세션 동작 범위를 preset으로 고정한다. 3가지 경로로 설정할 수 있으며, 우선순위는 아래와 같다.
 
-1. **요청별 헤더** (최우선): `X-Memento-Mode: <preset>`
+1. **요청별 헤더** (최우선): `X-Weasley DeepMind-Mode: <preset>`
 2. **initialize 파라미터**: `{ "method": "initialize", "params": { "mode": "<preset>" } }`
 3. **키 단위 기본값** (admin console): `api_keys.default_mode` 컬럼 (migration-034)
 

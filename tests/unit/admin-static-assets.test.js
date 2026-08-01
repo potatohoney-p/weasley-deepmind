@@ -1,12 +1,12 @@
 /**
  * Admin 정적 자산 서빙 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-03-26
  *
- * 인증 테스트(401)는 MEMENTO_ACCESS_KEY 환경변수가 모듈 로드 전에 설정되어야 한다.
+ * 인증 테스트(401)는 WEASLEY_DEEPMIND_ACCESS_KEY 환경변수가 모듈 로드 전에 설정되어야 한다.
  * 전체 suite 실행 시 config.js 캐시로 인해 인증 테스트가 skip될 수 있으며,
- * 이 경우 단독 실행으로 검증: MEMENTO_ACCESS_KEY=test node --test tests/unit/admin-static-assets.test.js
+ * 이 경우 단독 실행으로 검증: WEASLEY_DEEPMIND_ACCESS_KEY=test node --test tests/unit/admin-static-assets.test.js
  */
 
 import { describe, it } from "node:test";

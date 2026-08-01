@@ -41,7 +41,7 @@ Search-related modules live under `lib/memory/read/`; import paths follow the ac
 
 **reflect resolution_status auto-setting:** ReflectProcessor automatically assigns resolution_status to reflect-generated fragments. `errors_resolved` items receive `resolutionStatus: "resolved"`, and `open_questions` items receive `resolutionStatus: "open"`. All reflect-generated fragments also propagate `sessionId` for session-level tracking.
 
-**remember() pipeline structure (including MEMENTO_REMEMBER_ATOMIC=true path):**
+**remember() pipeline structure (including WEASLEY_DEEPMIND_REMEMBER_ATOMIC=true path):**
 
 ```
 remember(params)
@@ -51,7 +51,7 @@ remember(params)
   ├── _runPolicyGate(fragment, {mode:"production"}) — PolicyRules hard gate, evaluated on all paths
   │     dryRun, atomic, and non-atomic paths all pass through the same helper
   │     SymbolicPolicyViolationError is thrown before any transaction begins
-  ├── atomic branch — MEMENTO_REMEMBER_ATOMIC=true && keyId condition
+  ├── atomic branch — WEASLEY_DEEPMIND_REMEMBER_ATOMIC=true && keyId condition
   │     delegates to _rememberAtomic()
   │       BEGIN
   │       SELECT … FROM api_keys WHERE id=$keyId FOR UPDATE
@@ -59,7 +59,7 @@ remember(params)
   │       INSERT INTO fragments …
   │       COMMIT
   │       on quota violation: ROLLBACK → fragment_limit_exceeded error
-  ├── non-atomic branch — MEMENTO_REMEMBER_ATOMIC=false (default)
+  ├── non-atomic branch — WEASLEY_DEEPMIND_REMEMBER_ATOMIC=false (default)
   │     QuotaChecker.check() — pre-emptive check (no transaction)
   │     idempotency branch — when params.idempotencyKey is present
   │       FragmentReader.findByIdempotencyKey(key, keyId) lookup
@@ -485,7 +485,7 @@ When a verification event is added to case_events, atomically adjusts the import
 - Concurrency: UPDATE FROM is atomic via row locking. No read-modify-write race condition.
 - Trigger: fire-and-forget after `CaseEventStore.append()` COMMIT
 - Singleton: `getBackprop()` (shared for server lifetime)
-- Environment variable: `MEMENTO_CASE_BACKPROP_ENABLED=true` is required to activate (default: false). Also exported as the `CASE_BACKPROP_ENABLED` constant from `lib/config.js`. When disabled, the backprop call after append() is treated as a no-op.
+- Environment variable: `WEASLEY_DEEPMIND_CASE_BACKPROP_ENABLED=true` is required to activate (default: false). Also exported as the `CASE_BACKPROP_ENABLED` constant from `lib/config.js`. When disabled, the backprop call after append() is treated as a no-op.
 
 ### SearchParamAdaptor (FragmentSearch -> SearchParamAdaptor)
 
@@ -513,10 +513,10 @@ When `config.enabled=false`, it immediately returns a noop result with zero CPU 
 ### SymbolicMetrics
 
 `lib/symbolic/SymbolicMetrics.js`. Registers 4 prom-client metrics immediately on module load:
-- `memento_symbolic_claim_extracted_total` (labels: extractor, polarity)
-- `memento_symbolic_warning_total` (labels: rule, severity)
-- `memento_symbolic_gate_blocked_total` (labels: phase, reason)
-- `memento_symbolic_op_latency_ms` histogram (labels: op, buckets: 1~500ms)
+- `weasley_deepmind_symbolic_claim_extracted_total` (labels: extractor, polarity)
+- `weasley_deepmind_symbolic_warning_total` (labels: rule, severity)
+- `weasley_deepmind_symbolic_gate_blocked_total` (labels: phase, reason)
+- `weasley_deepmind_symbolic_op_latency_ms` histogram (labels: op, buckets: 1~500ms)
 
 Four helper methods unify external calls: `recordClaim(extractor, polarity)`, `recordWarning(rule, severity)`, `recordGateBlock(phase, reason)`, `observeLatency(op, ms)`. Supports both singleton `symbolicMetrics` export and DI injection simultaneously.
 
@@ -607,7 +607,7 @@ Each JSON file schema: `{ name, description, excluded_tools[], fixed_tools[], sk
 
 `_resolveMode(req, msg, dbDefaultMode, keyId)` determines the mode in this order:
 
-1. `X-Memento-Mode` request header (highest priority) — applied if the value is a registered preset name, otherwise null
+1. `X-Weasley DeepMind-Mode` request header (highest priority) — applied if the value is a registered preset name, otherwise null
 2. `params.mode` field in an `initialize` request
 3. `api_keys.default_mode` DB column (migration-034)
 
@@ -732,7 +732,7 @@ const output = await this._pipeline(text, { pooling: "mean", normalize: true });
 
 ## lib/storage Adapter Layer
 
-`lib/storage/index.js` returns a storage adapter singleton based on the `MEMENTO_STORAGE` environment variable.
+`lib/storage/index.js` returns a storage adapter singleton based on the `WEASLEY_DEEPMIND_STORAGE` environment variable.
 
 | Value | Adapter | Status |
 |-|-|-|

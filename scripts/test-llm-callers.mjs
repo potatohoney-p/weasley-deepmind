@@ -2,7 +2,7 @@
 /**
  * test-llm-callers.mjs — LLM caller JSON 스키마 E2E 검증
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 수정일: 2026-04-20 (v2.12.0 문서 현행화 반영)
  *
  * 목적: AutoReflect, ConsolidatorGC, ContradictionDetector, MemoryEvaluator 4개 LLM caller가
@@ -89,7 +89,7 @@ await test("ConsolidatorGC (long text split)", async () => {
     "Format: [\"sentence1\",\"sentence2\",\"sentence3\"]";
 
   const longText =
-    "Memento MCP는 v2.8.0에서 Symbolic Memory Phase 0~6과 LLM Provider Fallback Chain을 도입했다. " +
+    "Weasley DeepMind는 v2.8.0에서 Symbolic Memory Phase 0~6과 LLM Provider Fallback Chain을 도입했다. " +
     "Symbolic Memory는 기본 플래그 전부 off 상태로 v2.7.0 동작을 완전히 보존한다. " +
     "LLM Fallback Chain은 Gemini CLI 외 12개 외부 provider를 JSON 배열 설정으로 등록할 수 있다.";
 

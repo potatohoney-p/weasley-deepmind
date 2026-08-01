@@ -1,7 +1,7 @@
 /**
  * Unit tests: parseJsonResponse heuristic
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-16
  */
 

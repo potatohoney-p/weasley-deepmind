@@ -1,6 +1,6 @@
 -- migration-025-case-id-episode.sql
 -- case_id 추가 + episode 파편 스키마 확장 + assertion_status
--- 작성자: 최진호
+-- 작성자: Weasley Open Source
 -- 작성일: 2026-04-03
 
 

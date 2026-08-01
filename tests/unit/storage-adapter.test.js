@@ -1,12 +1,12 @@
 /**
  * 스토리지 어댑터 계층 회귀 가드
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-05-13
  *
  * 검증 항목:
  * 1. getStorage() 기본 반환값이 PgVectorStore 인스턴스인지
- * 2. MEMENTO_STORAGE=sqlite-vec 설정 시 SqliteVecStore 인스턴스 반환
+ * 2. WEASLEY_DEEPMIND_STORAGE=sqlite-vec 설정 시 SqliteVecStore 인스턴스 반환
  * 3. SqliteVecStore 메서드 호출이 'not implemented' 에러를 던지는지
  * 4. 두 어댑터 모두 필수 인터페이스 메서드/프로퍼티를 보유하는지
  */
@@ -24,12 +24,12 @@ import {
 /** 각 테스트 전 싱글톤 초기화 및 환경변수 정리 */
 beforeEach(() => {
   _resetStorageForTest();
-  delete process.env.MEMENTO_STORAGE;
+  delete process.env.WEASLEY_DEEPMIND_STORAGE;
 });
 
 after(() => {
   _resetStorageForTest();
-  delete process.env.MEMENTO_STORAGE;
+  delete process.env.WEASLEY_DEEPMIND_STORAGE;
 });
 
 /** 필수 인터페이스 메서드/프로퍼티 목록 */
@@ -38,7 +38,7 @@ const REQUIRED_PROPERTIES = ["engine", "vectorSupport"];
 
 describe("getStorage() — 어댑터 선택", () => {
 
-  it("MEMENTO_STORAGE 미설정 시 PgVectorStore 반환", () => {
+  it("WEASLEY_DEEPMIND_STORAGE 미설정 시 PgVectorStore 반환", () => {
     const store = getStorage();
     assert.ok(
       store instanceof PgVectorStore,
@@ -46,14 +46,14 @@ describe("getStorage() — 어댑터 선택", () => {
     );
   });
 
-  it("MEMENTO_STORAGE=pgvector 명시 시 PgVectorStore 반환", () => {
-    process.env.MEMENTO_STORAGE = "pgvector";
+  it("WEASLEY_DEEPMIND_STORAGE=pgvector 명시 시 PgVectorStore 반환", () => {
+    process.env.WEASLEY_DEEPMIND_STORAGE = "pgvector";
     const store = getStorage();
     assert.ok(store instanceof PgVectorStore);
   });
 
-  it("MEMENTO_STORAGE=sqlite-vec 시 SqliteVecStore 반환", () => {
-    process.env.MEMENTO_STORAGE = "sqlite-vec";
+  it("WEASLEY_DEEPMIND_STORAGE=sqlite-vec 시 SqliteVecStore 반환", () => {
+    process.env.WEASLEY_DEEPMIND_STORAGE = "sqlite-vec";
     const store = getStorage();
     assert.ok(
       store instanceof SqliteVecStore,
@@ -61,8 +61,8 @@ describe("getStorage() — 어댑터 선택", () => {
     );
   });
 
-  it("MEMENTO_STORAGE 알 수 없는 값 시 pgvector 폴백", () => {
-    process.env.MEMENTO_STORAGE = "unknown-backend";
+  it("WEASLEY_DEEPMIND_STORAGE 알 수 없는 값 시 pgvector 폴백", () => {
+    process.env.WEASLEY_DEEPMIND_STORAGE = "unknown-backend";
     const store = getStorage();
     assert.ok(store instanceof PgVectorStore, "알 수 없는 값은 pgvector로 폴백해야 한다");
   });
@@ -87,7 +87,7 @@ describe("PgVectorStore — 인터페이스 준수", () => {
 
   beforeEach(() => {
     _resetStorageForTest();
-    delete process.env.MEMENTO_STORAGE;
+    delete process.env.WEASLEY_DEEPMIND_STORAGE;
     store = getStorage();
   });
 
@@ -125,7 +125,7 @@ describe("SqliteVecStore — stub 동작", () => {
 
   beforeEach(() => {
     _resetStorageForTest();
-    process.env.MEMENTO_STORAGE = "sqlite-vec";
+    process.env.WEASLEY_DEEPMIND_STORAGE = "sqlite-vec";
     store = getStorage();
   });
 

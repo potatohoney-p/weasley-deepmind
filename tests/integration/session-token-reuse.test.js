@@ -1,26 +1,26 @@
 /**
  * 세션 토큰 재사용 E2E 통합 테스트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-19
  *
  * 배경:
  *   claude.ai 커넥터가 Mcp-Session-Id 헤더를 유실하여 매 initialize마다 새 세션이
  *   생성되던 문제를 v2.9.0에서 수정했다.
- *   deriveTokenKey(lib/handlers/mcp-handler.js:38)가 Bearer/memento-access-key 토큰을
+ *   deriveTokenKey(lib/handlers/mcp-handler.js:38)가 Bearer/weasley_deepmind-access-key 토큰을
  *   sha256 단축 해시로 캐시 키로 변환하고, bindTokenToSession(lib/redis.js:265)이
  *   Redis에 토큰→세션ID 매핑을 저장한다.
  *   동일 토큰으로 Mcp-Session-Id 없이 재호출 시 기존 세션이 반환되어야 한다.
  *
  * 시나리오:
- *   1. 실제 서버를 기동한다 (MEMENTO_ACCESS_KEY, DB, Redis 필요).
+ *   1. 실제 서버를 기동한다 (WEASLEY_DEEPMIND_ACCESS_KEY, DB, Redis 필요).
  *   2. access token A로 initialize → sessionId s1, MCP-Session-Id 헤더 s1 수신.
  *   3. 같은 토큰 A로 Mcp-Session-Id 없이 initialize 재호출.
  *   4. 응답 MCP-Session-Id 헤더가 s1과 동일한지 검증.
  *
  * 수동 실행:
  *   E2E_SESSION_REUSE=1 \
- *   MEMENTO_ACCESS_KEY=<key> \
+ *   WEASLEY_DEEPMIND_ACCESS_KEY=<key> \
  *   DATABASE_URL=postgresql://user:pass@localhost:35432/bee_db \
  *   REDIS_ENABLED=true \
  *   REDIS_HOST=localhost \
@@ -41,7 +41,7 @@ const ENABLED = process.env.E2E_SESSION_REUSE === "1";
 
 /** 기본 포트는 서버 PORT env 또는 57332 */
 const SERVER_PORT = parseInt(process.env.PORT || "57332", 10);
-const ACCESS_KEY  = process.env.MEMENTO_ACCESS_KEY || "";
+const ACCESS_KEY  = process.env.WEASLEY_DEEPMIND_ACCESS_KEY || "";
 
 /** initialize JSON-RPC 요청 본문 */
 const INIT_BODY = JSON.stringify({
@@ -163,7 +163,7 @@ describe("세션 토큰 재사용 E2E", { skip: !ENABLED, timeout: 30_000 }, () 
 
   test("ACCESS_KEY 미설정 시 graceful skip", (t) => {
     if (!ACCESS_KEY) {
-      t.skip("MEMENTO_ACCESS_KEY 미설정 — 인증 불가");
+      t.skip("WEASLEY_DEEPMIND_ACCESS_KEY 미설정 — 인증 불가");
       return;
     }
     assert.ok(ACCESS_KEY.length > 0);
@@ -191,7 +191,7 @@ describe("세션 토큰 재사용 E2E", { skip: !ENABLED, timeout: 30_000 }, () 
     async (t) => {
       if (!serverAvailable) { t.skip("서버 미연결"); return; }
       if (!redisAvailable)  { t.skip("Redis 미연결 — 바인딩 불가"); return; }
-      if (!ACCESS_KEY)      { t.skip("MEMENTO_ACCESS_KEY 미설정"); return; }
+      if (!ACCESS_KEY)      { t.skip("WEASLEY_DEEPMIND_ACCESS_KEY 미설정"); return; }
 
       /** 첫 번째 initialize — Mcp-Session-Id 없이 전송 */
       const first = await postMcp({ body: INIT_BODY, accessKey: ACCESS_KEY });
@@ -252,7 +252,7 @@ describe("세션 토큰 재사용 E2E", { skip: !ENABLED, timeout: 30_000 }, () 
     { timeout: 20_000 },
     async (t) => {
       if (!serverAvailable) { t.skip("서버 미연결"); return; }
-      if (!ACCESS_KEY)      { t.skip("MEMENTO_ACCESS_KEY 미설정"); return; }
+      if (!ACCESS_KEY)      { t.skip("WEASLEY_DEEPMIND_ACCESS_KEY 미설정"); return; }
 
       /**
        * 두 번째 토큰은 ACCESS_KEY 뒤에 임의 suffix를 붙여 구성한다.

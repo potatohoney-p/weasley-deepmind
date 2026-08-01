@@ -1,7 +1,7 @@
 /**
  * downgrade-reflect-ttl.js — session_reflect permanent 파편의 TTL 재평가·강등.
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-16
  *
  * 사용: node scripts/downgrade-reflect-ttl.js [--execute]

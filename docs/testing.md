@@ -1,6 +1,6 @@
 # 테스트 가이드
 
-작성자: 최진호
+작성자: Weasley Open Source
 작성일: 2026-04-29
 수정일: 2026-05-19
 
@@ -8,7 +8,7 @@
 
 ## 개요
 
-memento-mcp의 테스트는 세 계층으로 구성된다.
+weasley-deepmind의 테스트는 세 계층으로 구성된다.
 
 - 단위 테스트 (node:test): 외부 의존성 없이 모듈 단위 검증
 - 통합 테스트: DB/Redis 연결 가능 여부를 런타임 자동 판단 또는 환경변수 활성화
@@ -24,13 +24,13 @@ memento-mcp의 테스트는 세 계층으로 구성된다.
 # 전체 단위 테스트
 npm test
 
-# 직접 실행 (MEMENTO_METRICS_DEFAULT=off 권장)
-MEMENTO_METRICS_DEFAULT=off node --experimental-test-module-mocks --test \
+# 직접 실행 (WEASLEY_DEEPMIND_METRICS_DEFAULT=off 권장)
+WEASLEY_DEEPMIND_METRICS_DEFAULT=off node --experimental-test-module-mocks --test \
   'tests/unit/*.test.js' \
   'tests/unit/**/*.test.js'
 ```
 
-`MEMENTO_METRICS_DEFAULT=off`는 prom-client 레지스트리 중복 초기화 경고를 억제한다.
+`WEASLEY_DEEPMIND_METRICS_DEFAULT=off`는 prom-client 레지스트리 중복 초기화 경고를 억제한다.
 단위 테스트는 DB, Redis, EMBEDDING_API_KEY 없이 실행된다.
 
 ---
@@ -125,7 +125,7 @@ after(async () => {
 단일 파일 실행 시 환경변수 명시:
 
 ```bash
-MEMENTO_METRICS_DEFAULT=off node --experimental-test-module-mocks --test \
+WEASLEY_DEEPMIND_METRICS_DEFAULT=off node --experimental-test-module-mocks --test \
   tests/unit/<파일명>.test.js
 ```
 

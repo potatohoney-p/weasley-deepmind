@@ -1,7 +1,7 @@
 /*
  * migration-033-symbolic-hard-gate.sql
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-15
  *
  * Phase 4 soft gating을 테넌트별로 hard gate로 승격할 수 있는 opt-in 플래그.

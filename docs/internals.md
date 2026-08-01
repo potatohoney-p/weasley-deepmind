@@ -41,7 +41,7 @@ MemoryManager는 thin facade다. 비즈니스 로직은 `lib/memory/processors/`
 
 **reflect의 resolution_status 자동 세팅:** ReflectProcessor는 reflect 생성 파편에 resolution_status를 자동 부여한다. `errors_resolved` 항목은 `resolutionStatus: "resolved"`로, `open_questions` 항목은 `resolutionStatus: "open"`으로 설정된다. 또한 모든 reflect 생성 파편에 `sessionId`가 전파되어 세션 단위 추적이 가능하다.
 
-**remember() 본문 구조 (MEMENTO_REMEMBER_ATOMIC=true 경로 포함):**
+**remember() 본문 구조 (WEASLEY_DEEPMIND_REMEMBER_ATOMIC=true 경로 포함):**
 
 ```
 remember(params)
@@ -51,7 +51,7 @@ remember(params)
   ├── _runPolicyGate(fragment, {mode:"production"}) — PolicyRules hard gate 공통 평가
   │     dryRun·atomic·non-atomic 세 경로 모두 동일 헬퍼를 거친다
   │     SymbolicPolicyViolationError throw 시 트랜잭션 시작 이전에 즉시 중단
-  ├── atomic 분기 — MEMENTO_REMEMBER_ATOMIC=true && keyId 조건
+  ├── atomic 분기 — WEASLEY_DEEPMIND_REMEMBER_ATOMIC=true && keyId 조건
   │     _rememberAtomic() 위임
   │       BEGIN
   │       SELECT … FROM api_keys WHERE id=$keyId FOR UPDATE
@@ -59,7 +59,7 @@ remember(params)
   │       INSERT INTO fragments …
   │       COMMIT
   │       quota 위반 시 ROLLBACK → fragment_limit_exceeded 에러
-  ├── non-atomic 분기 — MEMENTO_REMEMBER_ATOMIC=false (기본)
+  ├── non-atomic 분기 — WEASLEY_DEEPMIND_REMEMBER_ATOMIC=false (기본)
   │     QuotaChecker.check() — 선제 검사 (트랜잭션 없음)
   │     idempotency 분기 — params.idempotencyKey 존재 시
   │       FragmentReader.findByIdempotencyKey(key, keyId) 조회
@@ -243,7 +243,7 @@ SSE 스트림이 닫히면(`res.on('close')`) 서버는 SSE 응답 객체만 제
 
 1. **bound_key_id 경로 (1순위)**: 토큰의 `bound_key_id` 필드가 있으면 `validateApiKeyById(bound_key_id)`로 UUID 직접 조회. name-based client_id 바인딩 방식이 이 경로를 사용한다. 성공 시 `keyId`/`groupKeyIds`/`permissions` 반환. `mcp_oauth_bound_client_authenticated_total` 카운터 증가.
 2. **is_api_key=true 경로 (2순위)**: `client_id`가 원본 API 키 문자열인 경우 `validateApiKeyFromDB(client_id)`로 조회. bound_key_id 조회 실패 시에도 이 경로로 낙하.
-3. **non-API-key OAuth (3순위)**: `MCP_REJECT_NONAPIKEY_OAUTH=true`(기본)이면 `{ valid: false, error: "non-API-key OAuth denied" }` 반환. `mcp_oauth_nonapikey_rejected_total` + `memento_tenant_isolation_blocked_total{component="oauth_nonapikey_denied"}` 카운터 증가. `false`이면 하위 호환 동작 (`keyId=null` 세션 — 운영 환경에서 절대 사용하지 말 것).
+3. **non-API-key OAuth (3순위)**: `MCP_REJECT_NONAPIKEY_OAUTH=true`(기본)이면 `{ valid: false, error: "non-API-key OAuth denied" }` 반환. `mcp_oauth_nonapikey_rejected_total` + `weasley_deepmind_tenant_isolation_blocked_total{component="oauth_nonapikey_denied"}` 카운터 증가. `false`이면 하위 호환 동작 (`keyId=null` 세션 — 운영 환경에서 절대 사용하지 말 것).
 
 ### OAuth name-based client_id 바인딩
 
@@ -515,7 +515,7 @@ case_events에 verification 이벤트가 추가되면, 해당 케이스의 증�
 - 동시성: UPDATE FROM은 행 잠금으로 원자적. read-modify-write race condition 없음.
 - 트리거: `CaseEventStore.append()` COMMIT 후 fire-and-forget
 - 싱글톤: `getBackprop()` (서버 수명 동안 공유)
-- 환경변수: `MEMENTO_CASE_BACKPROP_ENABLED=true`이어야 활성화된다(기본값: false). `lib/config.js`의 `CASE_BACKPROP_ENABLED` 상수로도 참조. 비활성 시 append() 후 backprop 호출이 no-op으로 처리된다.
+- 환경변수: `WEASLEY_DEEPMIND_CASE_BACKPROP_ENABLED=true`이어야 활성화된다(기본값: false). `lib/config.js`의 `CASE_BACKPROP_ENABLED` 상수로도 참조. 비활성 시 append() 후 backprop 호출이 no-op으로 처리된다.
 
 ### SearchParamAdaptor (FragmentSearch -> SearchParamAdaptor)
 
@@ -543,10 +543,10 @@ architecture.md의 Symbolic Memory Layer 섹션이 전체 설계를 다룬다. �
 ### SymbolicMetrics
 
 `lib/symbolic/SymbolicMetrics.js`. prom-client 4종 메트릭을 모듈 로드 시 즉시 등록한다:
-- `memento_symbolic_claim_extracted_total` (labels: extractor, polarity)
-- `memento_symbolic_warning_total` (labels: rule, severity)
-- `memento_symbolic_gate_blocked_total` (labels: phase, reason)
-- `memento_symbolic_op_latency_ms` histogram (labels: op, buckets: 1~500ms)
+- `weasley_deepmind_symbolic_claim_extracted_total` (labels: extractor, polarity)
+- `weasley_deepmind_symbolic_warning_total` (labels: rule, severity)
+- `weasley_deepmind_symbolic_gate_blocked_total` (labels: phase, reason)
+- `weasley_deepmind_symbolic_op_latency_ms` histogram (labels: op, buckets: 1~500ms)
 
 `recordClaim(extractor, polarity)`, `recordWarning(rule, severity)`, `recordGateBlock(phase, reason)`, `observeLatency(op, ms)` 4개 헬퍼로 외부 호출을 통일한다. 싱글톤 `symbolicMetrics` export 및 DI 주입 방식을 동시 지원한다.
 
@@ -686,7 +686,7 @@ initialize 이후 모든 요청에서 `MCP-Protocol-Version` 헤더를 검사한
 
 `_resolveMode(req, msg, dbDefaultMode, keyId)` 함수가 아래 순서로 mode를 결정한다:
 
-1. `X-Memento-Mode` 요청 헤더 (최우선) — 등록된 프리셋이면 적용, 아니면 null
+1. `X-Weasley DeepMind-Mode` 요청 헤더 (최우선) — 등록된 프리셋이면 적용, 아니면 null
 2. `initialize` 요청의 `params.mode` 필드
 3. `api_keys.default_mode` DB 컬럼 값 (migration-034)
 
@@ -811,7 +811,7 @@ const output = await this._pipeline(text, { pooling: "mean", normalize: true });
 
 ## lib/storage 어댑터 계층
 
-`lib/storage/index.js`가 `MEMENTO_STORAGE` 환경변수에 따라 스토리지 어댑터 싱글톤을 반환한다.
+`lib/storage/index.js`가 `WEASLEY_DEEPMIND_STORAGE` 환경변수에 따라 스토리지 어댑터 싱글톤을 반환한다.
 
 | 값 | 어댑터 | 상태 |
 |-|-|-|

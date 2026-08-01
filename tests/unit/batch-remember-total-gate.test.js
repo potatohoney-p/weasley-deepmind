@@ -1,7 +1,7 @@
 /**
  * batch_remember 총 문자수 게이트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-07-16
  */
 

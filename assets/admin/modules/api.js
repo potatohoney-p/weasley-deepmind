@@ -1,7 +1,7 @@
 /**
- * Memento MCP Admin Console — API 클라이언트
+ * Weasley DeepMind Admin Console — API 클라이언트
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-07
  *
  * state.masterKey를 Authorization 헤더에 주입하여 내부 API를 호출한다.

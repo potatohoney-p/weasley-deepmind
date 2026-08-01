@@ -1,7 +1,7 @@
 /**
  * Migration 001 - Temporal Schema (Point-in-time Query)
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-03-03
  *
  * fragments 테이블에 bi-temporal valid_from / valid_to 컬럼을 추가하여

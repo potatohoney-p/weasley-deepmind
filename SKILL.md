@@ -1,4 +1,4 @@
-﻿# weasley-deepmind Skill Reference
+# weasley-deepmind Skill Reference
 
 AI 에이전트가 weasley-deepmind 기억 서버를 최대 효율로 활용하기 위한 기술 레퍼런스.
 
@@ -10,12 +10,12 @@ weasley-deepmind 서버는 AI 에이전트의 세션 간 장기 기억을 파편
 
 - `batch_remember`는 동기(기본)와 비동기(`async: true`) 두 모드를 지원한다. 비동기 모드에서는 선검증 후 Redis 큐에 적재하고 `{async, accepted, jobId}`를 즉시 반환하며, 워커가 ack·재시도(최대 3회)·dead-letter·기동 복구(RPOPLPUSH reliable queue)로 at-least-once 처리를 보장한다. `batch_status(jobId)`로 처리 상태(queued/processing/completed/dead)를 조회한다. Redis 비활성 환경에서는 자동으로 동기 모드로 폴백한다. `batch_remember`와 `memory_consolidate`는 표준 단일 JSON-RPC 응답으로 반환되며 `stream` 파라미터는 동작하지 않는다(하위 호환 유지).
 - 검색은 3계층(L1 키워드 → L2 pgvector 시맨틱 → L3 RRF 하이브리드)으로 자동 라우팅되며, `computeRecallScore` 함수가 cross-encoder reranker 결과에 topic/keyword 직접 일치 신호를 log 정규화된 가산항으로 반영한다. 시맨틱 임계값 기본값은 0.5이고, `SearchParamAdaptor`가 50회 이상 샘플 축적 후 키별·시간대별로 임계값을 자동 조정한다.
-- 형태소 분석은 로컬 CPU 분석기(`MorphemeTokenizer`)가 담당한다. 한글 garu-ko·영어 PorterStemmer·중국어 @node-rs/jieba·일본어 kuromoji로 라우팅하며, 벤치마크 기준 1.06ms/call 수준이다. `MEMENTO_MORPHEME_TOKENIZER=llm` 설정 시에만 LLM 경로가 활성화된다.
+- 형태소 분석은 로컬 CPU 분석기(`MorphemeTokenizer`)가 담당한다. 한글 garu-ko·영어 PorterStemmer·중국어 @node-rs/jieba·일본어 kuromoji로 라우팅하며, 벤치마크 기준 1.06ms/call 수준이다. `WEASLEY_DEEPMIND_MORPHEME_TOKENIZER=llm` 설정 시에만 LLM 경로가 활성화된다.
 - 코어 도구는 MCP `title` + `annotations`(readOnlyHint/idempotentHint/openWorldHint) 메타데이터를 포함한다. Codex Desktop 등 deferred/lazy 로딩 클라이언트를 위한 재검색 가이드가 서버 initialize instructions에 포함된다.
 - recall/context/reflect 응답 `_meta`에 `serverTime { iso, epoch_ms, display_kst, timezone }` 필드가 포함되어 LLM 클라이언트가 매 응답마다 서버 현재 시각을 재확인할 수 있다.
 - `tool_reflect` 응답에 `_meta.link_suggestions[]`가 포함된다. 이 목록은 schema-fit gate를 통과하지 못해 자동 링크되지 않은 인과 관계 후보다. LLM은 후보를 검토하여 정당한 인과로 판단되는 항목만 `link(fromId, toId, relationType=...)` 도구로 명시 호출한다.
 - recall/context 응답에서 `_meta.serverTime.display_kst` 또는 `_meta.serverTime.iso`로 현재 시점을 재확인하고 파편의 `created_at`·`age_days`와 대조하여 stale 여부를 판단한다. 응답 메타에 명시된 서버 시각이 자체 추정 시각과 다르면 서버 시각이 정답이다.
-- `lib/storage/` 어댑터 계층이 `getStorage()` 팩토리 형태로 존재하며, `MEMENTO_STORAGE` 환경변수로 storage 백엔드를 선택한다.
+- `lib/storage/` 어댑터 계층이 `getStorage()` 팩토리 형태로 존재하며, `WEASLEY_DEEPMIND_STORAGE` 환경변수로 storage 백엔드를 선택한다.
 - 검색 레이어는 `lib/memory/read/SearchScope.js`를 통해 `(workspace, caseId, resolutionStatus, phase, affect, keyId)` scope를 처음부터 정합 적용한다.
 - 실제 로직은 `lib/memory/processors/` 4개 클래스(MemoryRememberer·MemoryRecaller·MemoryReflector·MemoryLinker)와 `lib/memory/` 하위 6개 서브디렉토리(`read/`, `write/`, `link/`, `consolidate/`, `embedding/`, `signals/`)로 구성된다.
 
@@ -28,11 +28,11 @@ weasley-deepmind 서버는 AI 에이전트의 세션 간 장기 기억을 파편
   - `LLM_CONCURRENCY_ENABLED=true|false` (기본 true, kill switch)
   - `LLM_CONCURRENCY_WAIT_MS=30000` (슬롯 대기 타임아웃 ms)
   - `LLM_CONCURRENCY` (JSON, chainKey 또는 provider name 기준 오버라이드)
-- 메트릭: `memento_llm_provider_concurrency_active{provider}`, `memento_llm_provider_concurrency_wait_ms{provider}`, `memento_llm_provider_429_total{provider}`
+- 메트릭: `weasley_deepmind_llm_provider_concurrency_active{provider}`, `weasley_deepmind_llm_provider_concurrency_wait_ms{provider}`, `weasley_deepmind_llm_provider_429_total{provider}`
 
 ### `_meta` 응답 필드 사용 의무
 
-recall / context 응답 메타데이터는 `_meta.searchEventId` / `_meta.hints` / `_meta.suggestion` 경로로만 읽는다. top-level mirror 필드(`_searchEventId` / `_memento_hint` / `_suggestion`)는 지원되지 않는다.
+recall / context 응답 메타데이터는 `_meta.searchEventId` / `_meta.hints` / `_meta.suggestion` 경로로만 읽는다. top-level mirror 필드(`_searchEventId` / `_weasley_deepmind_hint` / `_suggestion`)는 지원되지 않는다.
 
 ---
 
@@ -62,9 +62,9 @@ recall / context 응답 메타데이터는 `_meta.searchEventId` / `_meta.hints`
 ```
 사용자: "weasley-deepmind에 새 기능 하나 추가하려고 해"
 ↓
-1. recall(topic="memento-mcp", contextText="새 기능 추가 계획")
-2. recall(type="decision", topic="memento-mcp")
-3. recall(type="procedure", keywords=["memento-mcp", "test"])
+1. recall(topic="weasley-deepmind", contextText="새 기능 추가 계획")
+2. recall(type="decision", topic="weasley-deepmind")
+3. recall(type="procedure", keywords=["weasley-deepmind", "test"])
 ↓
 4. 답변 생성
 ```
@@ -90,7 +90,7 @@ recall / context 응답 메타데이터는 `_meta.searchEventId` / `_meta.hints`
 | 발화 신호 | 예시 표현 | 의무 호출 |
 |-|-|-|
 | 명시적 과거 참조 | "이전에", "저번에", "지난번", "전에 했던" | `recall(text=관련 내용, includeContext=true)` |
-| 프로젝트명 등장 | "memento-mcp", "RealPT", "my-project" 등 고유 식별자 | `recall(topic=프로젝트명, contextText=현재 작업 요약)` |
+| 프로젝트명 등장 | "weasley-deepmind", "RealPT", "my-project" 등 고유 식별자 | `recall(topic=프로젝트명, contextText=현재 작업 요약)` |
 | 에러·실패·이상 동작 보고 | "에러 떴어", "안 돼", "실패했어", "터졌어" | `recall(type="error", keywords=[에러 키워드])` |
 | 설정·환경변수·포트 언급 | "포트 뭐였지", "설정 어떻게 했지", "키 어디 있지" | `recall(type="fact", keywords=[설정명])` |
 | 절차·빌드·배포 질문 | "어떻게 배포하지", "빌드 절차", "테스트 돌리는 법" | `recall(type="procedure", keywords=[프로젝트명, "deploy"])` |
@@ -200,13 +200,13 @@ recall 호출
 
 ```bash
 # 환경변수 방식 (영구 설정에 적합)
-export MEMENTO_CLI_REMOTE=https://memento.weasley-deepmind.net/mcp
-export MEMENTO_CLI_KEY=mmcp_xxx
-memento-mcp recall "query"
-memento-mcp context
+export WEASLEY_DEEPMIND_CLI_REMOTE=https://deepmind.example.com/mcp
+export WEASLEY_DEEPMIND_CLI_KEY=wdm_xxx
+weasley-deepmind recall "query"
+weasley-deepmind context
 
 # 플래그 방식 (일회성 호출)
-memento-mcp recall "query" --remote https://memento.weasley-deepmind.net/mcp --key mmcp_xxx
+weasley-deepmind recall "query" --remote https://deepmind.example.com/mcp --key wdm_xxx
 ```
 
 local-only 명령(migrate, admin 등)을 원격 모드에서 호출하면 에러가 반환된다.
@@ -250,7 +250,7 @@ const hint    = res._meta.hints;           // signal + trigger
 const suggest = res._meta.suggestion;      // recommendedTool + recommendedArgs
 ```
 
-top-level `_searchEventId` / `_memento_hint` / `_suggestion` mirror 필드는 지원되지 않는다. `_meta.*` 경로만 사용할 것.
+top-level `_searchEventId` / `_weasley_deepmind_hint` / `_suggestion` mirror 필드는 지원되지 않는다. `_meta.*` 경로만 사용할 것.
 
 #### fields 파라미터 (sparse fieldsets)
 
@@ -297,7 +297,7 @@ top-level `_searchEventId` / `_memento_hint` / `_suggestion` mirror 필드는 �
 서버가 지원하는 4가지 동작 모드를 연결 시점 또는 API 키 설정으로 선택할 수 있다.
 
 활성화 우선순위 (높음 → 낮음):
-1. HTTP 헤더: `X-Memento-Mode: recall-only`
+1. HTTP 헤더: `X-Weasley DeepMind-Mode: recall-only`
 2. initialize params: `{ "mode": "recall-only" }`
 3. API 키 기본값: `api_keys.default_mode` 컬럼
 
@@ -371,17 +371,17 @@ CLI provider는 API 키 불필요. 로컬 바이너리(`gemini`/`codex`/`copilot
 
 - **토큰 기반 세션 재사용**: 같은 Bearer/API 키로 initialize 재호출 시 기존 세션 재활용. claude.ai 커넥터의 Mcp-Session-Id 유실 문제 대응
 - **null crash 방어**: 빈 POST body를 400 Invalid Request로 거부
-- **MorphemeIndex LLM timeout**: 15s → 60s. `MEMENTO_MORPHEME_TOKENIZER=llm` 경로 사용 시에만 적용. 기본 경로(`local`)는 로컬 CPU 분석기(MorphemeTokenizer)를 사용하므로 이 값을 참조하지 않는다.
+- **MorphemeIndex LLM timeout**: 15s → 60s. `WEASLEY_DEEPMIND_MORPHEME_TOKENIZER=llm` 경로 사용 시에만 적용. 기본 경로(`local`)는 로컬 CPU 분석기(MorphemeTokenizer)를 사용하므로 이 값을 참조하지 않는다.
 
 ---
 
 ## Symbolic Memory
 
-Symbolic Verification Layer는 확률론적 검색 파이프라인 위에 추가된 opt-in 레이어다. 모든 `MEMENTO_SYMBOLIC_*` 플래그는 기본 `false`이므로 활성화하지 않으면 동작에 변화가 없다.
+Symbolic Verification Layer는 확률론적 검색 파이프라인 위에 추가된 opt-in 레이어다. 모든 `WEASLEY_DEEPMIND_SYMBOLIC_*` 플래그는 기본 `false`이므로 활성화하지 않으면 동작에 변화가 없다.
 
 신규 응답 필드 요약:
-- `remember` → `validation_warnings: string[]` (`MEMENTO_SYMBOLIC_POLICY_RULES=true` 시, rule 이름 배열)
-- `recall` → 각 파편의 `explanations: [{code, detail, ruleVersion}]` (`MEMENTO_SYMBOLIC_EXPLAIN=true` 시)
+- `remember` → `validation_warnings: string[]` (`WEASLEY_DEEPMIND_SYMBOLIC_POLICY_RULES=true` 시, rule 이름 배열)
+- `recall` → 각 파편의 `explanations: [{code, detail, ruleVersion}]` (`WEASLEY_DEEPMIND_SYMBOLIC_EXPLAIN=true` 시)
 - 에러 `-32003 SYMBOLIC_POLICY_VIOLATION` (해당 키의 `symbolic_hard_gate=true` 상태에서 PolicyRules 위반 시)
 
 ## 보안 기본값 및 설정
@@ -390,7 +390,7 @@ Symbolic Verification Layer는 확률론적 검색 파이프라인 위에 추가
 
 ### 인증 (Auth)
 
-- `MEMENTO_ACCESS_KEY` 필수화: 미설정 시 서버 기동이 거부된다. 개발/테스트 환경에서 인증을 비활성화하려면 `MEMENTO_AUTH_DISABLED=true`를 명시적으로 설정한다.
+- `WEASLEY_DEEPMIND_ACCESS_KEY` 필수화: 미설정 시 서버 기동이 거부된다. 개발/테스트 환경에서 인증을 비활성화하려면 `WEASLEY_DEEPMIND_AUTH_DISABLED=true`를 명시적으로 설정한다.
 - `ALLOWED_ORIGINS` 미설정 시 same-origin 요청만 허용된다. 크로스 오리진 접근이 필요하다면 허용할 오리진을 명시적으로 열거해야 한다.
 
 ### OAuth
@@ -405,15 +405,15 @@ Symbolic Verification Layer는 확률론적 검색 파이프라인 위에 추가
 
 | 변수명 | 타입 | 기본값 | 설명 |
 |--------|------|--------|------|
-| `MEMENTO_ACCESS_KEY` | string | (없음, 필수) | 마스터 API 키. 미설정 시 기동 거부. |
-| `MEMENTO_AUTH_DISABLED` | boolean | `false` | `true` 설정 시 인증을 비활성화한다. 개발 전용. |
+| `WEASLEY_DEEPMIND_ACCESS_KEY` | string | (없음, 필수) | 마스터 API 키. 미설정 시 기동 거부. |
+| `WEASLEY_DEEPMIND_AUTH_DISABLED` | boolean | `false` | `true` 설정 시 인증을 비활성화한다. 개발 전용. |
 | `ALLOWED_ORIGINS` | string | (없음) | CORS 허용 오리진 목록 (쉼표 구분). 미설정 시 same-origin만 허용. |
 | `ENABLE_OPENAPI` | boolean | `false` | `true` 설정 시 `/openapi.json` 엔드포인트 활성화. |
 | `OAUTH_TOKEN_TTL_SECONDS` | number | `2592000` | OAuth access token 유효 시간 (초). `SESSION_TTL_MINUTES * 60`으로 산출. 기본값 30일. |
 | `OAUTH_REFRESH_TTL_SECONDS` | number | `604800` | OAuth refresh token 유효 시간 (초). |
-| `MEMENTO_REMEMBER_ATOMIC` | boolean | `false` | `true` 시 remember()의 quota check + INSERT를 단일 트랜잭션으로 원자화(TOCTOU 완전 차단). 동시 요청이 드문 환경에서는 기본값 유지. |
-| `MEMENTO_CASE_BACKPROP_ENABLED` | boolean | `false` | `true` 시 case verification 이벤트마다 증거 파편 importance를 자동 역전파(CaseRewardBackprop). 비활성 시 no-op. |
-| `MEMENTO_STORAGE` | string | `pgvector` | storage 어댑터 선택. `pgvector`(기본, PgVectorStore) 또는 `sqlite-vec`(SqliteVecStore). |
+| `WEASLEY_DEEPMIND_REMEMBER_ATOMIC` | boolean | `false` | `true` 시 remember()의 quota check + INSERT를 단일 트랜잭션으로 원자화(TOCTOU 완전 차단). 동시 요청이 드문 환경에서는 기본값 유지. |
+| `WEASLEY_DEEPMIND_CASE_BACKPROP_ENABLED` | boolean | `false` | `true` 시 case verification 이벤트마다 증거 파편 importance를 자동 역전파(CaseRewardBackprop). 비활성 시 no-op. |
+| `WEASLEY_DEEPMIND_STORAGE` | string | `pgvector` | storage 어댑터 선택. `pgvector`(기본, PgVectorStore) 또는 `sqlite-vec`(SqliteVecStore). |
 | `MIGRATION_LINT_FROM` | string | (없음) | `npm run lint:migrations` cutoff override. 지정 마이그레이션 번호 이후만 검사. |
 
 ---
@@ -440,7 +440,7 @@ weasley-deepmind는 MCP(Model Context Protocol) 기반의 장기 기억 서버�
 ```
 context() 호출
 -> core_memory: 앵커 + 고중요도 파편 (preference, error, procedure)
-   (앵커는 중요도순 상위 N개가 항상 포함된다. N은 서버의 MEMENTO_CONTEXT_ANCHOR_LIMIT 설정, 기본 10)
+   (앵커는 중요도순 상위 N개가 항상 포함된다. N은 서버의 WEASLEY_DEEPMIND_CONTEXT_ANCHOR_LIMIT 설정, 기본 10)
 -> working_memory: 현재 세션의 워킹 메모리
 -> system_hints: 미반영 세션 경고, 시스템 알림
 ```
@@ -466,7 +466,7 @@ context 로드 후 행동:
 | 에러 해결책 확정 | procedure | 0.8 | "nginx에 proxy_set_header Host $host 추가" |
 | 아키텍처/기술 결정 | decision | 0.7 | "인증은 OAuth 2.0 + PKCE로 결정" |
 | 배포/빌드 절차 완성 | procedure | 0.7 | "배포: git push -> CI -> Docker build -> kubectl apply" |
-| 새 설정값/경로 확인 | fact | 0.5 | "memento-mcp 포트: 57332, admin: /v1/internal/model/nothing" |
+| 새 설정값/경로 확인 | fact | 0.5 | "weasley-deepmind 포트: 57332, admin: /v1/internal/model/nothing" |
 
 #### recall 선행 호출 시점 (작업 전 의무)
 
@@ -526,20 +526,20 @@ reflect 규칙:
 ### 필수 포함 키워드
 
 1. 프로젝트 작업인 경우: 프로젝트명을 keywords에 반드시 포함
-   - 예: `keywords: ["memento-mcp", "oauth", "DCR"]`
-   - topic도 프로젝트명으로 설정: `topic: "memento-mcp"`
+   - 예: `keywords: ["weasley-deepmind", "oauth", "DCR"]`
+   - topic도 프로젝트명으로 설정: `topic: "weasley-deepmind"`
 
 2. 디바이스/호스트 구분이 가능한 경우: hostname 포함
    - 작업 디렉토리 경로에서 추출 (예: /srv/apps/paysvc -> "paysvc")
    - 환경변수, 시스템 정보에서 추출 (예: os.hostname())
-   - 예: `keywords: ["memento-mcp", "my-host", "oauth"]`
+   - 예: `keywords: ["weasley-deepmind", "my-host", "oauth"]`
 
 3. reflect의 summary/decisions/errors_resolved에도 동일 규칙 적용
 
 ### workspace 파라미터 활용 규칙
 
 - workspace: 프로젝트·직종·클라이언트 단위로 기억을 분리하려면 workspace 파라미터를 지정한다.
-  예: `workspace: "memento-mcp"`, `workspace: "client-acme"`, `workspace: "personal"`
+  예: `workspace: "weasley-deepmind"`, `workspace: "client-acme"`, `workspace: "personal"`
 - 미지정 시 키의 default_workspace가 자동 적용된다.
 - reflect도 workspace를 받는다. 멀티 프로젝트 환경에서는 reflect에 workspace를 지정해 세션 요약이 다른 프로젝트 context에 주입되는 것을 방지한다.
 - 전역 기억(모든 workspace에서 조회)으로 저장하려면 workspace를 지정하지 않고 키에 default_workspace도 없으면 된다.
@@ -549,8 +549,8 @@ reflect 규칙:
 
 프로젝트별 기억 분리:
 ```
-remember(content="...", topic="error", type="error", workspace="memento-mcp")
-recall(keywords=["auth"], workspace="memento-mcp")
+remember(content="...", topic="error", type="error", workspace="weasley-deepmind")
+recall(keywords=["auth"], workspace="weasley-deepmind")
 ```
 
 전역 기억 (모든 workspace에서 공유):
@@ -658,8 +658,8 @@ tokenBudget을 초과하면 중요도 낮은 파편부터 잘림. 중요한 정�
 remember(
   content="OAuth 구현 과정: DCR 엔드포인트 추가 -> Claude.ai가 client_id=Authorization을 보내는 버그 발견 -> auto-register로 우회 -> redirect_uri를 origin 기반으로 변경하여 ChatGPT connector 동적 경로 대응",
   type="episode",
-  topic="memento-mcp",
-  keywords=["memento-mcp", "oauth", "DCR", "my-host"],
+  topic="weasley-deepmind",
+  keywords=["weasley-deepmind", "oauth", "DCR", "my-host"],
   contextSummary="2026-04-02 세션에서 OAuth MCP 준수 구현. Claude.ai/ChatGPT 연동 완료."
 )
 ```
@@ -784,7 +784,7 @@ curl 응답 검증 체크:
 ### 키워드로 출처 구분
 
 같은 그룹 내에서도 어떤 플랫폼/디바이스에서 생긴 기억인지 구분하려면:
-- keywords에 플랫폼명 포함: `["memento-mcp", "claude-code", "my-host"]`
+- keywords에 플랫폼명 포함: `["weasley-deepmind", "claude-code", "my-host"]`
 - recall 시 플랫폼 필터: `recall(keywords=["claude-code"])`
 
 ## 멀티에이전트 협업
@@ -805,7 +805,7 @@ Codex Desktop 등 일부 MCP 클라이언트는 도구를 deferred/lazy 로딩�
 핵심 원칙: 한 번의 좁은 검색 결과를 서버의 실제 도구 목록으로 오해하지 마라. remember/batch_remember/reflect는 보이는데 recall이 안 보이면, 즉시 더 넓은 쿼리와 큰 limit으로 재검색한다.
 
 재검색 패턴:
-- query: `memento context recall remember reflect batch_remember search_traces reconstruct_history`
+- query: `weasley_deepmind context recall remember reflect batch_remember search_traces reconstruct_history`
 - limit: 20 이상
 
 검증: 서버 raw tools/list에는 context/recall/remember/reflect/batch_remember가 항상 포함된다. healthy 서버에서 특정 턴에 도구가 안 보이면 클라이언트 deferred 검색 한계이지 서버 누락이 아니다.
@@ -1563,15 +1563,15 @@ recall 또는 context 응답의 `_meta.hints` 필드를 읽는다:
 
 ## LLM Provider Fallback
 
-Gemini CLI 외 `codex-cli`, `copilot-cli`, `qwen-cli` 포함 15개 이상의 외부 provider로 자동 fallback 가능. 설정: `LLM_PRIMARY=gemini-cli` (기본) + `LLM_FALLBACKS` JSON 배열. env 미설정 시 기존 Gemini CLI 단독 동작 유지. 형태소 분석은 기본적으로 로컬 CPU 분석기(MorphemeTokenizer)가 담당하며 LLM provider 체인을 사용하지 않는다(`MEMENTO_MORPHEME_TOKENIZER=llm` 설정 시에만 LLM 경로 활성화). 자세한 운영은 `docs/operations/llm-providers.md` 참조.
+Gemini CLI 외 `codex-cli`, `copilot-cli`, `qwen-cli` 포함 15개 이상의 외부 provider로 자동 fallback 가능. 설정: `LLM_PRIMARY=gemini-cli` (기본) + `LLM_FALLBACKS` JSON 배열. env 미설정 시 기존 Gemini CLI 단독 동작 유지. 형태소 분석은 기본적으로 로컬 CPU 분석기(MorphemeTokenizer)가 담당하며 LLM provider 체인을 사용하지 않는다(`WEASLEY_DEEPMIND_MORPHEME_TOKENIZER=llm` 설정 시에만 LLM 경로 활성화). 자세한 운영은 `docs/operations/llm-providers.md` 참조.
 
 ## Symbolic Memory 활용 (opt-in)
 
-모든 `MEMENTO_SYMBOLIC_*` 플래그는 기본 `false`다. 아래 기능은 해당 플래그를 명시적으로 활성화한 환경에서만 동작한다.
+모든 `WEASLEY_DEEPMIND_SYMBOLIC_*` 플래그는 기본 `false`다. 아래 기능은 해당 플래그를 명시적으로 활성화한 환경에서만 동작한다.
 
 ### validation_warnings 해석
 
-`remember` 응답에 `validation_warnings: string[]` 필드가 포함된다 (`MEMENTO_SYMBOLIC_POLICY_RULES=true` 시, violations 있을 때만). 각 요소는 rule 이름 문자열이다. 필드 자체가 없으면 위반 없음.
+`remember` 응답에 `validation_warnings: string[]` 필드가 포함된다 (`WEASLEY_DEEPMIND_SYMBOLIC_POLICY_RULES=true` 시, violations 있을 때만). 각 요소는 rule 이름 문자열이다. 필드 자체가 없으면 위반 없음.
 
 예시: `{"success": true, "id": "frag-...", "validation_warnings": ["decisionHasRationale"]}`
 
@@ -1593,7 +1593,7 @@ Gemini CLI 외 `codex-cli`, `copilot-cli`, `qwen-cli` 포함 15개 이상의 외
 
 ### explanations 필드 활용
 
-`recall` 응답 파편에 `explanations: [{code, detail, ruleVersion}]` 배열이 포함된다 (`MEMENTO_SYMBOLIC_EXPLAIN=true` 시, 설명이 있을 때만). 해당 파편이 왜 검색 결과에 포함됐는지 최대 3개 이유를 제공한다. 클라이언트가 파편의 관련성을 UI에 표시하거나, LLM 컨텍스트에 설명을 주입할 때 활용한다.
+`recall` 응답 파편에 `explanations: [{code, detail, ruleVersion}]` 배열이 포함된다 (`WEASLEY_DEEPMIND_SYMBOLIC_EXPLAIN=true` 시, 설명이 있을 때만). 해당 파편이 왜 검색 결과에 포함됐는지 최대 3개 이유를 제공한다. 클라이언트가 파편의 관련성을 UI에 표시하거나, LLM 컨텍스트에 설명을 주입할 때 활용한다.
 
 예시: `{"explanations": [{"code": "semantic_similarity", "detail": "cosine 0.87", "ruleVersion": "v1"}]}`
 
@@ -1605,7 +1605,7 @@ reason code 6종 (`code` 필드값):
 - `case_cohort_member` — case_mode 코호트
 - `recent_activity_ema` — ema_activation 가점
 
-단계적 활성화 권장 순서: `MEMENTO_SYMBOLIC_ENABLED=true` → `MEMENTO_SYMBOLIC_SHADOW=true` + `MEMENTO_SYMBOLIC_CLAIM_EXTRACTION=true` → `scripts/backfill-claims.js --dry-run` 선행 → `MEMENTO_SYMBOLIC_EXPLAIN=true` → `MEMENTO_SYMBOLIC_POLICY_RULES=true`.
+단계적 활성화 권장 순서: `WEASLEY_DEEPMIND_SYMBOLIC_ENABLED=true` → `WEASLEY_DEEPMIND_SYMBOLIC_SHADOW=true` + `WEASLEY_DEEPMIND_SYMBOLIC_CLAIM_EXTRACTION=true` → `scripts/backfill-claims.js --dry-run` 선행 → `WEASLEY_DEEPMIND_SYMBOLIC_EXPLAIN=true` → `WEASLEY_DEEPMIND_SYMBOLIC_POLICY_RULES=true`.
 
 ---
 
@@ -1627,6 +1627,6 @@ reason code 6종 (`code` 필드값):
 | keywords 미지정 | 자동 추출에 의존하면 프로젝트명/호스트명 등 핵심 키워드 누락 | 프로젝트명 + 토픽 + 고유 식별자를 keywords에 명시적으로 포함 |
 | validation_warnings 무시 후 반복 remember | 동일 경고 파편이 누적되면 symbolic_hard_gate 활성화 시 전면 차단됨 | 경고 내용에 따라 content/linkedTo/resolutionStatus를 보강 후 재저장 |
 | recall 결과의 explanations reasonCodes를 fragment content에 복사 저장 | 검색 품질 메타데이터는 저장하면 안 됨. 노이즈로 검색 정밀도 저하 | reasonCodes는 UI 표시나 컨텍스트 힌트용으로만 사용, 저장 금지 |
-| Shadow mode 없이 Phase 2+ 직행 | 기존 데이터의 claim 백필 없이 explain/policy 활성화 시 경고 오탐 증가 | `MEMENTO_SYMBOLIC_SHADOW=true` + `scripts/backfill-claims.js --dry-run` 선행 후 단계적 활성화 |
+| Shadow mode 없이 Phase 2+ 직행 | 기존 데이터의 claim 백필 없이 explain/policy 활성화 시 경고 오탐 증가 | `WEASLEY_DEEPMIND_SYMBOLIC_SHADOW=true` + `scripts/backfill-claims.js --dry-run` 선행 후 단계적 활성화 |
 
 

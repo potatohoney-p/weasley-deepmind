@@ -121,7 +121,7 @@ export class AdminEsmLoadError extends Error {
   constructor() {
     super("admin.js is now an ESM entry point. loadAdmin() VM sandbox is incompatible. " +
           "Tests should import from assets/admin/modules/* directly. " +
-          "See ~/.claude/plans/memento-security-hardening.md Step 1.0.2.");
+          "See ~/.claude/plans/weasley_deepmind-security-hardening.md Step 1.0.2.");
     this.name = "AdminEsmLoadError";
   }
 }

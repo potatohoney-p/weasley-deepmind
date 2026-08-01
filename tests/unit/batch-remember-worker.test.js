@@ -1,6 +1,6 @@
 /**
  * batch-remember-worker.test.js
- * 작성자: 최진호 / 수정일: 2026-06-19
+ * 작성자: Weasley Open Source / 수정일: 2026-06-19
  * 신뢰성 소비(ack/재시도/dead-letter) 검증 + start/stop drain 검증.
  */
 import { test, describe, beforeEach, mock } from "node:test";
@@ -33,7 +33,7 @@ mock.module("../../config/memory.js", {
       batchRememberWorker: {
         intervalMs: 5,
         retryLimit: 3,
-        queueKey  : "memento:batch_remember_queue"
+        queueKey  : "weasley_deepmind:batch_remember_queue"
       }
     }
   }

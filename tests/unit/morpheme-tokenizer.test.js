@@ -4,9 +4,9 @@ import { segmentByScript, tokenizeLocal, warmup } from "../../lib/memory/embeddi
 
 describe("segmentByScript", () => {
   test("한·영 혼용을 스크립트 런으로 분리", () => {
-    const segs = segmentByScript("memento 임베딩 비용");
+    const segs = segmentByScript("weasley_deepmind 임베딩 비용");
     assert.deepEqual(segs, [
-      { script: "latin",  text: "memento" },
+      { script: "latin",  text: "weasley_deepmind" },
       { script: "hangul", text: "임베딩" },
       { script: "hangul", text: "비용" },
     ]);
@@ -17,19 +17,19 @@ describe("segmentByScript", () => {
     assert.deepEqual(segs.map(s => s.script), ["han", "kana", "other"]);
   });
 
-  test("코드 토큰 memento-mcp는 라틴 런으로 유지", () => {
-    const segs = segmentByScript("memento-mcp L3");
+  test("코드 토큰 weasley-deepmind는 라틴 런으로 유지", () => {
+    const segs = segmentByScript("weasley-deepmind L3");
     assert.equal(segs[0].script, "latin");
-    assert.ok(segs.some(s => s.text.includes("memento-mcp")));
+    assert.ok(segs.some(s => s.text.includes("weasley-deepmind")));
   });
 });
 
 describe("tokenizeLocal", () => {
   test("한국어 코드 혼용 형태소 추출", async () => {
-    const m = await tokenizeLocal("memento-mcp 임베딩 비용을 절감했다", 10);
+    const m = await tokenizeLocal("weasley-deepmind 임베딩 비용을 절감했다", 10);
     assert.ok(m.includes("임베딩"));
     assert.ok(m.includes("비용"));
-    assert.ok(m.some(t => t.toLowerCase().includes("memento")));
+    assert.ok(m.some(t => t.toLowerCase().includes("weasley-deepmind")));
     assert.ok(m.length <= 10);
   });
 
@@ -76,11 +76,11 @@ describe("warmup", () => {
   });
 });
 
-describe("kuromoji 가드 — MEMENTO_ENABLE_KUROMOJI=false", () => {
+describe("kuromoji 가드 — WEASLEY_DEEPMIND_ENABLE_KUROMOJI=false", () => {
   test("enableKuromoji=false이면 가나 런이 문자 분리로 처리된다", async () => {
-    /** process.env.MEMENTO_ENABLE_KUROMOJI 는 실행 전 env로 주입됨.
+    /** process.env.WEASLEY_DEEPMIND_ENABLE_KUROMOJI 는 실행 전 env로 주입됨.
      *  MEMORY_CONFIG는 모듈 로드 시점에 평가되므로, 이 테스트는
-     *  MEMENTO_ENABLE_KUROMOJI=false 환경에서만 유효하다. */
+     *  WEASLEY_DEEPMIND_ENABLE_KUROMOJI=false 환경에서만 유효하다. */
     const { MEMORY_CONFIG } = await import("../../config/memory.js");
     if (MEMORY_CONFIG.morphemeIndex.enableKuromoji !== false) {
       // 환경 변수 미설정 시 스킵 (가드 경로 미진입)

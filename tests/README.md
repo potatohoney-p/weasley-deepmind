@@ -16,7 +16,7 @@
 | `npm run test:integration` | 통합 + e2e (DB/Redis 필요) |
 | `npm run test:e2e` | e2e만 |
 | `npm run test:ci` | 단위(test) + 통합·e2e(test:integration) — CI 단일 게이트 |
-| `DOTENV_CONFIG_PATH=.env.test MEMENTO_METRICS_DEFAULT=off REDIS_ENABLED=false CACHE_ENABLED=false node --experimental-test-module-mocks --test tests/unit/<file>.test.js` | 단일 파일 실행 |
+| `DOTENV_CONFIG_PATH=.env.test WEASLEY_DEEPMIND_METRICS_DEFAULT=off REDIS_ENABLED=false CACHE_ENABLED=false node --experimental-test-module-mocks --test tests/unit/<file>.test.js` | 단일 파일 실행 |
 
 ## Conventions
 
@@ -37,12 +37,12 @@ after 훅에서 정리하지 않으면 node:test runner가 event loop를 14초 �
 
 ### 환경변수
 
-`npm test`는 `DOTENV_CONFIG_PATH=.env.test`, `MEMENTO_METRICS_DEFAULT=off`, `REDIS_ENABLED=false`, `CACHE_ENABLED=false`를 자동으로 주입한다.
+`npm test`는 `DOTENV_CONFIG_PATH=.env.test`, `WEASLEY_DEEPMIND_METRICS_DEFAULT=off`, `REDIS_ENABLED=false`, `CACHE_ENABLED=false`를 자동으로 주입한다.
 이 환경변수가 없으면 운영 `.env`를 읽거나 prom-client default metrics timer가 활성화되어 hang이 발생할 수 있다.
 단일 파일 실행 시에도 반드시 같은 환경변수를 설정해야 한다:
 
 ```bash
-DOTENV_CONFIG_PATH=.env.test MEMENTO_METRICS_DEFAULT=off REDIS_ENABLED=false CACHE_ENABLED=false node --experimental-test-module-mocks --test tests/unit/<file>.test.js
+DOTENV_CONFIG_PATH=.env.test WEASLEY_DEEPMIND_METRICS_DEFAULT=off REDIS_ENABLED=false CACHE_ENABLED=false node --experimental-test-module-mocks --test tests/unit/<file>.test.js
 ```
 
 ### assertCleanShutdown 헬퍼
@@ -64,7 +64,7 @@ after(async () => {
 1. import가 timer 또는 HTTP agent를 활성화하는지 확인 (lib/sessions, lib/metrics, lib/redis 경유 여부)
 2. 활성화된다면 after 훅에서 `await teardownTestResources()` 호출
 3. 훅 마지막에 `await assertCleanShutdown()` 추가
-4. 단독 실행 시 exit 0 확인: `DOTENV_CONFIG_PATH=.env.test MEMENTO_METRICS_DEFAULT=off REDIS_ENABLED=false CACHE_ENABLED=false node --experimental-test-module-mocks --test tests/unit/<file>.test.js`
+4. 단독 실행 시 exit 0 확인: `DOTENV_CONFIG_PATH=.env.test WEASLEY_DEEPMIND_METRICS_DEFAULT=off REDIS_ENABLED=false CACHE_ENABLED=false node --experimental-test-module-mocks --test tests/unit/<file>.test.js`
 
 #### 통합 테스트
 

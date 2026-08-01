@@ -1,7 +1,7 @@
 /**
  * CSRF Origin 검증 단위 테스트 (session-handler.js: isRotateOriginAllowed)
  *
- * 작성자: 최진호
+ * 작성자: Weasley Open Source
  * 작성일: 2026-04-20
  *
  * isRotateOriginAllowed는 handleSessionRotate 내부 함수이므로
@@ -19,7 +19,7 @@ import assert from "node:assert/strict";
 import { Readable } from "node:stream";
 
 process.env.DOTENV_CONFIG_PATH ??= ".env.test";
-process.env.MEMENTO_METRICS_DEFAULT ??= "off";
+process.env.WEASLEY_DEEPMIND_METRICS_DEFAULT ??= "off";
 process.env.REDIS_ENABLED ??= "false";
 process.env.CACHE_ENABLED ??= "false";
 
@@ -64,7 +64,7 @@ describe("handleSessionRotate: CSRF Origin 검증", () => {
 
   before(async () => {
     /** auth 우회 — CSRF/rate-limit 계층만 단위 검증하기 위해 인증 비활성화 */
-    process.env.MEMENTO_AUTH_DISABLED = "true";
+    process.env.WEASLEY_DEEPMIND_AUTH_DISABLED = "true";
     ({ handleSessionRotate } = await import("../../lib/handlers/session-handler.js"));
   });
 
