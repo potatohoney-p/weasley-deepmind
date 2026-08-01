@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 700" font-family="'Segoe UI', Arial, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4a5568"/>
+    </marker>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3182ce"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#38a169"/>
+    </marker>
+    <marker id="arrow-purple" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#805ad5"/>
+    </marker>
+    <linearGradient id="queryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ebf8ff"/>
+      <stop offset="100%" style="stop-color:#bee3f8"/>
+    </linearGradient>
+    <linearGradient id="l1Grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fff5f5"/>
+      <stop offset="100%" style="stop-color:#fed7d7"/>
+    </linearGradient>
+    <linearGradient id="l2Grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fffff0"/>
+      <stop offset="100%" style="stop-color:#fefcbf"/>
+    </linearGradient>
+    <linearGradient id="l3Grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0fff4"/>
+      <stop offset="100%" style="stop-color:#c6f6d5"/>
+    </linearGradient>
+    <linearGradient id="rrfGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#faf5ff"/>
+      <stop offset="100%" style="stop-color:#e9d8fd"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Title -->
+  <text x="480" y="35" text-anchor="middle" font-size="18" fill="#1a202c" font-weight="600">Figure 2: Three-Tier Retrieval Flow</text>
+
+  <!-- Query Input -->
+  <rect x="340" y="55" width="280" height="65" rx="10" fill="url(#queryGrad)" stroke="#3182ce" stroke-width="1.5"/>
+  <text x="480" y="78" text-anchor="middle" font-size="13" fill="#2b6cb0" font-weight="600">Query Input</text>
+  <text x="480" y="95" text-anchor="middle" font-size="10.5" fill="#4a5568">keywords[ ], topic, type, text</text>
+  <text x="480" y="108" text-anchor="middle" font-size="10" fill="#718096">tokenBudget (default: 1000)</text>
+
+  <!-- Decision diamond: has text query? -->
+  <polygon points="480,145 560,180 480,215 400,180" fill="#edf2f7" stroke="#4a5568" stroke-width="1.2"/>
+  <text x="480" y="183" text-anchor="middle" font-size="10.5" fill="#2d3748">text query?</text>
+
+  <!-- Arrow from query to diamond -->
+  <line x1="480" y1="120" x2="480" y2="145" stroke="#4a5568" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+  <!-- Left branch: keywords only (No) -->
+  <text x="385" y="175" text-anchor="end" font-size="10" fill="#718096">No</text>
+  <line x1="400" y1="180" x2="160" y2="180" stroke="#4a5568" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="160" y1="180" x2="160" y2="240" stroke="#4a5568" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+  <!-- Right branch: Yes -->
+  <text x="575" y="175" font-size="10" fill="#718096">Yes</text>
+  <line x1="560" y1="180" x2="480" y2="180" stroke="none"/>
+
+  <!-- Yes path splits to L1 + parallel L2/L3 -->
+  <line x1="480" y1="215" x2="480" y2="235" stroke="#4a5568" stroke-width="1.2"/>
+  <!-- Fork -->
+  <line x1="160" y1="235" x2="800" y2="235" stroke="#4a5568" stroke-width="0.8" stroke-dasharray="2,2"/>
+  <line x1="160" y1="235" x2="160" y2="240" stroke="#4a5568" stroke-width="1.2"/>
+  <line x1="480" y1="235" x2="480" y2="240" stroke="#4a5568" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <line x1="800" y1="235" x2="800" y2="240" stroke="#4a5568" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+  <!-- L1: Redis SINTER -->
+  <rect x="60" y="250" width="200" height="130" rx="8" fill="url(#l1Grad)" stroke="#e53e3e" stroke-width="1.5"/>
+  <text x="160" y="272" text-anchor="middle" font-size="13" fill="#c53030" font-weight="600">L1: Redis SINTER</text>
+  <line x1="80" y1="280" x2="240" y2="280" stroke="#fed7d7" stroke-width="1"/>
+  <text x="160" y="298" text-anchor="middle" font-size="10" fill="#4a5568">Keywords -> Redis Sets</text>
+  <text x="160" y="314" text-anchor="middle" font-size="10" fill="#4a5568">SINTER intersection</text>
+  <text x="160" y="330" text-anchor="middle" font-size="10" fill="#4a5568">Type / Topic filter</text>
+  <text x="160" y="350" text-anchor="middle" font-size="10" fill="#718096">Latency: &lt; 2ms</text>
+  <text x="160" y="366" text-anchor="middle" font-size="10" fill="#718096">Exact keyword match</text>
+
+  <!-- L2: PostgreSQL GIN -->
+  <rect x="380" y="250" width="200" height="130" rx="8" fill="url(#l2Grad)" stroke="#d69e2e" stroke-width="1.5"/>
+  <text x="480" y="272" text-anchor="middle" font-size="13" fill="#b7791f" font-weight="600">L2: PostgreSQL GIN</text>
+  <line x1="400" y1="280" x2="560" y2="280" stroke="#fefcbf" stroke-width="1"/>
+  <text x="480" y="298" text-anchor="middle" font-size="10" fill="#4a5568">GIN index on keywords[]</text>
+  <text x="480" y="314" text-anchor="middle" font-size="10" fill="#4a5568">Array overlap (&amp;&amp;) query</text>
+  <text x="480" y="330" text-anchor="middle" font-size="10" fill="#4a5568">Partial match support</text>
+  <text x="480" y="350" text-anchor="middle" font-size="10" fill="#718096">Latency: 5-15ms</text>
+  <text x="480" y="366" text-anchor="middle" font-size="10" fill="#718096">Broader recall than L1</text>
+
+  <!-- L3: pgvector HNSW -->
+  <rect x="700" y="250" width="200" height="130" rx="8" fill="url(#l3Grad)" stroke="#38a169" stroke-width="1.5"/>
+  <text x="800" y="272" text-anchor="middle" font-size="13" fill="#276749" font-weight="600">L3: pgvector HNSW</text>
+  <line x1="720" y1="280" x2="880" y2="280" stroke="#c6f6d5" stroke-width="1"/>
+  <text x="800" y="298" text-anchor="middle" font-size="10" fill="#4a5568">Query embedding generation</text>
+  <text x="800" y="314" text-anchor="middle" font-size="10" fill="#4a5568">HNSW cosine similarity</text>
+  <text x="800" y="330" text-anchor="middle" font-size="10" fill="#4a5568">Top-K nearest neighbors</text>
+  <text x="800" y="350" text-anchor="middle" font-size="10" fill="#718096">Latency: 10-50ms</text>
+  <text x="800" y="366" text-anchor="middle" font-size="10" fill="#718096">Semantic understanding</text>
+
+  <!-- Parallel indicator for L2 and L3 -->
+  <rect x="370" y="392" width="440" height="22" rx="4" fill="#edf2f7" stroke="#a0aec0" stroke-width="0.8"/>
+  <text x="590" y="407" text-anchor="middle" font-size="10" fill="#718096">L2 and L3 execute in parallel when text query present</text>
+
+  <!-- Arrows from L1/L2/L3 down to merge -->
+  <line x1="160" y1="380" x2="160" y2="460" stroke="#e53e3e" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <line x1="480" y1="414" x2="480" y2="460" stroke="#d69e2e" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <line x1="800" y1="414" x2="800" y2="430" stroke="#38a169" stroke-width="1.2"/>
+  <line x1="800" y1="430" x2="800" y2="460" stroke="#38a169" stroke-width="1.2" marker-end="url(#arrow-green)"/>
+
+  <!-- RRF Merge Box -->
+  <rect x="80" y="470" width="800" height="80" rx="10" fill="url(#rrfGrad)" stroke="#805ad5" stroke-width="1.5"/>
+  <text x="480" y="495" text-anchor="middle" font-size="14" fill="#553c9a" font-weight="600">Reciprocal Rank Fusion (RRF, k=60)</text>
+  <text x="480" y="515" text-anchor="middle" font-size="11" fill="#4a5568">RRF(d) = Sum over all tiers: 1 / (k + rank(d))</text>
+  <text x="480" y="535" text-anchor="middle" font-size="10" fill="#718096">Deduplication by fragment ID, merged score ranking, tokenBudget truncation</text>
+
+  <!-- Arrow to output -->
+  <line x1="480" y1="550" x2="480" y2="585" stroke="#805ad5" stroke-width="1.5" marker-end="url(#arrow-purple)"/>
+
+  <!-- Output -->
+  <rect x="300" y="590" width="360" height="65" rx="10" fill="#f7fafc" stroke="#4a5568" stroke-width="1.5"/>
+  <text x="480" y="615" text-anchor="middle" font-size="13" fill="#2d3748" font-weight="600">Ranked Fragment List</text>
+  <text x="480" y="633" text-anchor="middle" font-size="10.5" fill="#4a5568">Sorted by RRF score, trimmed to tokenBudget</text>
+  <text x="480" y="648" text-anchor="middle" font-size="10" fill="#718096">Includes similarity scores from L3 when available</text>
+
+  <!-- Legend -->
+  <rect x="30" y="665" width="900" height="25" rx="4" fill="#f7fafc" stroke="#e2e8f0" stroke-width="0.8"/>
+  <rect x="50" y="672" width="12" height="12" rx="2" fill="url(#l1Grad)" stroke="#e53e3e" stroke-width="0.8"/>
+  <text x="68" y="682" font-size="9.5" fill="#4a5568">L1: Exact Match</text>
+  <rect x="200" y="672" width="12" height="12" rx="2" fill="url(#l2Grad)" stroke="#d69e2e" stroke-width="0.8"/>
+  <text x="218" y="682" font-size="9.5" fill="#4a5568">L2: Partial Match</text>
+  <rect x="360" y="672" width="12" height="12" rx="2" fill="url(#l3Grad)" stroke="#38a169" stroke-width="0.8"/>
+  <text x="378" y="682" font-size="9.5" fill="#4a5568">L3: Semantic Search</text>
+  <rect x="540" y="672" width="12" height="12" rx="2" fill="url(#rrfGrad)" stroke="#805ad5" stroke-width="0.8"/>
+  <text x="558" y="682" font-size="9.5" fill="#4a5568">RRF Fusion</text>
+  <line x1="680" y1="678" x2="710" y2="678" stroke="#4a5568" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="718" y="682" font-size="9.5" fill="#4a5568">Conditional Path</text>
+</svg>

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 750" font-family="'Segoe UI', Arial, sans-serif">
+  <defs>
+    <marker id="sa" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4a5568"/>
+    </marker>
+    <marker id="sa-blue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3182ce"/>
+    </marker>
+    <marker id="sa-orange" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#dd6b20"/>
+    </marker>
+    <marker id="sa-green" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#38a169"/>
+    </marker>
+    <pattern id="diag" patternUnits="userSpaceOnUse" width="6" height="6">
+      <path d="M0,6 L6,0" stroke="#e2e8f0" stroke-width="0.5"/>
+    </pattern>
+  </defs>
+
+  <!-- Title -->
+  <text x="480" y="35" text-anchor="middle" font-size="18" fill="#1a202c" font-weight="600">Figure 4: Context Injection and Session Lifecycle</text>
+
+  <!-- Lifeline labels -->
+  <rect x="50" y="55" width="120" height="36" rx="6" fill="#ebf8ff" stroke="#3182ce" stroke-width="1.5"/>
+  <text x="110" y="78" text-anchor="middle" font-size="11" fill="#2b6cb0" font-weight="600">LLM Agent</text>
+
+  <rect x="270" y="55" width="120" height="36" rx="6" fill="#f0fff4" stroke="#38a169" stroke-width="1.5"/>
+  <text x="330" y="78" text-anchor="middle" font-size="11" fill="#276749" font-weight="600">MCP Server</text>
+
+  <rect x="490" y="55" width="120" height="36" rx="6" fill="#fff5f5" stroke="#e53e3e" stroke-width="1.5"/>
+  <text x="550" y="78" text-anchor="middle" font-size="11" fill="#c53030" font-weight="600">Redis</text>
+
+  <rect x="700" y="55" width="130" height="36" rx="6" fill="#fffff0" stroke="#d69e2e" stroke-width="1.5"/>
+  <text x="765" y="78" text-anchor="middle" font-size="11" fill="#b7791f" font-weight="600">PostgreSQL</text>
+
+  <!-- Lifelines -->
+  <line x1="110" y1="91" x2="110" y2="710" stroke="#3182ce" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="330" y1="91" x2="330" y2="710" stroke="#38a169" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="550" y1="91" x2="550" y2="710" stroke="#e53e3e" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="765" y1="91" x2="765" y2="710" stroke="#d69e2e" stroke-width="1" stroke-dasharray="4,3"/>
+
+  <!-- Phase labels on left -->
+  <rect x="5" y="105" width="30" height="175" rx="4" fill="#ebf8ff" stroke="#bee3f8" stroke-width="0.8"/>
+  <text x="20" y="200" text-anchor="middle" font-size="10" fill="#3182ce" font-weight="600" transform="rotate(-90, 20, 200)">Session Start</text>
+
+  <rect x="5" y="300" width="30" height="200" rx="4" fill="#fffff0" stroke="#fefcbf" stroke-width="0.8"/>
+  <text x="20" y="405" text-anchor="middle" font-size="10" fill="#d69e2e" font-weight="600" transform="rotate(-90, 20, 405)">Session Active</text>
+
+  <rect x="5" y="520" width="30" height="175" rx="4" fill="#faf5ff" stroke="#e9d8fd" stroke-width="0.8"/>
+  <text x="20" y="610" text-anchor="middle" font-size="10" fill="#805ad5" font-weight="600" transform="rotate(-90, 20, 610)">Session End</text>
+
+  <!-- === SESSION START === -->
+
+  <!-- 1. context() call -->
+  <line x1="110" y1="120" x2="320" y2="120" stroke="#3182ce" stroke-width="1.5" marker-end="url(#sa-blue)"/>
+  <text x="215" y="114" text-anchor="middle" font-size="10" fill="#2b6cb0">context(sessionId, types[])</text>
+
+  <!-- 2. Load core memory -->
+  <line x1="330" y1="140" x2="755" y2="140" stroke="#4a5568" stroke-width="1.2" marker-end="url(#sa)"/>
+  <text x="540" y="134" text-anchor="middle" font-size="9.5" fill="#4a5568">SELECT preference, error, procedure fragments</text>
+
+  <!-- 3. Return core fragments -->
+  <line x1="755" y1="155" x2="340" y2="155" stroke="#4a5568" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#sa)"/>
+  <text x="540" y="170" text-anchor="middle" font-size="9.5" fill="#718096">Core memory fragments (sorted by importance)</text>
+
+  <!-- 4. Load working memory if sessionId -->
+  <line x1="330" y1="185" x2="540" y2="185" stroke="#e53e3e" stroke-width="1.2" marker-end="url(#sa)"/>
+  <text x="435" y="179" text-anchor="middle" font-size="9.5" fill="#c53030">GET session:{sessionId}:wm</text>
+
+  <line x1="540" y1="200" x2="340" y2="200" stroke="#e53e3e" stroke-width="1.2" stroke-dasharray="5,3"/>
+  <text x="435" y="215" text-anchor="middle" font-size="9.5" fill="#718096">Working memory fragments</text>
+
+  <!-- 5. Type-slot allocation -->
+  <rect x="285" y="225" width="90" height="30" rx="4" fill="#f0fff4" stroke="#38a169" stroke-width="1"/>
+  <text x="330" y="244" text-anchor="middle" font-size="9" fill="#276749">Type-Slot</text>
+  <text x="330" y="255" text-anchor="middle" font-size="8" fill="#276749">Allocation</text>
+
+  <!-- 6. Return injection text -->
+  <line x1="330" y1="265" x2="120" y2="265" stroke="#38a169" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#sa-green)"/>
+  <text x="225" y="260" text-anchor="middle" font-size="9.5" fill="#276749">injectionText (within tokenBudget)</text>
+
+  <!-- Type-slot detail box -->
+  <rect x="630" y="220" width="280" height="70" rx="6" fill="#f7fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="770" y="238" text-anchor="middle" font-size="10" fill="#2d3748" font-weight="600">Type-Slot Allocation</text>
+  <text x="650" y="255" font-size="9" fill="#4a5568">PREFERENCE: 30% | ERROR: 25%</text>
+  <text x="650" y="270" font-size="9" fill="#4a5568">PROCEDURE: 25% | FACT: 10%</text>
+  <text x="650" y="285" font-size="9" fill="#4a5568">DECISION: 5%  | RELATION: 5%</text>
+
+  <!-- === SESSION ACTIVE === -->
+
+  <!-- remember() -->
+  <line x1="110" y1="320" x2="320" y2="320" stroke="#dd6b20" stroke-width="1.5" marker-end="url(#sa-orange)"/>
+  <text x="215" y="314" text-anchor="middle" font-size="10" fill="#c05621">remember(content, scope="session")</text>
+
+  <line x1="330" y1="340" x2="540" y2="340" stroke="#e53e3e" stroke-width="1.2" marker-end="url(#sa)"/>
+  <text x="435" y="334" text-anchor="middle" font-size="9.5" fill="#c53030">HSET session:{id}:wm {fragId}</text>
+
+  <line x1="540" y1="355" x2="340" y2="355" stroke="#e53e3e" stroke-width="1.2" stroke-dasharray="5,3"/>
+
+  <line x1="330" y1="365" x2="120" y2="365" stroke="#38a169" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#sa-green)"/>
+  <text x="225" y="380" text-anchor="middle" font-size="9.5" fill="#718096">fragment ID (session-scoped)</text>
+
+  <!-- recall() -->
+  <line x1="110" y1="405" x2="320" y2="405" stroke="#3182ce" stroke-width="1.5" marker-end="url(#sa-blue)"/>
+  <text x="215" y="399" text-anchor="middle" font-size="10" fill="#2b6cb0">recall(keywords, text, type)</text>
+
+  <!-- 3-tier retrieval -->
+  <rect x="285" y="415" width="90" height="25" rx="4" fill="#edf2f7" stroke="#a0aec0" stroke-width="0.8"/>
+  <text x="330" y="432" text-anchor="middle" font-size="9" fill="#4a5568">3-Tier Search</text>
+
+  <line x1="330" y1="440" x2="120" y2="465" stroke="#38a169" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#sa-green)"/>
+  <text x="225" y="460" text-anchor="middle" font-size="9.5" fill="#276749">Ranked fragments + linked fragments</text>
+
+  <!-- Repeated interactions indicator -->
+  <rect x="70" y="480" width="590" height="25" rx="4" fill="url(#diag)" stroke="#a0aec0" stroke-width="0.8"/>
+  <text x="365" y="497" text-anchor="middle" font-size="10" fill="#718096">... repeated remember() / recall() / amend() / link() calls ...</text>
+
+  <!-- === SESSION END === -->
+
+  <!-- reflect() -->
+  <line x1="110" y1="535" x2="320" y2="535" stroke="#805ad5" stroke-width="1.5" marker-end="url(#sa)"/>
+  <text x="215" y="529" text-anchor="middle" font-size="10" fill="#553c9a">reflect(summary, decisions, errors)</text>
+
+  <!-- Convert WM to permanent -->
+  <line x1="330" y1="555" x2="755" y2="555" stroke="#4a5568" stroke-width="1.2" marker-end="url(#sa)"/>
+  <text x="540" y="549" text-anchor="middle" font-size="9.5" fill="#4a5568">INSERT permanent fragments from session summary</text>
+
+  <line x1="755" y1="570" x2="340" y2="570" stroke="#4a5568" stroke-width="1.2" stroke-dasharray="5,3"/>
+
+  <!-- Clean working memory -->
+  <line x1="330" y1="590" x2="540" y2="590" stroke="#e53e3e" stroke-width="1.2" marker-end="url(#sa)"/>
+  <text x="435" y="584" text-anchor="middle" font-size="9.5" fill="#c53030">DEL session:{id}:wm</text>
+
+  <line x1="540" y1="605" x2="340" y2="605" stroke="#e53e3e" stroke-width="1.2" stroke-dasharray="5,3"/>
+  <text x="435" y="620" text-anchor="middle" font-size="9.5" fill="#718096">Working memory purged</text>
+
+  <!-- Return -->
+  <line x1="330" y1="635" x2="120" y2="635" stroke="#38a169" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#sa-green)"/>
+  <text x="225" y="629" text-anchor="middle" font-size="9.5" fill="#276749">Reflect result (fragments created)</text>
+
+  <!-- Data flow legend -->
+  <rect x="50" y="665" width="860" height="48" rx="6" fill="#f7fafc" stroke="#e2e8f0" stroke-width="0.8"/>
+  <text x="480" y="683" text-anchor="middle" font-size="10" fill="#2d3748" font-weight="600">Data Flow Legend</text>
+  <line x1="80" y1="700" x2="130" y2="700" stroke="#3182ce" stroke-width="1.5"/>
+  <text x="138" y="704" font-size="9" fill="#4a5568">Request (sync)</text>
+  <line x1="250" y1="700" x2="300" y2="700" stroke="#4a5568" stroke-width="1.2" stroke-dasharray="5,3"/>
+  <text x="308" y="704" font-size="9" fill="#4a5568">Response</text>
+  <line x1="410" y1="700" x2="460" y2="700" stroke="#dd6b20" stroke-width="1.5"/>
+  <text x="468" y="704" font-size="9" fill="#4a5568">Session-scoped write</text>
+  <line x1="590" y1="700" x2="640" y2="700" stroke="#805ad5" stroke-width="1.5"/>
+  <text x="648" y="704" font-size="9" fill="#4a5568">Session termination</text>
+  <line x1="770" y1="700" x2="820" y2="700" stroke="#e53e3e" stroke-width="1.2"/>
+  <text x="828" y="704" font-size="9" fill="#4a5568">Redis operation</text>
+</svg>

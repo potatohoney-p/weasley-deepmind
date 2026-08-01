@@ -1,0 +1,46 @@
+﻿{
+    "name":  "weasley-deepmind-mcp",
+    "version":  "5.3.1",
+    "description":  "Fragment-Based Memory MCP Server",
+    "main":  "server.js",
+    "type":  "module",
+    "bin":  {
+                "weasley-deepmind":  "bin/memento.js",
+                "memento-mcp":  "bin/memento.js"
+            },
+    "scripts":  {
+                    "start":  "node server.js",
+                    "test":  "DOTENV_CONFIG_PATH=.env.test MEMENTO_METRICS_DEFAULT=off REDIS_ENABLED=false CACHE_ENABLED=false node --experimental-test-module-mocks --test \u0027tests/unit/*.test.js\u0027 \u0027tests/unit/**/*.test.js\u0027",
+                    "test:integration":  "node --test tests/integration/*.test.js tests/e2e/*.test.js",
+                    "test:integration:llm":  "MEMENTO_METRICS_DEFAULT=off node --test --test-concurrency=1 tests/integration/llm-cli-smoke.test.js tests/integration/llm-timeout.test.js tests/integration/morpheme-llm-real.test.js tests/integration/llm-chain-real.test.js",
+                    "test:e2e":  "node --test --test-concurrency=1 tests/e2e/*.test.js",
+                    "test:e2e:local":  "bash scripts/run-e2e-tests.sh",
+                    "test:ci":  "npm test \u0026\u0026 npm run test:integration",
+                    "lint":  "eslint .",
+                    "backfill:embeddings":  "node scripts/backfill-embeddings.js",
+                    "lint:migrations":  "node scripts/lint-migrations.js",
+                    "migrate":  "node scripts/migrate.js",
+                    "cli":  "node bin/memento.js"
+                },
+    "dependencies":  {
+                         "@huggingface/transformers":  "^3.8.1",
+                         "@modelcontextprotocol/sdk":  "^1.27.1",
+                         "@node-rs/jieba":  "^2.0.1",
+                         "dotenv":  "^16.0.0",
+                         "garu-ko":  "^0.9.1",
+                         "ioredis":  "^5.9.3",
+                         "js-tiktoken":  "^1.0.21",
+                         "kuromoji":  "^0.1.2",
+                         "natural":  "^8.1.1",
+                         "node-fetch":  "^3.3.2",
+                         "openai":  "^6.21.0",
+                         "pg":  "^8.18.0",
+                         "prom-client":  "^15.1.3",
+                         "winston":  "^3.19.0",
+                         "winston-daily-rotate-file":  "^5.0.0"
+                     },
+    "devDependencies":  {
+                            "eslint":  "^9.0.0"
+                        }
+}
+

@@ -1,0 +1,66 @@
+name: Tests
+
+on:
+  push:
+    branches: [main, "feat/**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  unit:
+    name: Unit Tests (no DB)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: All unit tests (Jest + node:test)
+        run: npm test
+
+  e2e:
+    name: E2E Tests (with DB)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg15
+        env:
+          POSTGRES_DB:       memento_test
+          POSTGRES_USER:     memento
+          POSTGRES_PASSWORD: memento_test
+        ports:
+          - 35433:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 15
+    env:
+      POSTGRES_HOST:      localhost
+      POSTGRES_PORT:      35433
+      POSTGRES_DB:        memento_test
+      POSTGRES_USER:      memento
+      POSTGRES_PASSWORD:  memento_test
+      DATABASE_URL:       postgresql://memento:memento_test@localhost:35433/memento_test
+      REDIS_ENABLED:      "false"
+      EMBEDDING_ENABLED:  "false"
+      MEMENTO_ACCESS_KEY: ci-test-key
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - name: Initialize schema and run migrations
+        run: |
+          DB_URL="postgresql://memento:memento_test@localhost:35433/memento_test"
+          psql "$DB_URL" -c "CREATE EXTENSION IF NOT EXISTS vector;"
+          psql "$DB_URL" -f lib/memory/memory-schema.sql
+          npm run migrate
+      - name: E2E tests
+        run: npm run test:e2e

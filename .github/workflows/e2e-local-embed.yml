@@ -1,0 +1,32 @@
+name: E2E Local Embedding
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * 1"
+
+jobs:
+  local-embed:
+    name: Local Transformers Embedding
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Cache HuggingFace model
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-e5-small-${{ runner.os }}
+
+      - run: npm ci
+
+      - name: Run local-embedding E2E
+        env:
+          E2E_LOCAL_EMBED: "1"
+        run: node --test tests/integration/local-embedding.test.js

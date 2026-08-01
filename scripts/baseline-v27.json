@@ -1,0 +1,9 @@
+{
+  "runAt": null,
+  "gitSha": null,
+  "note": "실제 수치는 사용자가 `node scripts/benchmark-hot-path.js` 실행 후 자동으로 채워진다. 이 파일은 Phase 0 스켈레톤.",
+  "remember": { "p50": null, "p95": null, "p99": null, "n": 0 },
+  "recall":   { "p50": null, "p95": null, "p99": null, "n": 0 },
+  "link":     { "p50": null, "p95": null, "p99": null, "n": 0 },
+  "reflect":  { "p50": null, "p95": null, "p99": null, "n": 0 }
+}

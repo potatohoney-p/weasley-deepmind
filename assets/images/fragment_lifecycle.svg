@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" font-family="'Segoe UI', Arial, sans-serif">
+  <defs>
+    <marker id="arr" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4a5568"/>
+    </marker>
+    <marker id="arr-red" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#e53e3e"/>
+    </marker>
+    <marker id="arr-teal" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#319795"/>
+    </marker>
+    <linearGradient id="createGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ebf8ff"/>
+      <stop offset="100%" style="stop-color:#bee3f8"/>
+    </linearGradient>
+    <linearGradient id="hotGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#fff5f5"/>
+      <stop offset="100%" style="stop-color:#fed7d7"/>
+    </linearGradient>
+    <linearGradient id="warmGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#fffff0"/>
+      <stop offset="100%" style="stop-color:#fefcbf"/>
+    </linearGradient>
+    <linearGradient id="coldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f0fff4"/>
+      <stop offset="100%" style="stop-color:#c6f6d5"/>
+    </linearGradient>
+    <linearGradient id="permGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#faf5ff"/>
+      <stop offset="100%" style="stop-color:#e9d8fd"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Title -->
+  <text x="480" y="35" text-anchor="middle" font-size="18" fill="#1a202c" font-weight="600">Figure 3: Fragment Lifecycle</text>
+
+  <!-- Phase 1: Creation -->
+  <rect x="50" y="55" width="860" height="105" rx="8" fill="#f7fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="70" y="75" font-size="12" fill="#718096" font-weight="600">Phase 1: Synchronous Creation</text>
+
+  <!-- remember() call -->
+  <rect x="80" y="88" width="150" height="55" rx="8" fill="url(#createGrad)" stroke="#3182ce" stroke-width="1.5"/>
+  <text x="155" y="110" text-anchor="middle" font-size="12" fill="#2b6cb0" font-weight="600">remember()</text>
+  <text x="155" y="126" text-anchor="middle" font-size="9.5" fill="#4a5568">content, topic, type</text>
+  <text x="155" y="138" text-anchor="middle" font-size="9.5" fill="#4a5568">keywords, importance</text>
+
+  <!-- Arrow -->
+  <line x1="230" y1="115" x2="270" y2="115" stroke="#4a5568" stroke-width="1.2" marker-end="url(#arr)"/>
+
+  <!-- PostgreSQL persist -->
+  <rect x="280" y="88" width="160" height="55" rx="8" fill="#edf2f7" stroke="#4a5568" stroke-width="1.2"/>
+  <text x="360" y="108" text-anchor="middle" font-size="11" fill="#2d3748" font-weight="600">PostgreSQL INSERT</text>
+  <text x="360" y="124" text-anchor="middle" font-size="9.5" fill="#4a5568">Immediate persist</text>
+  <text x="360" y="138" text-anchor="middle" font-size="9" fill="#718096">Single-digit ms</text>
+
+  <!-- Arrow -->
+  <line x1="440" y1="115" x2="480" y2="115" stroke="#4a5568" stroke-width="1.2" marker-end="url(#arr)"/>
+
+  <!-- Redis index + queue -->
+  <rect x="490" y="88" width="160" height="55" rx="8" fill="#edf2f7" stroke="#e53e3e" stroke-width="1.2"/>
+  <text x="570" y="108" text-anchor="middle" font-size="11" fill="#c53030" font-weight="600">Redis Index + Queue</text>
+  <text x="570" y="124" text-anchor="middle" font-size="9.5" fill="#4a5568">SADD keyword sets</text>
+  <text x="570" y="138" text-anchor="middle" font-size="9.5" fill="#4a5568">LPUSH embed queue</text>
+
+  <!-- Arrow -->
+  <line x1="650" y1="115" x2="690" y2="115" stroke="#4a5568" stroke-width="1.2" marker-end="url(#arr)"/>
+
+  <!-- Return to agent -->
+  <rect x="700" y="88" width="150" height="55" rx="8" fill="url(#createGrad)" stroke="#3182ce" stroke-width="1.2"/>
+  <text x="775" y="108" text-anchor="middle" font-size="11" fill="#2b6cb0" font-weight="600">Return fragment ID</text>
+  <text x="775" y="124" text-anchor="middle" font-size="9.5" fill="#4a5568">Agent unblocked</text>
+  <text x="775" y="138" text-anchor="middle" font-size="9" fill="#718096">L1 searchable now</text>
+
+  <!-- Phase 2: Async Enrichment -->
+  <rect x="50" y="175" width="860" height="95" rx="8" fill="#fffff0" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="70" y="195" font-size="12" fill="#718096" font-weight="600">Phase 2: Asynchronous Enrichment</text>
+
+  <!-- BRPOP -->
+  <rect x="80" y="208" width="170" height="48" rx="8" fill="#fefcbf" stroke="#d69e2e" stroke-width="1.2"/>
+  <text x="165" y="228" text-anchor="middle" font-size="11" fill="#975a16" font-weight="600">EmbeddingWorker</text>
+  <text x="165" y="244" text-anchor="middle" font-size="9.5" fill="#4a5568">BRPOP from queue</text>
+
+  <line x1="250" y1="232" x2="295" y2="232" stroke="#4a5568" stroke-width="1.2" marker-end="url(#arr)"/>
+
+  <!-- Embed gen -->
+  <rect x="305" y="208" width="190" height="48" rx="8" fill="#fefcbf" stroke="#d69e2e" stroke-width="1.2"/>
+  <text x="400" y="228" text-anchor="middle" font-size="11" fill="#975a16" font-weight="600">text-embedding-3-small</text>
+  <text x="400" y="244" text-anchor="middle" font-size="9.5" fill="#4a5568">1536-dim vector</text>
+
+  <line x1="495" y1="232" x2="540" y2="232" stroke="#4a5568" stroke-width="1.2" marker-end="url(#arr)"/>
+
+  <!-- pgvector store -->
+  <rect x="550" y="208" width="170" height="48" rx="8" fill="#fefcbf" stroke="#d69e2e" stroke-width="1.2"/>
+  <text x="635" y="228" text-anchor="middle" font-size="11" fill="#975a16" font-weight="600">pgvector UPDATE</text>
+  <text x="635" y="244" text-anchor="middle" font-size="9.5" fill="#4a5568">L3 searchable now</text>
+
+  <line x1="720" y1="232" x2="765" y2="232" stroke="#4a5568" stroke-width="1.2" marker-end="url(#arr)"/>
+
+  <!-- Auto keywords -->
+  <rect x="775" y="208" width="120" height="48" rx="8" fill="#fefcbf" stroke="#d69e2e" stroke-width="1.2"/>
+  <text x="835" y="228" text-anchor="middle" font-size="10.5" fill="#975a16" font-weight="600">Auto-keywords</text>
+  <text x="835" y="244" text-anchor="middle" font-size="9.5" fill="#4a5568">If empty, extract</text>
+
+  <!-- Phase 3: TTL Lifecycle -->
+  <rect x="50" y="290" width="860" height="200" rx="8" fill="#f7fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="70" y="310" font-size="12" fill="#718096" font-weight="600">Phase 3: TTL Tier Transitions (Forgetting Model)</text>
+
+  <!-- HOT -->
+  <rect x="80" y="330" width="160" height="75" rx="8" fill="url(#hotGrad)" stroke="#e53e3e" stroke-width="1.5"/>
+  <text x="160" y="352" text-anchor="middle" font-size="12" fill="#c53030" font-weight="600">HOT</text>
+  <text x="160" y="370" text-anchor="middle" font-size="10" fill="#4a5568">TTL: 7 days</text>
+  <text x="160" y="385" text-anchor="middle" font-size="10" fill="#4a5568">High importance</text>
+  <text x="160" y="398" text-anchor="middle" font-size="9" fill="#718096">Active recall boost</text>
+
+  <line x1="240" y1="367" x2="290" y2="367" stroke="#4a5568" stroke-width="1.2" marker-end="url(#arr)"/>
+  <text x="265" y="360" text-anchor="middle" font-size="8.5" fill="#718096">decay</text>
+
+  <!-- WARM -->
+  <rect x="300" y="330" width="160" height="75" rx="8" fill="url(#warmGrad)" stroke="#d69e2e" stroke-width="1.5"/>
+  <text x="380" y="352" text-anchor="middle" font-size="12" fill="#b7791f" font-weight="600">WARM</text>
+  <text x="380" y="370" text-anchor="middle" font-size="10" fill="#4a5568">TTL: 30 days</text>
+  <text x="380" y="385" text-anchor="middle" font-size="10" fill="#4a5568">Moderate importance</text>
+  <text x="380" y="398" text-anchor="middle" font-size="9" fill="#718096">Standard retrieval</text>
+
+  <line x1="460" y1="367" x2="510" y2="367" stroke="#4a5568" stroke-width="1.2" marker-end="url(#arr)"/>
+  <text x="485" y="360" text-anchor="middle" font-size="8.5" fill="#718096">decay</text>
+
+  <!-- COLD -->
+  <rect x="520" y="330" width="160" height="75" rx="8" fill="url(#coldGrad)" stroke="#38a169" stroke-width="1.5"/>
+  <text x="600" y="352" text-anchor="middle" font-size="12" fill="#276749" font-weight="600">COLD</text>
+  <text x="600" y="370" text-anchor="middle" font-size="10" fill="#4a5568">TTL: 90 days</text>
+  <text x="600" y="385" text-anchor="middle" font-size="10" fill="#4a5568">Low importance</text>
+  <text x="600" y="398" text-anchor="middle" font-size="9" fill="#718096">L3 only retrieval</text>
+
+  <!-- Expired deletion -->
+  <line x1="680" y1="367" x2="730" y2="367" stroke="#e53e3e" stroke-width="1.2" marker-end="url(#arr-red)"/>
+  <text x="705" y="360" text-anchor="middle" font-size="8.5" fill="#e53e3e">expire</text>
+
+  <rect x="740" y="340" width="140" height="55" rx="8" fill="#fff5f5" stroke="#e53e3e" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="810" y="362" text-anchor="middle" font-size="12" fill="#c53030" font-weight="600">DELETED</text>
+  <text x="810" y="380" text-anchor="middle" font-size="9.5" fill="#4a5568">TTL expired</text>
+  <text x="810" y="393" text-anchor="middle" font-size="9" fill="#718096">Removed from all tiers</text>
+
+  <!-- PERMANENT path from any tier -->
+  <rect x="260" y="430" width="200" height="48" rx="8" fill="url(#permGrad)" stroke="#805ad5" stroke-width="1.5"/>
+  <text x="360" y="452" text-anchor="middle" font-size="12" fill="#553c9a" font-weight="600">PERMANENT</text>
+  <text x="360" y="468" text-anchor="middle" font-size="10" fill="#4a5568">isAnchor=true, no decay</text>
+
+  <!-- Arrow from HOT to PERMANENT -->
+  <line x1="160" y1="405" x2="160" y2="454" stroke="#805ad5" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="160" y1="454" x2="260" y2="454" stroke="#805ad5" stroke-width="1" marker-end="url(#arr)"/>
+  <text x="200" y="448" text-anchor="middle" font-size="8.5" fill="#805ad5">anchor</text>
+
+  <!-- Phase 4: Consolidation -->
+  <rect x="50" y="500" width="860" height="100" rx="8" fill="#f0fff4" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="70" y="520" font-size="12" fill="#718096" font-weight="600">Phase 4: Consolidation (12-Stage Maintenance)</text>
+
+  <rect x="80" y="535" width="130" height="48" rx="6" fill="#c6f6d5" stroke="#38a169" stroke-width="1"/>
+  <text x="145" y="555" text-anchor="middle" font-size="10" fill="#276749" font-weight="600">Importance Decay</text>
+  <text x="145" y="570" text-anchor="middle" font-size="9" fill="#4a5568">Exponential model</text>
+
+  <rect x="225" y="535" width="130" height="48" rx="6" fill="#c6f6d5" stroke="#38a169" stroke-width="1"/>
+  <text x="290" y="555" text-anchor="middle" font-size="10" fill="#276749" font-weight="600">Duplicate Merge</text>
+  <text x="290" y="570" text-anchor="middle" font-size="9" fill="#4a5568">Cosine > 0.92</text>
+
+  <rect x="370" y="535" width="140" height="48" rx="6" fill="#c6f6d5" stroke="#38a169" stroke-width="1"/>
+  <text x="440" y="555" text-anchor="middle" font-size="10" fill="#276749" font-weight="600">Contradiction Detect</text>
+  <text x="440" y="570" text-anchor="middle" font-size="9" fill="#4a5568">3-stage pipeline</text>
+
+  <rect x="525" y="535" width="130" height="48" rx="6" fill="#c6f6d5" stroke="#38a169" stroke-width="1"/>
+  <text x="590" y="555" text-anchor="middle" font-size="10" fill="#276749" font-weight="600">Supersede Links</text>
+  <text x="590" y="570" text-anchor="middle" font-size="9" fill="#4a5568">superseded_by chain</text>
+
+  <rect x="670" y="535" width="120" height="48" rx="6" fill="#c6f6d5" stroke="#38a169" stroke-width="1"/>
+  <text x="730" y="555" text-anchor="middle" font-size="10" fill="#276749" font-weight="600">Access Boost</text>
+  <text x="730" y="570" text-anchor="middle" font-size="9" fill="#4a5568">Recall reinforces</text>
+
+  <rect x="805" y="535" width="90" height="48" rx="6" fill="#c6f6d5" stroke="#38a169" stroke-width="1"/>
+  <text x="850" y="555" text-anchor="middle" font-size="10" fill="#276749" font-weight="600">TTL Shift</text>
+  <text x="850" y="570" text-anchor="middle" font-size="9" fill="#4a5568">Tier transition</text>
+
+  <!-- Phase 5: Terminal states -->
+  <rect x="50" y="615" width="860" height="75" rx="8" fill="#faf5ff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="70" y="635" font-size="12" fill="#718096" font-weight="600">Phase 5: Terminal Operations</text>
+
+  <rect x="100" y="648" width="160" height="32" rx="6" fill="#e9d8fd" stroke="#805ad5" stroke-width="1"/>
+  <text x="180" y="669" text-anchor="middle" font-size="10.5" fill="#553c9a">amend() - Update content</text>
+
+  <rect x="285" y="648" width="160" height="32" rx="6" fill="#e9d8fd" stroke="#805ad5" stroke-width="1"/>
+  <text x="365" y="669" text-anchor="middle" font-size="10.5" fill="#553c9a">forget() - Force delete</text>
+
+  <rect x="470" y="648" width="200" height="32" rx="6" fill="#e9d8fd" stroke="#805ad5" stroke-width="1"/>
+  <text x="570" y="669" text-anchor="middle" font-size="10.5" fill="#553c9a">link() - Create relations</text>
+
+  <rect x="695" y="648" width="190" height="32" rx="6" fill="#e9d8fd" stroke="#805ad5" stroke-width="1"/>
+  <text x="790" y="669" text-anchor="middle" font-size="10.5" fill="#553c9a">reflect() - Session summary</text>
+
+  <!-- Legend -->
+  <rect x="30" y="697" width="900" height="20" rx="3" fill="none"/>
+  <text x="480" y="711" text-anchor="middle" font-size="9.5" fill="#a0aec0">Synchronous path (solid) | Asynchronous path (Phase 2) | Decay transitions (Phase 3) | Periodic maintenance (Phase 4)</text>
+</svg>
