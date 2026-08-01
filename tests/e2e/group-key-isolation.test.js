@@ -90,7 +90,7 @@ after(async () => {
  */
 async function seedRcaChainUnderKey(key) {
   const err = await mgr.remember({
-    content     : "테스트 RCA 에러: 그룹 키 격리 검증용 원인 파편",
+    content     : `테스트 RCA 에러: 그룹 키 격리 검증용 원인 파편 (${key})`,
     topic       : TOPIC,
     type        : "error",
     importance  : 0.6,
@@ -98,7 +98,7 @@ async function seedRcaChainUnderKey(key) {
     _groupKeyIds: [key]
   });
   const fix = await mgr.remember({
-    content     : "테스트 RCA 해결: 그룹 키 격리 검증용 해결 파편",
+    content     : `테스트 RCA 해결: 그룹 키 격리 검증용 해결 파편 (${key})`,
     topic       : TOPIC,
     type        : "procedure",
     importance  : 0.6,
@@ -124,7 +124,7 @@ async function seedRcaChainUnderKey(key) {
 async function seedTraceUnderKey(key) {
   const caseId = "feat-keyiso-2026-06-09";
   await mgr.remember({
-    content     : "테스트 트레이스: 그룹 키 case_id 조회 검증용 파편",
+    content     : `테스트 트레이스: 그룹 키 case_id 조회 검증용 파편 (${key})`,
     topic       : TOPIC,
     type        : "fact",
     importance  : 0.6,
