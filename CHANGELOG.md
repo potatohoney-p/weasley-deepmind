@@ -1,5 +1,16 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- Revalidate hot-cache recall candidates against durable rows before scope
+  selection, ranking and token budgeting. Superseded/deleted facts and outdated
+  amended content can no longer survive solely in a serialized Redis payload,
+  including after process restart or a later stale cache refill. Explicit history
+  reads retain superseded rows with current validity metadata. Validation uses a
+  bounded batch and preserves existing agent/key scope rules; durable-read errors
+  propagate instead of falling back to unverified cached content.
+
 ## [5.3.1] - 2026-07-27
 
 ### Fixed

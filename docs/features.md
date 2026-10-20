@@ -30,6 +30,36 @@ weasley-deepmind의 주요 모듈을 한 페이지로 정리한 ledger. 새 모�
 |`SearchSideEffects` (`lib/memory/read/SearchSideEffects.js`)|검색 결과 배열 + ctx|searchEventId, co_retrieved 업데이트, EMA 갱신|DB 장애 시 soft fail|—|`weasley_deepmind_search_event_total`|migration-027|
 |`PgVectorStore` / `SqliteVecStore` (`lib/storage/`)|SQL 문 + 파라미터|rows 배열|연결 오류 시 throw; SqliteVecStore는 미구현 스텁|`WEASLEY_DEEPMIND_STORAGE`|—|—|
 
+## Hot-cache recall consistency
+
+`FragmentSearch` treats Redis hot payloads as candidate hints. Before ranking or
+budgeting, it hydrates hits among at most 30 requested IDs through the existing
+`FragmentReader.getByIds` and `queryWithAgentVector` path. Only the durable row's
+content, validity and scope fields are used. This adds a bounded batch SELECT for
+cache validation in addition to normal L2 reads; the shared database helper may
+also perform transaction/session setup. There is no per-candidate SELECT loop or
+database scan.
+
+Default recall excludes inactive/deleted rows; `includeSuperseded: true` preserves
+explicit historical candidates with durable `valid_to` values. Scalar keys, group
+keys, empty groups, master access and peer-agent opt-in retain their existing
+scoped-reader contract. Workspace and affect filtering run on hydrated rows.
+The by-ID L1-miss fallback applies the same scope, including case, phase and
+resolution status, so it cannot reintroduce a candidate rejected during hydration.
+The separate `searchAsOf` path and the tool's `asOf`/`anchorTime` behavior are unchanged.
+
+Absent or missed Redis entries require no validation read. If a populated cache
+cannot be validated because the durable read fails, that error propagates; the
+cache is not an offline source of truth. Thus even a hot-only result now requires
+durable-read availability. Read validation also handles old payloads repopulated
+after a mutation, without requiring every mutation path to delete every cache.
+
+This does not promise linearizability for a read overlapping a concurrent mutation,
+freshness of Redis candidate indexes, or exhaustive retrieval. Session-only Working
+Memory remains Redis-only and does not use this hydration path. The offline
+`superseded-hot-cache-recall.test.js` regression covers restart/stale-refill scenarios,
+amended-content budgets, history, scope and the reader's SQL bindings.
+
 ## 실험적 기능 플래그
 
 다음 기능은 기본 off이며 ENV 토글로 활성화한다. 운영 신뢰가 확보되면 기본 on으로 승급할 후보다.
