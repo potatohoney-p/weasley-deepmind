@@ -433,7 +433,8 @@ describe("MemoryRecaller 기본 includeLinks 최종 병합 격리", () => {
     assert.deepEqual(idsOf(result), new Set(["base", "linked-own", "linked-global"]));
     assert.deepEqual(calls[0][4], {
       workspace         : "ws-a",
-      includePeerAgents : false
+      includePeerAgents : false,
+      includeSuperseded : false
     });
   });
 
@@ -453,7 +454,8 @@ describe("MemoryRecaller 기본 includeLinks 최종 병합 격리", () => {
     );
     assert.deepEqual(calls[0][4], {
       workspace         : "ws-a",
-      includePeerAgents : true
+      includePeerAgents : true,
+      includeSuperseded : false
     });
   });
 });

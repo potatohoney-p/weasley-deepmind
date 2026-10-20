@@ -323,7 +323,7 @@ MCP resources for real-time queries on the current state of the memory system.
 | includeLinks | boolean | - | Include linked fragments (1-hop, resolved_by/caused_by prioritized). Default true. |
 | linkRelationType | string | - | Link relation type filter (related, caused_by, resolved_by, part_of, contradicts) |
 | threshold | number | - | Similarity threshold (0-1) |
-| includeSuperseded | boolean | - | Include expired (superseded) fragments. Default false. |
+| includeSuperseded | boolean | - | Include expired (superseded) fragments, including one-hop linked neighbors. Default false. Linked history retains `valid_to`; key, agent and workspace restrictions still apply. |
 | includePeerAgents | boolean | - | When true, includes fragments from other agentIds within the same key/workspace scope (for multi-agent collaboration). Key and workspace boundaries are preserved. Default false. |
 | asOf | string | - | ISO 8601. Return only fragments valid at the specified point in time. |
 | excludeSeen | boolean | - | Exclude fragments already injected by context(). Default true. |
