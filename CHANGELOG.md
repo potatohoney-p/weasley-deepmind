@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- Default recall no longer reintroduces superseded memories through one-hop links.
+  Both incoming and outgoing linked-neighbor queries exclude expired rows before
+  applying the result limit, and the final recall merge checks validity again.
+  `includeSuperseded: true` also applies to linked neighbors and retains their
+  `valid_to` metadata without relaxing key, agent or workspace isolation.
+
 ## [5.3.1] - 2026-07-27
 
 ### Fixed

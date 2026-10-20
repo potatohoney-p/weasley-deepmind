@@ -327,7 +327,7 @@ API 키의 일일 호출 제한을 변경한다. 마스터 키 인증 필요.
 | includeLinks | boolean | - | 연결된 파편 포함 (1-hop, resolved_by/caused_by 우선). 기본 true. |
 | linkRelationType | string | - | 연결 파편 관계 유형 필터 (related, caused_by, resolved_by, part_of, contradicts) |
 | threshold | number | - | similarity 임계값 (0~1) |
-| includeSuperseded | boolean | - | 만료(superseded) 파편 포함. 기본 false. |
+| includeSuperseded | boolean | - | 만료(superseded) 파편 포함. 1-hop 연결 파편에도 적용되며 기본 false. 연결된 과거 파편의 `valid_to`를 유지하고 key, agent, workspace 격리는 그대로 적용한다. |
 | includePeerAgents | boolean | - | true 시 같은 키/workspace 스코프 내 다른 agentId 파편 포함(멀티에이전트 협업용). 키·workspace 경계는 유지. 기본 false. |
 | asOf | string | - | ISO 8601. 특정 시점 기준 유효 파편만. |
 | excludeSeen | boolean | - | context()에서 이미 주입된 파편 제외. 기본 true. |
