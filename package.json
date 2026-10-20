@@ -37,6 +37,7 @@
     "test:e2e:local": "bash scripts/run-e2e-tests.sh",
     "test:ci": "npm test && npm run test:integration",
     "lint": "eslint .",
+    "eval:recall": "node scripts/evaluate-recall.js",
     "backfill:embeddings": "node scripts/backfill-embeddings.js",
     "lint:migrations": "node scripts/lint-migrations.js",
     "migrate": "node scripts/migrate.js",
