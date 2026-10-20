@@ -116,7 +116,7 @@ export const MEMORY_CONFIG = {
       highAccessThreshold: 5,
       learningBoost      : 0.3,
     },
-    /** structured=true 전용: rankedInjection 복합 점수 가중치 (합계 1.0) */
+      /** flat/structured 공통: context injection 복합 점수 가중치 (합계 1.0) */
     rankWeights        : {
       importance    : 0.6,
       ema_activation: 0.4

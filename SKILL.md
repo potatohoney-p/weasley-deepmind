@@ -966,7 +966,7 @@ summary 또는 sessionId 중 하나 이상 필수.
 
 | 이름 | 타입 | 필수 | 설명 |
 |------|------|------|------|
-| tokenBudget | number | - | 기본 2000 |
+| tokenBudget | number | - | 기본 2000. flat/structured 공통 cl100k_base 주입 내용 예산. 필수 anchor는 초과해도 포함되며 totalTokens에 반영. JSON/섹션 헤더와 보조 learning 메타데이터는 제외. |
 | types | string[] | - | 기본: preference, error, procedure |
 | sessionId | string | - | 워킹 메모리 로드용 |
 | structured | boolean | - | 계층 구조 반환. 기본 false. |
