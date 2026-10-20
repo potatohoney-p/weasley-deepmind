@@ -3,6 +3,9 @@
 ## [Unreleased]
 
 ### Fixed
+- Compare model-cache workflow paths through installed-package symlinks and
+  Windows junctions, even before the cache directory exists. Equivalent locations
+  no longer fail the offline check; genuinely different cache paths still fail.
 - Cache the installed Transformers.js model directory in the weekly local-embedding
   workflow and restore it after `npm ci` so installation cannot erase restored
   files. Scope the cache key to the OS and lockfile; correct the documented default
