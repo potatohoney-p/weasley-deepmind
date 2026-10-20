@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Added
+- Offline recall replay with a fresh query process, independently authored English,
+  Korean and Japanese correction/retraction fixtures, paired cold/stale-cache
+  reports and real cl100k content-token budgets. The production recall adapter
+  passes the safety gate while an explicit legacy-cache negative control fails.
+  Storage and mutations are synthetic; no models, live services or recovery claims.
+
 ### Fixed
 - Revalidate hot-cache recall candidates against durable rows before scope
   selection, ranking and token budgeting. Superseded/deleted facts and outdated
