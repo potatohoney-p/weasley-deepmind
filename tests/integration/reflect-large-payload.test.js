@@ -87,6 +87,21 @@ describe("R12 reflect 큰 페이로드 TDZ 회귀 가드", () => {
     };
     mm.caseEventStore    = { append: async () => {}, recordEvent: async () => {} };
 
+    // The episode uses the single-remember atomic path, separate from the batch
+    // stub below. Keep the real remember() fragment construction/branch ordering
+    // under test, and isolate the transaction boundary before it opens a DB pool.
+    const atomicFragments = [];
+    mm.rememberer._rememberAtomic = async (fragment, context) => {
+      atomicFragments.push({ fragment, keyId: context.keyId });
+      return {
+        id: `stub-atomic-${atomicFragments.length}`,
+        keywords: fragment.keywords,
+        ttl_tier: fragment.ttl_tier,
+        scope: "persistent",
+        conflicts: []
+      };
+    };
+
     /**
      * Phase 1 변경: ReflectProcessor가 batchRememberProcessor를 통해 INSERT하므로
      * 실제 DB pool 없이 동작하도록 batchRememberProcessor를 stub으로 교체한다.
@@ -136,5 +151,10 @@ describe("R12 reflect 큰 페이로드 TDZ 회귀 가드", () => {
      * 차단하므로 이 지점에 도달했다는 사실 자체가 회귀 가드를 만족한다.
      */
     assert.ok(result.fragments.length >= 1, `fragment가 최소 1건 생성되어야 한다 — 실제 ${result.fragments.length}`);
+    assert.equal(batchCallCount, 1, "summary fragments must exercise the batch path");
+    assert.equal(atomicFragments.length, 1, "the narrative must exercise the single atomic path");
+    assert.equal(atomicFragments[0].fragment.type, "episode");
+    assert.equal(atomicFragments[0].fragment.content, narrativeSummary);
+    assert.equal(atomicFragments[0].keyId, params._keyId);
   });
 });

@@ -8,6 +8,22 @@
 
 ## 개요
 
+### Default offline check
+
+Run `npm run test:integration` from the repository root. The command loads the
+checked-in synthetic `.env.test` fixture and disables Redis, cache and default
+metrics, matching `npm test`. It does not load a developer's default `.env`.
+Without a reachable test PostgreSQL instance, DB-dependent cases skip; provider
+E2E flags remain opt-in. This command also runs in the no-DB GitHub Actions job.
+`npm run test:ci` combines the unit and integration commands.
+
+The reflect payload regression preserves the real fragment-construction and
+atomic-branch call ordering, then stubs the transaction boundary. It verifies
+that the narrative episode reaches that boundary with its content and key ID.
+It does not claim to exercise a real PostgreSQL transaction; dedicated DB tests
+cover those paths. Session-rotation fixtures use the configured test key and
+allowed origins through the real handler, including a missing-token 401 check.
+
 이 디렉터리의 LLM 관련 통합 테스트는 gemini-cli, codex-cli, copilot-cli 실제 바이너리 호출과
 MorphemeIndex의 LLM 체인 관통 동작을 end-to-end로 검증한다.
 각 테스트는 환경변수 가드로 기본 skip 처리되어 있으며, 명시적으로 활성화해야 실행된다.
