@@ -124,17 +124,20 @@ node server.js
 ## 메모리 및 성능 참고
 
 - 첫 호출 시 Hugging Face Hub에서 모델을 다운로드한다. e5-small 약 120MB, bge-m3 약 500MB. 이후에는 로컬 캐시를 사용한다.
-- 캐시 경로 지정을 권장한다:
+- 잠금 파일의 Transformers.js 3.8.1 기본 캐시는 설치 디렉터리 내부의
+  `node_modules/@huggingface/transformers/.cache`이다. 현재 provider는 캐시 경로를
+  덮어쓰지 않으며 `HF_HOME` 환경변수도 적용하지 않는다. 설치된 런타임에서 확인한다:
 
-```
-HF_HOME=/var/lib/weasley_deepmind/huggingface
+```bash
+node --input-type=module -e "import { env } from '@huggingface/transformers'; console.log(env.cacheDir)"
 ```
 
-- Docker 배포 시 볼륨 마운트 예:
-
-```
--v /var/lib/weasley_deepmind/huggingface:/root/.cache/huggingface
-```
+- 컨테이너에서는 위 명령이 출력한 내부 경로를 영속 볼륨으로 유지한다.
+  `npm ci`는 `node_modules`를 지우므로 주간 E2E 워크플로는 설치 후 모델 캐시를
+  복원한다. OS와 잠금 파일이 캐시 키에 포함된다.
+- `local-embedding-cache-workflow.test.js`는 작은 합성 config 파일만으로 실제
+  Transformers.js 파일 캐시와 새 프로세스의 오프라인 재사용을 검증한다.
+  모델 가중치 다운로드, 추론 성능, GitHub 캐시 서비스의 복원 성공을 측정하지 않는다.
 
 - CPU 기준 임베딩 지연시간 (Q8 quantized):
 

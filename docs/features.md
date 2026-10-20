@@ -30,6 +30,16 @@ weasley-deepmind의 주요 모듈을 한 페이지로 정리한 ledger. 새 모�
 |`SearchSideEffects` (`lib/memory/read/SearchSideEffects.js`)|검색 결과 배열 + ctx|searchEventId, co_retrieved 업데이트, EMA 갱신|DB 장애 시 soft fail|—|`weasley_deepmind_search_event_total`|migration-027|
 |`PgVectorStore` / `SqliteVecStore` (`lib/storage/`)|SQL 문 + 파라미터|rows 배열|연결 오류 시 throw; SqliteVecStore는 미구현 스텁|`WEASLEY_DEEPMIND_STORAGE`|—|—|
 
+## Local embedding E2E cache
+
+The weekly local-embedding workflow caches the installed Transformers.js default
+directory after `npm ci`, using an OS/lockfile key. The locked 3.8.1 runtime stores
+files under `node_modules/@huggingface/transformers/.cache`; the application does
+not map `HF_HOME` to that path. Offline unit checks compare the workflow path with
+the actual runtime and verify a tiny synthetic configuration survives across fresh
+processes without network access. They do not load model weights or measure model
+performance or GitHub cache-service behavior.
+
 ## 실험적 기능 플래그
 
 다음 기능은 기본 off이며 ENV 토글로 활성화한다. 운영 신뢰가 확보되면 기본 on으로 승급할 후보다.
