@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- Context injection now applies the requested content-token budget to flat and
+  structured responses using the existing cl100k_base tokenizer. Whole fragments
+  are selected by importance/activation rank; a candidate that does not fit no
+  longer blocks smaller candidates. Mandatory anchors retain their existing
+  budget exemption and are included in reported token totals.
+- Context deduplicates anchor/core/working fragments before rendering text,
+  constructing structured categories, accounting tokens, or recording seen IDs.
+  Budget-excluded fragments remain available to a later recall.
+
 ## [5.3.1] - 2026-07-27
 
 ### Fixed
