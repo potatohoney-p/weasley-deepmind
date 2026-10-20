@@ -236,7 +236,9 @@ async function runHotCacheSearch(includePeerAgents) {
   search.store = {
     searchByKeywords: async () => [],
     searchByTopic   : async () => [],
-    getByIds        : async () => [],
+    getByIds        : async (ids, agentId, _keyId, _groupKeyIds, opts = {}) => rows
+      .filter(row => ids.includes(row.id) && (opts.includePeerAgents || row.agent_id === agentId || row.agent_id === "default"))
+      .map(row => ({ ...row })),
     incrementAccess : () => {},
     touchLinked     : async () => {}
   };
