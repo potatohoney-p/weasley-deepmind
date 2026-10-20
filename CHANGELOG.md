@@ -1,5 +1,16 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- The integration test command now loads `.env.test` and disables Redis/cache
+  and default metrics consistently with the unit suite. Offline integration is
+  included in the existing no-DB CI job; DB-dependent cases retain their skips.
+- Integration fixtures now use cross-platform file URLs, isolate the narrative
+  episode's atomic storage boundary, and exercise session rotation with the test
+  key and an allowed origin instead of a late, ineffective auth-disable flag.
+  No production authentication behavior changed.
+
 ## [5.3.1] - 2026-07-27
 
 ### Fixed

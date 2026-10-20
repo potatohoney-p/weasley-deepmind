@@ -21,6 +21,8 @@ jobs:
         run: npm run lint
       - name: All unit tests (Jest + node:test)
         run: npm test
+      - name: Offline integration tests (DB-required cases skip)
+        run: npm run test:integration
 
   e2e:
     name: E2E Tests (with DB)
