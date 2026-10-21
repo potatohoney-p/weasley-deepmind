@@ -694,7 +694,7 @@ violations 있는 경우 (soft gate — 저장됨):
 | toId | string | O | 대상 파편 ID |
 | relationType | string | - | 관계 유형 (related, caused_by, resolved_by, part_of, contradicts). 기본 related. |
 | agentId | string | - | 에이전트 ID |
-| weight | number | - | 관계 가중치 (0-1, 기본 1) |
+| weight | number | - | 유한한 숫자 관계 가중치 (권장 0-1, 기본 1). 숫자 문자열·NaN·무한대는 dryRun에서도 거부 |
 | dryRun | boolean | - | true 설정 시 실제 링크 생성 없이 사이클 여부·소유권 검사 결과만 반환. |
 
 ---
