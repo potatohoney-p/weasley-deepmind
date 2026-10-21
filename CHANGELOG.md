@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- L2.5 graph neighbor selection now deduplicates neighbors and orders by link weight before applying its limit, instead of truncating in fragment-ID order. Existing scope/validity filters and post-selection relation boosts are unchanged.
+
 ## [5.3.1] - 2026-07-27
 
 ### Fixed
