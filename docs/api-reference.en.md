@@ -642,7 +642,7 @@ Establish a relationship between two fragments. Specifies causal, resolution, co
 | toId | string | Y | Target fragment ID |
 | relationType | string | - | Relation type (related, caused_by, resolved_by, part_of, contradicts). Default related. |
 | agentId | string | - | Agent ID |
-| weight | number | - | Relation weight (0-1, default 1) |
+| weight | number | - | Finite numeric relation weight (recommended 0-1, default 1). Numeric strings, NaN and infinities are rejected, including dryRun |
 | dryRun | boolean | - | When true, returns cycle and ownership check results without creating the link. |
 
 ---

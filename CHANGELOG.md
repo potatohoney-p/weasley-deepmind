@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- Reject nonnumeric and nonfinite `link.weight` values before link writes or resolved-error importance updates, including dry runs. JSON numeric overflow and strings such as `"NaN"` previously reached PostgreSQL `REAL` weights and affected graph retrieval. Finite values and the omitted/null default of 1 are unchanged; existing persisted weights are not repaired.
+
 ## [5.3.1] - 2026-07-27
 
 ### Fixed

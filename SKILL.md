@@ -918,7 +918,7 @@ async 사용 지침: 대량(수십~200건) 일괄 저장에서 호출자 대기�
 | fromId | string | O | 시작 파편 ID |
 | toId | string | O | 대상 파편 ID |
 | relationType | string | - | related(기본), caused_by, resolved_by, part_of, contradicts |
-| weight | number | - | 관계 가중치 (0-1, 기본 1) |
+| weight | number | - | 유한한 숫자 관계 가중치 (권장 0-1, 기본 1). 숫자 문자열·NaN·무한대는 dryRun에서도 거부 |
 | agentId | string | - | 에이전트 ID |
 
 fromId 또는 toId가 타 테넌트 소유 파편인 경우 `"Fragment not found or no permission"` 오류가 반환된다.
