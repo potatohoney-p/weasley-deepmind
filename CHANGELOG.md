@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- Recall continuation cursors now restore their ranking anchor before search and final ranking, and serialize the exact anchor used for the first page. This prevents elapsed wall-clock time from changing page order for an unchanged candidate set with valid creation timestamps. Invalid cursor offsets or timestamps restart at the first page; pagination is not a snapshot of changing memory contents. Missing/invalid fragment creation timestamps retain their existing wall-clock scoring fallback, so the stable-order guarantee does not cover those fragments.
+
 ## [5.3.1] - 2026-07-27
 
 ### Fixed
