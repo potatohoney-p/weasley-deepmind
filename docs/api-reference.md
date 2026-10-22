@@ -320,7 +320,7 @@ API 키의 일일 호출 제한을 변경한다. 마스터 키 인증 필요.
 | 이름 | 타입 | 필수 | 설명 |
 |------|------|------|------|
 | keywords | string[] | - | 키워드 검색 (L1→L2). text 미지정 시 keywords(+contextText) 합성 텍스트로 L3 시맨틱 보조 검색이 병렬 수행되어 저장 keywords에 없는 용어도 content 기반 회수된다 (`semanticSearch.keywordFallback`으로 제어, searchPath에 `L3kw:N` 세그먼트). |
-| text | string | - | 자연어 쿼리 (L3 시맨틱) |
+| text | string | - | 자연어 쿼리. keywords/topic 미지정 시 최대 5개 추출 용어로 저장 키워드를 검색하며, 임베딩 활성 시 L3 시맨틱도 병행한다. [일치 범위](operations/text-keyword-recall.md) 참고. |
 | topic | string | - | 주제 필터 |
 | type | string | - | 타입 필터 (fact, decision, error, preference, procedure, relation, episode) |
 | tokenBudget | number | - | 최대 반환 토큰. 기본 1000. |

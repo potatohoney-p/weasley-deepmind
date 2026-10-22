@@ -316,7 +316,7 @@ MCP resources for real-time queries on the current state of the memory system.
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
 | keywords | string[] | - | Keyword search (L1->L2). Without text, an L3 semantic supplement runs in parallel using the synthesized keywords(+contextText) text, recovering fragments whose stored keywords lack the query terms (controlled by `semanticSearch.keywordFallback`, adds an `L3kw:N` searchPath segment). |
-| text | string | - | Natural language query (L3 semantic) |
+| text | string | - | Natural language query; without explicit keywords/topic, searches stored keywords using up to five derived terms. L3 semantic search also runs when embeddings are enabled. See [matching limits](operations/text-keyword-recall.md). |
 | topic | string | - | Topic filter |
 | type | string | - | Type filter (fact, decision, error, preference, procedure, relation, episode) |
 | tokenBudget | number | - | Maximum return tokens. Default 1000. |
