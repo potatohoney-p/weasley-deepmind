@@ -668,6 +668,12 @@ violations 있는 경우 (soft gate — 저장됨):
 
 ## MCP 도구 — forget
 
+`id`가 있으면 `topic`보다 우선한다. topic 삭제는 요청 API 키 소유이면서 요청 agentId 또는 default 에이전트에 속한 모든 파편에 적용한다. superseded 파편과 모든 workspace를 포함한다. 그룹 조회 권한은 다른 키의 삭제 권한을 부여하지 않는다. master 키는 키 필터만 해제하며 에이전트 범위는 유지한다.
+
+응답은 `{success: true, deleted, protected}`이다. `protected`는 force=false일 때 범위 내 permanent 파편 수다. topic dryRun은 `{success: true, dryRun: true, simulated: {topic, matched_count, would_delete_count, protected_count, linked_count}}`를 반환한다. linked_count는 삭제 예정 파편에 닿는 고유 링크 행 수이며 soft-deleted 링크도 포함한다. 미리 보기는 파편·버전·링크·캐시를 변경하지 않으며 동시 쓰기에 대한 예약이 아니다.
+
+명시적 forget은 영구 삭제다. 삭제 파편의 버전 이력은 기존 스키마 CASCADE로 제거되며 보호된 파편과 무관한 이력은 유지한다. topic 삭제는 대상 행을 잠그고 링크 정리와 함께 하나의 트랜잭션으로 커밋 또는 롤백한다. 대상 선택 이후 삽입된 행은 다음 호출이 필요할 수 있다. 캐시 제거는 커밋 이후 best-effort이며 분산 트랜잭션을 보장하지 않는다. 임베딩 제공자는 필요하지 않다.
+
 파편 기억 삭제. id 또는 topic 중 하나는 필수. permanent 계층 파편은 force 옵션이 필요.
 
 ### 파라미터

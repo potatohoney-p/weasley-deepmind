@@ -64,3 +64,5 @@ jobs:
           npm run migrate
       - name: E2E tests
         run: npm run test:e2e
+      - name: Topic forgetting lifecycle (PostgreSQL, no providers)
+        run: node --test tests/integration/topic-forget-lifecycle.test.js
