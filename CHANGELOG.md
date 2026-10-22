@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+- Topic forgetting now deletes every eligible owned fragment in one transaction, including superseded rows, instead of stopping after 200. Permanent memories remain protected unless `force=true`; topic dry-run returns counts without changing storage or cache. Link cleanup rolls back on failure, and only committed deletions are deindexed. Group read access does not expand deletion ownership. An explicit `id` takes precedence over `topic`, as documented by the tool schema.
+
 ## [5.3.1] - 2026-07-27
 
 ### Fixed

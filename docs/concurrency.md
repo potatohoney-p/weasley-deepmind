@@ -8,6 +8,7 @@ write 경로별 lock 종류·격리 수준·재시도 정책을 한 페이지로
 
 |경로|진입점|lock 종류|격리/트랜잭션|재시도 정책|TOCTOU 가드|회귀 테스트|
 |-|-|-|-|-|-|-|
+|forget(topic)|`MemoryRememberer.forget` → `FragmentWriter.deleteByTopic`|대상 행을 id 순으로 `FOR UPDATE`; dryRun은 잠금 없음|단일 BEGIN/COMMIT, 호출 agent RLS, 명시적 owner key + agent/default 필터|자동 재시도 없음. 실패 시 전체 롤백, 성공 후 캐시 제거|잠근 행의 ttl_tier로 permanent 보호. 그룹 read 권한은 쓰기에 미적용. 선택 이후 INSERT는 다음 호출 대상|`tests/integration/topic-forget-lifecycle.test.js`|
 |remember (atomic)|`MemoryRememberer._rememberAtomic` (`lib/memory/processors/MemoryRememberer.js`)|`SELECT … api_keys FOR UPDATE` (row lock) → INSERT|단일 트랜잭션 BEGIN/COMMIT, `app.current_agent_id='system'`|호출자가 idempotencyKey로 안전 재시도. 트랜잭션 자체 자동 재시도 없음|quota 재검증을 동일 트랜잭션 안에서 수행. PolicyRules hard gate는 진입 직전 `_runPolicyGate`로 통일됨|`tests/unit/atomic-remember-policy-gate.test.js`, `tests/integration/toctou-remember-concurrency.test.js`|
 |remember (non-atomic)|`MemoryRememberer.remember` 본문|`QuotaChecker.check` 선제 검사 + INSERT|개별 쿼리. RLS는 호출자 agent_id 적용|호출자 책임|동시 요청이 드문 환경 전용. 다중 인스턴스에서는 atomic 사용 권고|`tests/unit/memory-manager-remember-tdz.test.js`|
 |batchRemember|`MemoryRememberer.batchRemember` → `BatchRememberProcessor`|`api_keys FOR UPDATE`로 quota Phase B 검증 → 24컬럼 × N행 multi-row INSERT|단일 트랜잭션. `ON CONFLICT (idempotency_key) DO NOTHING` 유지|chunk 단위 256KB 또는 500행 분할. chunk별 트랜잭션|Phase A 사전 quota check + Phase B 동일 트랜잭션 재검증|`tests/integration/batch-remember.test.js`|

@@ -628,6 +628,12 @@ Delete fragment memory. Either id or topic is required. Permanent-tier fragments
 | agentId | string | - | Agent ID |
 | dryRun | boolean | - | When true, returns target fragment info and connected link count without actually deleting. |
 
+When `id` is supplied, it takes precedence over `topic`. Topic deletion covers all owned fragments in that topic (including superseded rows), for the requested agent and the shared `default` agent, across workspaces. Group read access does not grant deletion rights over another key's records. A master key removes the key ownership filter, while retaining the agent scope.
+
+The response is `{success: true, deleted, protected}`. `protected` counts permanent fragments in that scope when `force` is false. Topic dry-run returns `{success: true, dryRun: true, simulated: {topic, matched_count, would_delete_count, protected_count, linked_count}}`; `linked_count` counts distinct link rows touching would-delete fragments, including soft-deleted links. Preview does not alter fragments, version history, links or cache. It is a preview, not a reservation against concurrent writes.
+
+Forgetting is an explicit hard delete: versions belonging to deleted fragments are removed by the existing schema cascade. Protected and unrelated history remains. Topic selection locks matching rows, and fragment deletion plus link cleanup commits or rolls back together. Rows inserted after selection may require a later call. Cache invalidation starts after commit and remains best-effort; this does not establish a distributed cache transaction. No provider is needed.
+
 ---
 
 ## MCP Tool — link
