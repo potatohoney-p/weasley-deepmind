@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- Text-only recall now searches the durable keyword index using up to five derived terms, including when embeddings are disabled or fail. Without semantic or reranker evidence, distinct keyword coverage takes priority before token trimming and final recall ranking, so older multi-term answers survive recent partial matches. Explicit keywords/topic and existing scope filters retain precedence.
+- Offline public-tool cases and PostgreSQL component acceptance cover provider failure, cold readers, old answers, corrections, tenant isolation and no-match queries. See `docs/operations/text-keyword-recall.md` for the bounded matching contract and reproducible checks.
+
 ## [5.3.1] - 2026-07-27
 
 ### Fixed

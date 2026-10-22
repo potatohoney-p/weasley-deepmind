@@ -870,7 +870,7 @@ async 사용 지침: 대량(수십~200건) 일괄 저장에서 호출자 대기�
 | 이름 | 타입 | 필수 | 설명 |
 |------|------|------|------|
 | keywords | string[] | - | 키워드 검색 (L1->L2) |
-| text | string | - | 자연어 쿼리 (L3 시맨틱) |
+| text | string | - | 자연어 쿼리 (keywords/topic 미지정 시 L2 키워드 검색, 임베딩 활성 시 L3 시맨틱 병행) |
 | topic | string | - | 주제 필터 |
 | type | string | - | 타입 필터 (episode 제외. episode는 text/topic으로 검색) |
 | tokenBudget | number | - | 최대 반환 토큰. 기본 1000. |
