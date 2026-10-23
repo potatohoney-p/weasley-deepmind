@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- Fix narrative reconstruction so soft-deleted fragment links no longer create causal chains or mark open incidents resolved. Active incoming and outgoing links are unchanged.
+
 ## [5.3.1] - 2026-07-27
 
 ### Fixed
