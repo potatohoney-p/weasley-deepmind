@@ -12,7 +12,7 @@ export async function checkHistoryActiveLinks(client, reconstructor) {
   ]) {
     await client.query(`INSERT INTO agent_memory.fragments
       (id, content, content_hash, topic, type, case_id, resolution_status)
-      VALUES ($1, $1, $1, $2, 'fact', $2, $3)`, [id, caseId, status]);
+      VALUES ($1, $2, $3, $4, 'fact', $5, $6)`, [id, id, id, caseId, caseId, status]);
   }
   await client.query(`INSERT INTO agent_memory.fragment_links
     (from_id, to_id, relation_type, weight) VALUES ($1, $2, 'resolved_by', 1)`, [incident, resolution]);
