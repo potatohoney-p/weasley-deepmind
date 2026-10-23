@@ -845,6 +845,8 @@ Core Memory + Working Memory + session_reflect를 분리 로드한다. 세션 �
 
 파편의 전체 변경 이력 조회. amend로 수정된 이전 버전과 superseded_by 체인을 반환한다.
 
+명시한 ID가 대체된 파편이어도 이력을 조회합니다. 응답은 `{ current, versions, superseded_by_chain }`이며 `current`는 요청한 ID의 저장 행입니다. 현재 유효 여부는 `valid_to`로 구분합니다. 직접 연결된 후속 파편에도 동일한 에이전트·키 가시성 범위를 적용하며, 일반 recall과 ID 조회는 현재 유효 파편만 반환합니다.
+
 ### 파라미터
 
 | 이름 | 타입 | 필수 | 설명 |
