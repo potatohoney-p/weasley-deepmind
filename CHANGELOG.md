@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- Temporal recall now honors explicit `includeSuperseded: true` through the search and database layers. Default recall still excludes expired fragments; tenant, workspace and time filters remain in force before ordering and limiting.
+
 ## [5.3.1] - 2026-07-27
 
 ### Fixed
