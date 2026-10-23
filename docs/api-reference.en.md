@@ -762,7 +762,7 @@ Traces causal relationship chains starting from an error fragment. Dedicated to 
 
 ## MCP Tool — fragment_history
 
-Query the complete change history of a fragment. Returns previous versions modified via amend and superseded_by chains.
+Query the complete change history of a fragment, including an explicitly identified superseded fragment. Returns `{ current, versions, superseded_by_chain }`: `current` is the stored row for the requested ID, not necessarily an active memory; inspect its `valid_to`. Versions are prior amendments and the chain contains directly linked successors within the same agent/key visibility scope. Ordinary recall and ID reads remain current-only. Inaccessible or missing source IDs return the existing not-found/no-permission error.
 
 ### Parameters
 

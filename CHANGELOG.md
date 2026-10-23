@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- Explicit fragment history now loads superseded source rows, stops before child reads for inaccessible sources, and applies the same agent/key visibility scope to successor rows. Ordinary ID reads remain current-only.
+
 ## [5.3.1] - 2026-07-27
 
 ### Fixed
