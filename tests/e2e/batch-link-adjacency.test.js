@@ -36,7 +36,10 @@ test("batched links preserve pairwise adjacency and disconnected components", as
     assert.equal(await store.isReachable(a, b, agent), true);
     // A repeated edge and a node occurring in both source and target positions
     // must not introduce duplicates, self-links, or unrelated neighbors.
-    await store.createLinks(sortPairs([{ fromId: a, toId: b }, { fromId: b, toId: c }]), agent);
+    await pool.query("UPDATE agent_memory.fragment_links SET weight = 3 WHERE from_id = $1 AND to_id = $2", [a, b]);
+    await store.createLinks(sortPairs([{ fromId: a, toId: b, relationType: "contradicts" }, { fromId: b, toId: c }]), agent);
+    const edge = await pool.query("SELECT relation_type, weight FROM agent_memory.fragment_links WHERE from_id = $1 AND to_id = $2", [a, b]);
+    assert.deepEqual(edge.rows, [{ relation_type: "contradicts", weight: 3 }]);
     assert.deepEqual(await neighbors(a), [b, e].sort());
     assert.deepEqual(await neighbors(b), [a, c].sort());
     assert.deepEqual(await neighbors(c), [b, d].sort());

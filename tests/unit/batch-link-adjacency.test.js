@@ -38,6 +38,7 @@ test("batch adjacency binds zipped pairs in both directions with caller scope", 
   assert.deepEqual(updates[0].params, [["a", "c"], ["b", "d"]]);
   assert.deepEqual(updates[1].params, [["b", "d"], ["a", "c"]]);
   const insert = transactionQueries.find(q => q.sql.includes("INSERT INTO"));
+  assert.doesNotMatch(insert.sql, /accessed_at/);
   assert.deepEqual(insert.params, ["a", "b", "related", "c", "d", "caused_by"]);
 });
 

@@ -3,7 +3,7 @@
 ## [Unreleased]
 
 ### Fixed
-- Preserve source/target pairing in batched link adjacency updates instead of introducing cross-pair neighbors.
+- Remove the unsupported batch-link timestamp assignment and preserve source/target pairing in batched link adjacency updates instead of introducing cross-pair neighbors.
 
 ## [5.3.1] - 2026-07-27
 

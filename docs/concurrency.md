@@ -75,7 +75,8 @@ read 경로는 write 경로와 달리 row-level lock을 사용하지 않는다. 
 `LinkStore.createLinks` preserves the positional pairing of `fromId` and `toId`
 when updating `fragments.linked_to` in both directions. A batch containing
 `(a, b)` and `(c, d)` must not connect the two components. Existing neighbors
-are retained and repeated edges are deduplicated. Regression coverage is in
+are retained and repeated edges are deduplicated. The upsert uses only columns
+defined by the migrated schema; fragment links have no `accessed_at` column. Regression coverage is in
 `tests/unit/batch-link-adjacency.test.js` and the PostgreSQL lifecycle test
 `tests/e2e/batch-link-adjacency.test.js`.
 
