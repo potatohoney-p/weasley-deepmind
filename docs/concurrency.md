@@ -69,3 +69,18 @@ read 경로는 write 경로와 달리 row-level lock을 사용하지 않는다. 
 |`LLM_CONCURRENCY`|JSON|chainKey 또는 provider name 기준 limit override|
 |`LLM_CHAIN_TIMEOUT_MS`|—|chain deadline. `0`이면 무제한|
 |`WEASLEY_DEEPMIND_METRICS_DEFAULT`|`on`|`off`이면 prom-client 카운터 noop (테스트 환경 권장)|
+
+## Batched link adjacency
+
+`LinkStore.createLinks` preserves the positional pairing of `fromId` and `toId`
+when updating `fragments.linked_to` in both directions. A batch containing
+`(a, b)` and `(c, d)` must not connect the two components. Existing neighbors
+are retained and repeated edges are deduplicated. Regression coverage is in
+`tests/unit/batch-link-adjacency.test.js` and the PostgreSQL lifecycle test
+`tests/e2e/batch-link-adjacency.test.js`.
+
+This does not change transaction boundaries: edge insertion commits before the
+two best-effort adjacency updates. It does not repair previously polluted arrays
+or guarantee atomic edge/adjacency updates under failures or concurrent writers.
+Caller scope, advisory-lock ordering requirements, and relation semantics are
+unchanged.
