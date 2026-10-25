@@ -3,6 +3,7 @@
 ## [5.3.1] - 2026-07-27
 
 ### Fixed
+- Preserve long string reflect summaries by splitting oversized URL-free sentences before fragment creation, including Unicode-safe boundaries and normalization before redaction. URL-bearing sentences and single-fragment remember retain their existing truncation policy.
 - keywords-only recall에서 시맨틱 보조(L3kw) 결과가 정확 키워드 일치 파편을 랭킹에서 밀어내거나 tokenBudget 절단으로 소실시킬 수 있던 문제 수정 (#30). 정확 일치 파편에 절단 이전 랭킹 가산(`ranking.exactKeywordBoost`, 기본 0.35)을 적용하고, 절단을 슬롯 보장 방식(정확 일치 예산 50% 선점, 시맨틱 보조 25% 몫 보장, 잔여 경쟁)으로 확장했다. text/mixed 쿼리의 절단 동작은 변경 없다.
 - explanations의 `semantic_similarity` 사유가 `L3kw` 세그먼트 회수 파편에도 부여된다.
 

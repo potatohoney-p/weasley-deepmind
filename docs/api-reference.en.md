@@ -677,7 +677,7 @@ Persist session learnings as atomic fragments at session end. Each array item is
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| summary | string \| string[] | - | Session overview fragment list. Array recommended. 1 item = 1 fact (1-2 sentences). |
+| summary | string \| string[] | - | Session overview fragment list. Array recommended. 1 item = 1 fact (1-2 sentences). Long string-input sentences without URLs are split into bounded fragments instead of discarding their tails. URL-bearing sentences retain the existing single-fragment truncation policy to avoid isolating context-free URL fragments. Whitespace may be normalized and PII is redacted before splitting. |
 | sessionId | string | - | Session ID. When provided, reflect synthesizes only fragments from the same session. |
 | decisions | string[] | - | Technical/architecture decision list. 1 item = 1 decision. |
 | errors_resolved | string[] | - | Resolved error list. 'Cause: X -> Resolution: Y' format recommended. |
