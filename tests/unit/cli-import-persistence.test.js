@@ -15,7 +15,7 @@ after(async () => {
 });
 
 for (const idempotent of [false, true]) {
-  test(`import binds durable hash and timestamp (idempotent=${idempotent})`, async () => {
+  test(`import binds durable hash and timestamp (idempotent=${idempotent})`, { timeout: 2000 }, async () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'deepmind-import-'));
     const file = path.join(dir, 'rows.jsonl');
     const rows = [
@@ -27,7 +27,11 @@ for (const idempotent of [false, true]) {
     const queries = [];
     let closed = false;
     mock.method(pg, 'Pool', function () {
-      return { query: async (sql, params) => { queries.push({ sql, params }); return { rowCount: 1 }; },
+      return { query: async (sql, params) => {
+        queries.push({ sql, params });
+        if (sql.startsWith('SET ')) await new Promise(resolve => setTimeout(resolve, 30));
+        return { rowCount: 1 };
+      },
         end: async () => { closed = true; } };
     });
     const log = mock.method(console, 'log', () => {});
@@ -96,5 +100,43 @@ test('invalid content shapes are skipped before hashing or persistence', async (
   } finally {
     mock.restoreAll();
     fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+
+test('database setup failure closes the pool before returning a failing exit code', async () => {
+  let closed = false;
+  const previousExitCode = process.exitCode;
+  mock.method(pg, 'Pool', function () {
+    return { query: async () => { throw new Error('synthetic setup failure'); },
+      end: async () => { closed = true; } };
+  });
+  mock.method(console, 'error', () => {});
+  try {
+    await importCmd({ input: '/unused-input-after-failed-setup', json: true });
+    assert.equal(process.exitCode, 1);
+    assert.ok(closed);
+  } finally {
+    process.exitCode = previousExitCode;
+    mock.restoreAll();
+  }
+});
+
+
+test('missing input after database setup still closes the pool', async () => {
+  let closed = false;
+  const previousExitCode = process.exitCode;
+  mock.method(pg, 'Pool', function () {
+    return { query: async () => ({ rowCount: 0 }), end: async () => { closed = true; } };
+  });
+  const error = mock.method(console, 'error', () => {});
+  try {
+    await importCmd({ input: path.join(os.tmpdir(), `missing-import-${crypto.randomUUID()}`), json: true });
+    assert.equal(process.exitCode, 1);
+    assert.ok(closed);
+    assert.match(error.mock.calls[0].arguments[0], /File not found/);
+  } finally {
+    process.exitCode = previousExitCode;
+    mock.restoreAll();
   }
 });

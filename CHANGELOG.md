@@ -3,7 +3,7 @@
 ## [Unreleased]
 
 ### Fixed
-- JSONL CLI import now supplies the required SHA-256 content hash and preserves exported creation timestamps in both normal and idempotent modes. Missing timestamps retain the database current-time fallback. Invalid content shapes are skipped before hashing.
+- JSONL CLI import now supplies the required SHA-256 content hash and preserves exported creation timestamps in both normal and idempotent modes. Missing timestamps retain the database current-time fallback. Invalid content shapes are skipped before hashing. Input consumption starts only after database setup, preventing small files from draining before iteration.
 
 ## [5.3.1] - 2026-07-27
 
