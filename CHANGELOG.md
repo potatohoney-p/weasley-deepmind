@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- Publish asynchronous embedding results only while the fragment still has the captured content and no vector. Concurrent amendments, deletions, and completed workers no longer receive stale vectors or false readiness events. Batch completion counts now report rows actually updated. Changed pending rows remain eligible for the existing orphan/backfill scan; this is not an automatic immediate retry or version-history lock.
+
 ## [5.3.1] - 2026-07-27
 
 ### Fixed
