@@ -21,7 +21,13 @@ six pass. Master/keyed and standalone/external-client routes are covered.
 migrated PostgreSQL schema: master and keyed promotion, lower-priority retries,
 immutable metadata, single durable row, and caller rollback. Without
 DATABASE_URL it explicitly skips; an explicitly configured database failure
-fails the test. Local PostgreSQL was unavailable; hosted CI is required before
+fails the test. The earlier core-flow E2E replays the base schema and recreates
+legacy global `idx_frag_hash` after the migration job. This regression reapplies
+existing migration 031 inside its rollback-only fixture to restore the intended
+partial indexes, and asserts their presence. It does not repair production or
+change other tests' committed schema. The initial hosted run exposed this fixture
+pollution (17 passed / 1 failed before the keyed promotion).
+Local PostgreSQL was unavailable; hosted CI is required before
 claiming this full database regression passed.
 
 An additional PGlite narrow-schema probe runs the actual generated production
