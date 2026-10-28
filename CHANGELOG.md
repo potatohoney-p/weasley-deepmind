@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — reconsolidation audit integrity
+
+- Preserve actual locked pre-update link weight and confidence in reconsolidation history, including clamp boundaries; add transaction and migrated-PostgreSQL regressions.
+
 ## [5.3.1] - 2026-07-27
 
 ### Fixed
