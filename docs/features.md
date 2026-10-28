@@ -61,3 +61,7 @@ weasley-deepmind의 주요 모듈을 한 페이지로 정리한 ledger. 새 모�
 5. migration이 따라오면 `lib/memory/migrations/migration-*.sql` 번호와 본 표 행을 연결한다.
 6. PR 템플릿(있다면)의 features ledger 체크박스에 체크한다.
 
+
+## Link read lifecycle
+
+`LinkStore` linked recall and RCA edge reads, and `LinkedFragmentLoader` attached previews, exclude `fragment_links.deleted_at IS NOT NULL` before limiting candidates. This does not remove the fragment itself from direct search, repair `linked_to` adjacency, or change key/agent/workspace policy. Validation and limits: [active-link-recall](validation/active-link-recall.md).

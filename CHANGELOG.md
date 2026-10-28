@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+- Exclude soft-deleted relationships from linked recall, RCA chains and attached previews before candidate limits. Fragment validity, scope policy and direct search behavior are unchanged.
+
 ## [5.3.1] - 2026-07-27
 
 ### Fixed
