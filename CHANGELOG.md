@@ -2,6 +2,8 @@
 
 ## Unreleased — reconsolidation audit integrity
 
+- Reconsolidation follow-up: reserve in-flight decay per link, start cooldown only after successful commit, and allow retry after failed or empty transactions.
+
 - Preserve actual locked pre-update link weight and confidence in reconsolidation history, including clamp boundaries; add transaction and migrated-PostgreSQL regressions.
 
 ## [5.3.1] - 2026-07-27

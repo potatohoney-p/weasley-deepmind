@@ -30,7 +30,27 @@ writing history. A failed history insert still rolls back the update.
 ## Limits
 
 One additional SELECT and single-row lock per eligible call. No schema changes,
-new transaction, policy/permission changes or historical ledger repair. Existing
-process-local decay/quarantine limiter, including its pre-transaction timestamp,
-is unchanged. No cross-process throttling, automatic retry, RLS certification,
+new transaction, policy/permission changes or historical ledger repair. The original snapshot change retained the process-local limiter;
+the failure-recovery follow-up below replaces pre-transaction timestamps. No cross-process throttling, automatic retry, RLS certification,
 production DB/provider access, latency claim or global graph snapshot.
+
+## Cooldown failure recovery follow-up
+
+Decay and quarantine share a process-local in-flight reservation before acquiring
+any connection. A second same-link decay is skipped while that operation is
+pending, even after 60 seconds. A successful COMMIT starts the existing 60-second
+cooldown; connection/query failures, rolled-back audits and missing/deleted links
+do not consume it. The reservation is cleared on all exits, independently of
+connection release. Reinforcement/restoration and unrelated links are unchanged.
+
+Eleven actual-module regressions cover failed connection/BEGIN/SELECT/UPDATE/
+audit/COMMIT, missing rows, long pending connections, exact cooldown boundaries,
+clock timestamp zero and unaffected actions. The migrated PostgreSQL regression
+also checks a real foreign-key audit failure rolls back, immediate decay retry
+succeeds once, then quarantine is suppressed by the committed cooldown.
+
+This remains a per-process, wall-clock limiter; no distributed admission,
+monotonic-clock behavior, bounded completed-ID map, automatic retry, or exactly-
+once guarantee is added. A COMMIT acknowledgement lost after server commit is
+ambiguous and cannot be resolved by this local limiter. A permanently pending
+operation keeps its reservation; no new transaction deadline is introduced.

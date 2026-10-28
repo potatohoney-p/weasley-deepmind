@@ -52,6 +52,20 @@ test("reconsolidation audits the locked pre-update state on migrated PostgreSQL"
     assert.equal(await count(), beforeCount);
     assert.deepEqual(await read(), { weight: 1, confidence: "0.500" });
 
+    // A rolled-back decay must not suppress the next valid feedback event.
+    const retryLink = (await pool.query(`INSERT INTO agent_memory.fragment_links
+      (from_id,to_id,relation_type,weight,confidence) VALUES ($2,$1,'related',1,0.5) RETURNING id`, ids)).rows[0].id;
+    await assert.rejects(reconsolidate(retryLink, "decay", { keyId: prefix + "-missing-key" }), { code: "23503" });
+    assert.deepEqual((await pool.query("SELECT weight,confidence FROM agent_memory.fragment_links WHERE id=$1", [retryLink])).rows[0],
+      { weight: 1, confidence: "0.500" });
+    assert.equal(Number((await pool.query("SELECT count(*) FROM agent_memory.link_reconsolidations WHERE link_id=$1", [retryLink])).rows[0].count), 0);
+    const retried = await reconsolidate(retryLink, "decay");
+    assert.ok(retried);
+    assert.equal(retried.old_weight, 1);
+    assert.ok(Math.abs(retried.new_weight - 0.85) < 0.000001);
+    assert.equal(await reconsolidate(retryLink, "quarantine"), null);
+    assert.equal(Number((await pool.query("SELECT count(*) FROM agent_memory.link_reconsolidations WHERE link_id=$1", [retryLink])).rows[0].count), 1);
+
     locker = await pool.connect();
     await locker.query("BEGIN");
     await locker.query("SELECT id FROM agent_memory.fragment_links WHERE id=$1 FOR UPDATE", [link]);
