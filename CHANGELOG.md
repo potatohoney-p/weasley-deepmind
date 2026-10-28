@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — core-flow E2E schema preservation
+
+- Stop replaying legacy schema DDL after migrations; require the prepared scoped hash indexes without modifying them. Add isolated runtime regression coverage.
+
 ## [5.3.1] - 2026-07-27
 
 ### Fixed

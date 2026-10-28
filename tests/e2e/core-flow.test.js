@@ -61,49 +61,18 @@ before(async () => {
     password: process.env.POSTGRES_PASSWORD || process.env.DB_PASSWORD,
   });
 
-  /** 스키마 + 마이그레이션 실행 (idempotent) */
-  const { readFileSync } = await import("node:fs");
-  const { join }         = await import("node:path");
-  const { fileURLToPath } = await import("node:url");
-  const { dirname }      = await import("node:path");
-
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname  = dirname(__filename);
-  const schemaDir     = join(__dirname, "../../lib/memory");
-  const migrationsDir = join(__dirname, "../../lib/memory/migrations");
-
-  const sqlFiles = [
-    "memory-schema.sql",
-    "migration-001-temporal.sql",
-    "migration-002-decay.sql",
-    "migration-003-api-keys.sql",
-    "migration-004-key-isolation.sql",
-    "migration-005-gc-columns.sql",
-    "migration-006-superseded-by-constraint.sql",
-    "migration-007-link-weight.sql",
-    "migration-008-morpheme-dict.sql",
-    "migration-009-co-retrieved.sql",
-    "migration-010-ema-activation.sql",
-    "migration-011-key-groups.sql",
-    "migration-012-quality-verified.sql",
-    "migration-013-search-events.sql",
-    "migration-014-ttl-short.sql",
-    "migration-015-created-at-index.sql",
-    "migration-016-agent-topic-index.sql",
-    "migration-017-episodic.sql",
-  ];
-
-  for (const file of sqlFiles) {
-    try {
-      const dir = file.startsWith("migration-") ? migrationsDir : schemaDir;
-      const sql = readFileSync(join(dir, file), "utf-8");
-      await pool.query(sql);
-    } catch (err) {
-      /** 이미 적용된 마이그레이션은 무시 */
-      if (!err.message.includes("already exists") && !err.message.includes("duplicate key")) {
-        console.warn(`[e2e/core-flow] migration ${file}: ${err.message}`);
-      }
-    }
+  // CI/local setup owns migrations. Replaying the base schema here recreates
+  // idx_frag_hash after migration 031 and changes later tests' conflict rules.
+  const { rows: indexes } = await pool.query(
+    "SELECT indexname FROM pg_indexes WHERE schemaname = $1 AND tablename = $2",
+    [SCHEMA, "fragments"]
+  );
+  const indexNames = new Set(indexes.map(row => row.indexname));
+  assert.ok(!indexNames.has("idx_frag_hash"),
+    "Legacy idx_frag_hash is present; prepare the database with the current migrations before E2E");
+  for (const name of ["uq_frag_hash_master", "uq_frag_hash_per_key"]) {
+    assert.ok(indexNames.has(name),
+      `Required index ${name} is missing; initialize the schema and run npm run migrate before E2E`);
   }
 
   /** MemoryManager 인스턴스 생성 */
