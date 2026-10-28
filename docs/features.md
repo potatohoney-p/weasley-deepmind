@@ -61,3 +61,11 @@ weasley-deepmind의 주요 모듈을 한 페이지로 정리한 ledger. 새 모�
 5. migration이 따라오면 `lib/memory/migrations/migration-*.sql` 번호와 본 표 행을 연결한다.
 6. PR 템플릿(있다면)의 features ledger 체크박스에 체크한다.
 
+
+## Working Memory context freshness
+
+`ContextBuilder` treats session Redis entries as candidate IDs and rehydrates them
+through `FragmentReader.getByIds` with existing agent/key/group scope, then filters
+current workspace, validity and anchor state. Each query contains at most 30 IDs;
+durable failures propagate rather than injecting stale payloads. See
+[validation and limits](validation/working-memory-freshness.md).

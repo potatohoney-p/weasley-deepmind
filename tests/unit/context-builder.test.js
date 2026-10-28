@@ -93,6 +93,7 @@ describe("ContextBuilder.build()", () => {
     };
 
     storeMock = {
+      getByIds: mock.fn(async () => [frag("wm-1", "fact", "wm item", { agent_id: "default", valid_to: null })]),
       searchBySource: mock.fn(async () => []),
     };
 

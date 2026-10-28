@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- Rehydrate session Working Memory context from current scoped durable rows instead of injecting stale Redis payloads after amendment, deletion or supersession.
+
 ## [5.3.1] - 2026-07-27
 
 ### Fixed
