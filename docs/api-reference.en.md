@@ -316,14 +316,14 @@ MCP resources for real-time queries on the current state of the memory system.
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
 | keywords | string[] | - | Keyword search (L1->L2). Without text, an L3 semantic supplement runs in parallel using the synthesized keywords(+contextText) text, recovering fragments whose stored keywords lack the query terms (controlled by `semanticSearch.keywordFallback`, adds an `L3kw:N` searchPath segment). |
-| text | string | - | Natural language query (L3 semantic) |
+| text | string | - | Natural language query; without explicit keywords/topic, searches stored keywords using up to five derived terms. L3 semantic search also runs when embeddings are enabled. See [matching limits](operations/text-keyword-recall.md). |
 | topic | string | - | Topic filter |
 | type | string | - | Type filter (fact, decision, error, preference, procedure, relation, episode) |
 | tokenBudget | number | - | Maximum return tokens. Default 1000. |
 | includeLinks | boolean | - | Include linked fragments (1-hop, resolved_by/caused_by prioritized). Default true. |
 | linkRelationType | string | - | Link relation type filter (related, caused_by, resolved_by, part_of, contradicts) |
 | threshold | number | - | Similarity threshold (0-1) |
-| includeSuperseded | boolean | - | Include expired (superseded) fragments. Default false. |
+| includeSuperseded | boolean | - | Include expired (superseded) fragments, including one-hop linked neighbors and timeRange candidates. Default false. Linked history retains `valid_to`; key, agent, workspace and time bounds still apply. |
 | includePeerAgents | boolean | - | When true, includes fragments from other agentIds within the same key/workspace scope (for multi-agent collaboration). Key and workspace boundaries are preserved. Default false. |
 | asOf | string | - | ISO 8601. Return only fragments valid at the specified point in time. |
 | excludeSeen | boolean | - | Exclude fragments already injected by context(). Default true. |
@@ -628,6 +628,12 @@ Delete fragment memory. Either id or topic is required. Permanent-tier fragments
 | agentId | string | - | Agent ID |
 | dryRun | boolean | - | When true, returns target fragment info and connected link count without actually deleting. |
 
+When `id` is supplied, it takes precedence over `topic`. Topic deletion covers all owned fragments in that topic (including superseded rows), for the requested agent and the shared `default` agent, across workspaces. Group read access does not grant deletion rights over another key's records. A master key removes the key ownership filter, while retaining the agent scope.
+
+The response is `{success: true, deleted, protected}`. `protected` counts permanent fragments in that scope when `force` is false. Topic dry-run returns `{success: true, dryRun: true, simulated: {topic, matched_count, would_delete_count, protected_count, linked_count}}`; `linked_count` counts distinct link rows touching would-delete fragments, including soft-deleted links. Preview does not alter fragments, version history, links or cache. It is a preview, not a reservation against concurrent writes.
+
+Forgetting is an explicit hard delete: versions belonging to deleted fragments are removed by the existing schema cascade. Protected and unrelated history remains. Topic selection locks matching rows, and fragment deletion plus link cleanup commits or rolls back together. Rows inserted after selection may require a later call. Cache invalidation starts after commit and remains best-effort; this does not establish a distributed cache transaction. No provider is needed.
+
 ---
 
 ## MCP Tool — link
@@ -642,7 +648,7 @@ Establish a relationship between two fragments. Specifies causal, resolution, co
 | toId | string | Y | Target fragment ID |
 | relationType | string | - | Relation type (related, caused_by, resolved_by, part_of, contradicts). Default related. |
 | agentId | string | - | Agent ID |
-| weight | number | - | Relation weight (0-1, default 1) |
+| weight | number | - | Finite numeric relation weight (recommended 0-1, default 1). Numeric strings, NaN and infinities are rejected, including dryRun |
 | dryRun | boolean | - | When true, returns cycle and ownership check results without creating the link. |
 
 ---
@@ -677,7 +683,7 @@ Persist session learnings as atomic fragments at session end. Each array item is
 
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| summary | string \| string[] | - | Session overview fragment list. Array recommended. 1 item = 1 fact (1-2 sentences). |
+| summary | string \| string[] | - | Session overview fragment list. Array recommended. 1 item = 1 fact (1-2 sentences). Long string-input sentences without URLs are split into bounded fragments instead of discarding their tails. URL-bearing sentences retain the existing single-fragment truncation policy to avoid isolating context-free URL fragments. Whitespace may be normalized and PII is redacted before splitting. |
 | sessionId | string | - | Session ID. When provided, reflect synthesizes only fragments from the same session. |
 | decisions | string[] | - | Technical/architecture decision list. 1 item = 1 decision. |
 | errors_resolved | string[] | - | Resolved error list. 'Cause: X -> Resolution: Y' format recommended. |
@@ -762,7 +768,7 @@ Traces causal relationship chains starting from an error fragment. Dedicated to 
 
 ## MCP Tool — fragment_history
 
-Query the complete change history of a fragment. Returns previous versions modified via amend and superseded_by chains.
+Query the complete change history of a fragment, including an explicitly identified superseded fragment. Returns `{ current, versions, superseded_by_chain }`: `current` is the stored row for the requested ID, not necessarily an active memory; inspect its `valid_to`. Versions are prior amendments and the chain contains directly linked successors within the same agent/key visibility scope. Ordinary recall and ID reads remain current-only. Inaccessible or missing source IDs return the existing not-found/no-permission error.
 
 ### Parameters
 

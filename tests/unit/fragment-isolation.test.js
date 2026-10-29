@@ -117,22 +117,15 @@ function makeMockFactory() {
 
 describe("FragmentWriter — content_hash 테넌트 격리", () => {
 
-  it("dedup SELECT가 key_id IS NOT DISTINCT FROM 조건을 포함한다", async () => {
-    const captured = [];
-    const writer   = new FragmentWriter();
-
-    // queryWithAgentVector를 직접 모킹할 수 없으므로
-    // db.js 모듈 단위에서 실제 pool 미사용 경로를 확인:
-    // getPrimaryPool()이 null 반환 → insert()가 null을 반환하는지 확인하는 대신,
-    // 실제 SQL 문자열 생성 로직은 FragmentWriter 소스에서 직접 검증한다.
-    //
-    // 아래는 dedup SELECT SQL이 key_id 격리 조건을 포함하는지 소스 레벨에서 확인.
-    const src = FragmentWriter.toString();
-    // class body에 해당 패턴이 있어야 한다
-    assert.ok(
-      src.includes("IS NOT DISTINCT FROM"),
-      "dedup SELECT must include IS NOT DISTINCT FROM for key_id isolation"
-    );
+  it("insert dedup uses the matching partial unique index, not a preflight return", () => {
+    const writer = new FragmentWriter();
+    const base = { id: "attempt", content: "memory", type: "fact" };
+    const master = writer._prepareInsertRow(base);
+    const keyed = writer._prepareInsertRow({ ...base, key_id: "owner-key" });
+    assert.match(master.insertSql, /ON CONFLICT \(content_hash\) WHERE key_id IS NULL/);
+    assert.match(keyed.insertSql, /ON CONFLICT \(key_id, content_hash\) WHERE key_id IS NOT NULL/);
+    assert.equal(master.insertParams[13], null);
+    assert.equal(keyed.insertParams[13], "owner-key");
   });
 
   it("insert(): keyId=null → ON CONFLICT (content_hash) WHERE key_id IS NULL", async () => {

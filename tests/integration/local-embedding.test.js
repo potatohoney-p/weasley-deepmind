@@ -9,7 +9,8 @@
  *
  * 전제:
  *   - @huggingface/transformers 설치됨
- *   - 최초 실행 시 ~/.cache/huggingface/에 모델 다운로드 (~120MB for e5-small)
+ *   - 최초 실행 시 Transformers.js env.cacheDir에 모델 다운로드 (~120MB for e5-small)
+ *     (현재 기본값: node_modules/@huggingface/transformers/.cache)
  *   - 다운로드 후 cache hit으로 실행
  *
  * E2E_LOCAL_EMBED 미설정 시 전체 suite skip.

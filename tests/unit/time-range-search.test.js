@@ -68,3 +68,22 @@ describe("parseTimeRange", () => {
     assert.ok(Number.isFinite(result.to.getTime()));
   });
 });
+
+describe("temporal search history propagation", () => {
+  test("forwards explicit history and all existing scope options", async () => {
+    const { FragmentSearch } = await import("../../lib/memory/read/FragmentSearch.js");
+    const calls = [];
+    const search = Object.create(FragmentSearch.prototype);
+    search.store = { searchByTimeRange: async (...args) => { calls.push(args); return []; } };
+    const from = new Date("2026-01-01T00:00:00Z");
+    const to = new Date("2026-02-01T00:00:00Z");
+    await search._searchTemporal({ timeRange: { from, to }, includeSuperseded: true,
+      agentId: "a", keyId: "k", workspace: "w", includePeerAgents: true,
+      caseId: "c", resolutionStatus: "resolved", phase: "result" });
+    assert.deepEqual(calls, [[from, to, { agentId: "a", keyId: "k", workspace: "w",
+      limit: 30, includeSuperseded: true, includePeerAgents: true,
+      caseId: "c", resolutionStatus: "resolved", phase: "result" }]]);
+    assert.deepEqual(await search._searchTemporal({ includeSuperseded: true }), []);
+    assert.equal(calls.length, 1, "no temporal DB request without a time range");
+  });
+});

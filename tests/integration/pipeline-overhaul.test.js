@@ -178,9 +178,9 @@ describe("Pipeline Overhaul Integration", () => {
   });
 
   describe("Backfill Script", () => {
-    it("backfill-embeddings.js exists and is importable", async () => {
+    it("backfill-embeddings.js exists as a regular file", async () => {
       const { stat } = await import("node:fs/promises");
-      const path = new URL("../../scripts/backfill-embeddings.js", import.meta.url).pathname;
+      const path = new URL("../../scripts/backfill-embeddings.js", import.meta.url);
       const s = await stat(path);
       assert.ok(s.isFile(), "backfill-embeddings.js should be a file");
     });

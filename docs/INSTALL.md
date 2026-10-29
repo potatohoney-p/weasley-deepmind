@@ -326,19 +326,21 @@ EMBEDDING_DIMENSIONS=384
 [LocalEmbedder] loading model Xenova/multilingual-e5-small (dtype=q8)
 ```
 
-### 캐시 경로 (HF_HOME)
+### Transformers.js 캐시 경로
 
-기본 캐시 경로: `~/.cache/huggingface`
+잠금 파일의 Transformers.js 3.8.1은 설치 디렉터리 내부의
+`node_modules/@huggingface/transformers/.cache`를 기본 캐시로 사용한다.
+이 애플리케이션은 해당 기본값을 사용하며 `HF_HOME` 설정으로 바뀌지 않는다.
 
-Docker 배포 시 모델을 볼륨에 마운트하여 재다운로드를 방지한다.
+설치 후 애플리케이션 디렉터리에서 실제 절대 경로를 확인한다.
 
-```yaml
-# docker-compose.yml 예시
-volumes:
-  - hf_cache:/root/.cache/huggingface
-environment:
-  - HF_HOME=/root/.cache/huggingface
+```bash
+node --input-type=module -e "import { env } from '@huggingface/transformers'; console.log(env.cacheDir)"
 ```
+
+컨테이너에서는 내부에서 출력된 경로를 영속 볼륨으로 유지한다. `npm ci`는
+`node_modules`를 지우므로 CI 캐시는 설치 이후에 복원해야 한다. 주간 로컬 임베딩
+워크플로는 이 순서와 OS/잠금 파일 기반 캐시 키를 사용한다.
 
 상세 설정은 [docs/embedding-local.md](embedding-local.md) 참조.
 

@@ -99,6 +99,29 @@ describe("ReflectProcessor - summary", () => {
     assert.equal(deps.index.index.mock.callCount(), 1);
   });
 
+  for (const useBatch of [false, true]) {
+    it(`preserves long string summaries with the real factory (batch=${useBatch})`, async () => {
+      const { FragmentFactory } = await import("../../lib/memory/write/FragmentFactory.js");
+      const deps = createMockDeps();
+      deps.factory = new FragmentFactory();
+      let saved;
+      if (useBatch) {
+        deps.batchRememberProcessor = { process: async ({ fragments }) => {
+          saved = fragments.map(f => f.content);
+          return { results: fragments.map((f, i) => ({ success: true, id: `batch-${i}` })) };
+        } };
+      }
+      const processor = new ReflectProcessor(deps);
+      const summary = `${"The memory worker verified the operation ".repeat(20)}FINAL CONFIRMED RESULT`;
+      const result = await processor.process({ summary, agentId: "test-agent" });
+      saved ??= deps.store.insert.mock.calls.map(call => call.arguments[0].content);
+      assert.equal(saved.join(" "), summary);
+      assert.equal(result.breakdown.summary, saved.length);
+      assert.ok(saved.length > 1);
+      assert.ok(saved.every(content => content.length <= 300));
+    });
+  }
+
   it("배열 summary를 각각 fact 파편으로 변환", async () => {
     const deps      = createMockDeps();
     const processor = new ReflectProcessor(deps);

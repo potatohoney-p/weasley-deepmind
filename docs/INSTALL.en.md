@@ -364,18 +364,21 @@ On first startup, the model is automatically downloaded from HuggingFace Hub. Fo
 [LocalEmbedder] loading model Xenova/multilingual-e5-small (dtype=q8)
 ```
 
-### Cache Path (HF_HOME)
+### Transformers.js Cache Path
 
-Default cache location: `~/.cache/huggingface`
+The locked Transformers.js 3.8.1 runtime defaults to
+`node_modules/@huggingface/transformers/.cache` inside its installation. This
+application uses that default; setting `HF_HOME` does not change it.
 
-For Docker deployments, mount the cache directory as a volume to avoid re-downloading on container restart:
+Print the absolute path from the application directory after installation:
 
-```yaml
-volumes:
-  - hf_cache:/root/.cache/huggingface
-environment:
-  - HF_HOME=/root/.cache/huggingface
+```bash
+node --input-type=module -e "import { env } from '@huggingface/transformers'; console.log(env.cacheDir)"
 ```
+
+For containers, persist the directory printed inside the container. Restore CI
+cache files after `npm ci`, since installation clears `node_modules`. The weekly
+local-embedding workflow follows this order and keys its cache by OS and lockfile.
 
 For full details, see [docs/embedding-local.md](embedding-local.md).
 

@@ -8,9 +8,12 @@ weasley-deepmind의 주요 모듈을 한 페이지로 정리한 ledger. 새 모�
 
 |모듈|입력|출력|주된 실패 모드|관련 ENV|관련 메트릭|관련 migration|
 |-|-|-|-|-|-|-|
+|`ContextBuilder` (`lib/memory/read/ContextBuilder.js`)|context params, core/working/anchor candidates|deduplicated flat or structured injection; shared ranked selection and cl100k_base content-token totals|mandatory anchors may exceed the requested budget; JSON/section labels and auxiliary learning metadata are outside the content budget|`WEASLEY_DEEPMIND_CONTEXT_ANCHOR_LIMIT`|—|—|
+|Offline recall evaluation (`scripts/evaluate-recall.js`)|Synthetic revision corpus, current/legacy-cache variant|Deterministic paired JSON report, exit 0/1/2|Invalid/missing cases, stale content, budget/accounting mismatch, full-budget miss; Node 24 required|Isolated synthetic child environment|Recall/precision with denominators, stale returns, cache differences|None|
+|`MemoryRememberer.forget` → `FragmentWriter.deleteByTopic`|topic, agentId, owner key, force/dryRun|deleted/protected 또는 비변경 preview counts|트랜잭션 실패 시 링크·파편 롤백. 캐시 제거는 커밋 후 best-effort|`REDIS_ENABLED`|—|기존 fragment_versions CASCADE, 새 migration 없음|
 |`MemoryRememberer` (`lib/memory/processors/MemoryRememberer.js`)|remember params (content/type/topic/keywords/importance 등)|`{id, keywords, ttl_tier, scope, conflicts, validation_warnings?}`|quota 초과(`fragment_limit_exceeded`), hard gate `SymbolicPolicyViolationError`, idempotency 충돌|`WEASLEY_DEEPMIND_REMEMBER_ATOMIC`, `WEASLEY_DEEPMIND_POLICY_RULES`|`weasley_deepmind_policy_warning_total`, `weasley_deepmind_policy_gate_block_total`|migration-031 (per-key content_hash), migration-034 (idempotency tenant/master unique)|
 |`BatchRememberProcessor`|fragment 배열 + keyId (async=true 시 Redis 큐 적재 후 즉시 반환)|`{insertedIds, skipped, conflicts}` 또는 `{async:true, accepted, rejected, jobId}`|quota Phase B 초과 시 ROLLBACK, 256KB/500행 chunk 한도; async=true 시 Redis 미연결이면 동기 경로 폴백|`BATCH_DATABASE_URL`|`mcp_batch_pool_active_connections`, `mcp_batch_pool_idle_connections`, `mcp_batch_pool_waiting_count`|migration-035 (morpheme_indexed)|
-|`FragmentSearch` (`lib/memory/read/FragmentSearch.js`)|`recall` params (text/keywords/topic/type/timeRange/contextText)|`{fragments[], searchPath, _meta:{searchEventId,hints,suggestion}}`|empty results, similarity 임계 미달, NLI 실패 (soft fallback)|`ENABLE_SPREADING_ACTIVATION`, `WEASLEY_DEEPMIND_SYMBOLIC_EXPLAIN`|`weasley_deepmind_recall_*`, `weasley_deepmind_search_event_total`|migration-027 (reconsolidation/episode/spreading)|
+|`FragmentSearch` (`lib/memory/read/FragmentSearch.js`)|`recall` params (text/keywords/topic/type/timeRange/contextText); text-only는 최대 5개 용어로 durable keyword 검색, 임베딩 선택적|`{fragments[], searchPath, _meta:{searchEventId,hints,suggestion}}`; semantic/reranker 점수 없으면 keyword coverage 우선|empty results (저장 keyword 불일치 포함), similarity 임계 미달, NLI 실패 (soft fallback); [text 검색 범위](operations/text-keyword-recall.md)|`ENABLE_SPREADING_ACTIVATION`, `WEASLEY_DEEPMIND_SYMBOLIC_EXPLAIN`|`weasley_deepmind_recall_*`, `weasley_deepmind_search_event_total`|migration-027 (reconsolidation/episode/spreading)|
 |`FragmentWriter` (`lib/memory/write/FragmentWriter.js`)|fragment 객체|insert/update id|RLS 거부, content_hash 충돌, `validation_warnings` 누적 후 INSERT|`WEASLEY_DEEPMIND_SCHEMA`|`weasley_deepmind_fragment_writes_total`|core schema|
 |`MemoryConsolidator` (`lib/memory/consolidate/MemoryConsolidator.js`)|cycle trigger|stage 결과 22항목 + per-stage timing|stage별 query error는 stage 결과에 잡힘, 다음 stage 진행|`WEASLEY_DEEPMIND_CONSOLIDATE_*`, `WEASLEY_DEEPMIND_CONSOLIDATE_TIMEOUT_MS`|`weasley_deepmind_consolidation_stage_ms`|해당 없음 (로직 전용)|
 |`ReconsolidationEngine` (`lib/memory/link/ReconsolidationEngine.js`)|tool_feedback 누적|link weight 갱신|fragment_links 부재, search_event_id 무효|`WEASLEY_DEEPMIND_RECONSOLIDATION_ENABLED`|`weasley_deepmind_link_weight_*`|migration-027|
@@ -29,6 +32,46 @@ weasley-deepmind의 주요 모듈을 한 페이지로 정리한 ledger. 새 모�
 |`SearchScope` (`lib/memory/read/SearchScope.js`)|sq (검색 쿼리 파라미터 객체)|검색 레이어별 scope 정합 객체 `(workspace, caseId, resolutionStatus, phase, affect, keyId)`|없음 (순수 변환)|—|—|—|
 |`SearchSideEffects` (`lib/memory/read/SearchSideEffects.js`)|검색 결과 배열 + ctx|searchEventId, co_retrieved 업데이트, EMA 갱신|DB 장애 시 soft fail|—|`weasley_deepmind_search_event_total`|migration-027|
 |`PgVectorStore` / `SqliteVecStore` (`lib/storage/`)|SQL 문 + 파라미터|rows 배열|연결 오류 시 throw; SqliteVecStore는 미구현 스텁|`WEASLEY_DEEPMIND_STORAGE`|—|—|
+
+## Hot-cache recall consistency
+
+`FragmentSearch` treats Redis hot payloads as candidate hints. Before ranking or
+budgeting, it hydrates hits among at most 30 requested IDs through the existing
+`FragmentReader.getByIds` and `queryWithAgentVector` path. Only the durable row's
+content, validity and scope fields are used. This adds a bounded batch SELECT for
+cache validation in addition to normal L2 reads; the shared database helper may
+also perform transaction/session setup. There is no per-candidate SELECT loop or
+database scan.
+
+Default recall excludes inactive/deleted rows; `includeSuperseded: true` preserves
+explicit historical candidates with durable `valid_to` values. Scalar keys, group
+keys, empty groups, master access and peer-agent opt-in retain their existing
+scoped-reader contract. Workspace and affect filtering run on hydrated rows.
+The by-ID L1-miss fallback applies the same scope, including case, phase and
+resolution status, so it cannot reintroduce a candidate rejected during hydration.
+The separate `searchAsOf` path and the tool's `asOf`/`anchorTime` behavior are unchanged.
+
+Absent or missed Redis entries require no validation read. If a populated cache
+cannot be validated because the durable read fails, that error propagates; the
+cache is not an offline source of truth. Thus even a hot-only result now requires
+durable-read availability. Read validation also handles old payloads repopulated
+after a mutation, without requiring every mutation path to delete every cache.
+
+This does not promise linearizability for a read overlapping a concurrent mutation,
+freshness of Redis candidate indexes, or exhaustive retrieval. Session Working Memory uses a separate durable hydration path in
+`ContextBuilder`; see [working-memory freshness](validation/working-memory-freshness.md). The offline
+`superseded-hot-cache-recall.test.js` regression covers restart/stale-refill scenarios,
+amended-content budgets, history, scope and the reader's SQL bindings.
+
+## Local embedding E2E cache
+
+The weekly local-embedding workflow caches the installed Transformers.js default
+directory after `npm ci`, using an OS/lockfile key. The locked 3.8.1 runtime stores
+files under `node_modules/@huggingface/transformers/.cache`; the application does
+not map `HF_HOME` to that path. Offline unit checks compare the workflow path with
+the actual runtime and verify a tiny synthetic configuration survives across fresh
+processes without network access. They do not load model weights or measure model
+performance or GitHub cache-service behavior.
 
 ## 실험적 기능 플래그
 
@@ -61,3 +104,15 @@ weasley-deepmind의 주요 모듈을 한 페이지로 정리한 ledger. 새 모�
 5. migration이 따라오면 `lib/memory/migrations/migration-*.sql` 번호와 본 표 행을 연결한다.
 6. PR 템플릿(있다면)의 features ledger 체크박스에 체크한다.
 
+
+## Working Memory context freshness
+
+`ContextBuilder` treats session Redis entries as candidate IDs and rehydrates them
+through `FragmentReader.getByIds` with existing agent/key/group scope, then filters
+current workspace, validity and anchor state. Each query contains at most 30 IDs;
+durable failures propagate rather than injecting stale payloads. See
+[validation and limits](validation/working-memory-freshness.md).
+
+## Link read lifecycle
+
+`LinkStore` linked recall and RCA edge reads, and `LinkedFragmentLoader` attached previews, exclude `fragment_links.deleted_at IS NOT NULL` before limiting candidates. This does not remove the fragment itself from direct search, repair `linked_to` adjacency, or change key/agent/workspace policy. Validation and limits: [active-link-recall](validation/active-link-recall.md).

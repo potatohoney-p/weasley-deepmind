@@ -23,6 +23,12 @@ It is part of the **Weasley Open Source** family and is released under Apache-2.
 - PostgreSQL 15 or newer with the `pgvector` extension
 - Redis 7 (optional, for cache and low-latency keyword lookup)
 
+For a reproducible offline check of correction/retraction recall and content-token
+budgets, run `npm run --silent eval:recall` with Node.js 24. This uses production
+recall code and synthetic storage, with no database or model required. See the
+[offline recall evaluation](docs/operations/offline-recall-evaluation.md) for the
+negative control, report definitions and limits.
+
 ## Install from npm
 
 ```bash

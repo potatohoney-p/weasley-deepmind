@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "name": "instrument-revisions-v1",
+  "budgets": [8, 32, 256],
+  "episodes": [
+    {
+      "id": "copper-gauge",
+      "language": "en",
+      "events": [
+        {"op": "put", "id": "copper-old", "content": "The calibration offset is twelve ticks."},
+        {"op": "put", "id": "copper-note", "content": "The storage drawer is lined with felt.", "importance": 0.2},
+        {"op": "put", "id": "copper-current", "content": "The corrected calibration offset is seven ticks."},
+        {"op": "supersede", "id": "copper-old"},
+        {"op": "amend", "id": "copper-current", "content": "The corrected calibration offset is seven ticks only after the gauge has rested at room temperature for twenty minutes; the previous unconditional instruction was incomplete."},
+        {"op": "supersede", "id": "copper-current"},
+        {"op": "put", "id": "copper-restored", "content": "After inspection, the calibration offset is restored to nine ticks."}
+      ],
+      "checkpoints": [
+        {"id": "initial", "after": 2,
+          "expected": [{"id": "copper-old", "content": "The calibration offset is twelve ticks."}],
+          "admissible": [{"id": "copper-old", "content": "The calibration offset is twelve ticks."}, {"id": "copper-note", "content": "The storage drawer is lined with felt."}]},
+        {"id": "corrected", "after": 4,
+          "expected": [{"id": "copper-current", "content": "The corrected calibration offset is seven ticks."}],
+          "admissible": [{"id": "copper-current", "content": "The corrected calibration offset is seven ticks."}, {"id": "copper-note", "content": "The storage drawer is lined with felt."}]},
+        {"id": "amended", "after": 5,
+          "expected": [{"id": "copper-current", "content": "The corrected calibration offset is seven ticks only after the gauge has rested at room temperature for twenty minutes; the previous unconditional instruction was incomplete."}],
+          "admissible": [{"id": "copper-current", "content": "The corrected calibration offset is seven ticks only after the gauge has rested at room temperature for twenty minutes; the previous unconditional instruction was incomplete."}, {"id": "copper-note", "content": "The storage drawer is lined with felt."}]},
+        {"id": "retracted", "after": 6,
+          "expected": [],
+          "admissible": [{"id": "copper-note", "content": "The storage drawer is lined with felt."}]},
+        {"id": "restored", "after": 7,
+          "expected": [{"id": "copper-restored", "content": "After inspection, the calibration offset is restored to nine ticks."}],
+          "admissible": [{"id": "copper-restored", "content": "After inspection, the calibration offset is restored to nine ticks."}, {"id": "copper-note", "content": "The storage drawer is lined with felt."}]}
+      ]
+    },
+    {
+      "id": "prism-stand",
+      "language": "ko",
+      "events": [
+        {"op": "put", "id": "prism-old", "content": "프리즘 받침대의 기준 각도는 십오 도입니다."},
+        {"op": "put", "id": "prism-note", "content": "보관 상자 안에는 회색 천이 있습니다.", "importance": 0.2},
+        {"op": "put", "id": "prism-current", "content": "수정된 프리즘 받침대의 기준 각도는 십칠 도입니다."},
+        {"op": "supersede", "id": "prism-old"},
+        {"op": "amend", "id": "prism-current", "content": "수정된 프리즘 받침대의 기준 각도는 십칠 도입니다. 다만 수평 조절을 마치고 진동이 완전히 멈춘 뒤에만 이 값을 사용하며 이전의 무조건적인 안내는 취소합니다."},
+        {"op": "supersede", "id": "prism-current"},
+        {"op": "put", "id": "prism-restored", "content": "재검사를 마친 프리즘 받침대의 기준 각도는 십육 도로 복원되었습니다."}
+      ],
+      "checkpoints": [
+        {"id": "initial", "after": 2,
+          "expected": [{"id": "prism-old", "content": "프리즘 받침대의 기준 각도는 십오 도입니다."}],
+          "admissible": [{"id": "prism-old", "content": "프리즘 받침대의 기준 각도는 십오 도입니다."}, {"id": "prism-note", "content": "보관 상자 안에는 회색 천이 있습니다."}]},
+        {"id": "corrected", "after": 4,
+          "expected": [{"id": "prism-current", "content": "수정된 프리즘 받침대의 기준 각도는 십칠 도입니다."}],
+          "admissible": [{"id": "prism-current", "content": "수정된 프리즘 받침대의 기준 각도는 십칠 도입니다."}, {"id": "prism-note", "content": "보관 상자 안에는 회색 천이 있습니다."}]},
+        {"id": "amended", "after": 5,
+          "expected": [{"id": "prism-current", "content": "수정된 프리즘 받침대의 기준 각도는 십칠 도입니다. 다만 수평 조절을 마치고 진동이 완전히 멈춘 뒤에만 이 값을 사용하며 이전의 무조건적인 안내는 취소합니다."}],
+          "admissible": [{"id": "prism-current", "content": "수정된 프리즘 받침대의 기준 각도는 십칠 도입니다. 다만 수평 조절을 마치고 진동이 완전히 멈춘 뒤에만 이 값을 사용하며 이전의 무조건적인 안내는 취소합니다."}, {"id": "prism-note", "content": "보관 상자 안에는 회색 천이 있습니다."}]},
+        {"id": "retracted", "after": 6,
+          "expected": [],
+          "admissible": [{"id": "prism-note", "content": "보관 상자 안에는 회색 천이 있습니다."}]},
+        {"id": "restored", "after": 7,
+          "expected": [{"id": "prism-restored", "content": "재검사를 마친 프리즘 받침대의 기준 각도는 십육 도로 복원되었습니다."}],
+          "admissible": [{"id": "prism-restored", "content": "재검사를 마친 프리즘 받침대의 기준 각도는 십육 도로 복원되었습니다."}, {"id": "prism-note", "content": "보관 상자 안에는 회색 천이 있습니다."}]}
+      ]
+    },
+    {
+      "id": "pendulum-case",
+      "language": "ja",
+      "events": [
+        {"op": "put", "id": "pendulum-old", "content": "振り子の基準周期は三秒です。"},
+        {"op": "put", "id": "pendulum-note", "content": "保管棚のラベルは青色です。", "importance": 0.2},
+        {"op": "put", "id": "pendulum-current", "content": "訂正後の振り子の基準周期は四秒です。"},
+        {"op": "supersede", "id": "pendulum-old"},
+        {"op": "amend", "id": "pendulum-current", "content": "訂正後の振り子の基準周期は四秒です。ただし台座を水平にして外部の振動が止まったことを確認してから使用してください。条件のない以前の説明は撤回します。"},
+        {"op": "delete", "id": "pendulum-current"},
+        {"op": "put", "id": "pendulum-restored", "content": "再点検により振り子の基準周期は五秒に復元されました。"}
+      ],
+      "checkpoints": [
+        {"id": "initial", "after": 2,
+          "expected": [{"id": "pendulum-old", "content": "振り子の基準周期は三秒です。"}],
+          "admissible": [{"id": "pendulum-old", "content": "振り子の基準周期は三秒です。"}, {"id": "pendulum-note", "content": "保管棚のラベルは青色です。"}]},
+        {"id": "corrected", "after": 4,
+          "expected": [{"id": "pendulum-current", "content": "訂正後の振り子の基準周期は四秒です。"}],
+          "admissible": [{"id": "pendulum-current", "content": "訂正後の振り子の基準周期は四秒です。"}, {"id": "pendulum-note", "content": "保管棚のラベルは青色です。"}]},
+        {"id": "amended", "after": 5,
+          "expected": [{"id": "pendulum-current", "content": "訂正後の振り子の基準周期は四秒です。ただし台座を水平にして外部の振動が止まったことを確認してから使用してください。条件のない以前の説明は撤回します。"}],
+          "admissible": [{"id": "pendulum-current", "content": "訂正後の振り子の基準周期は四秒です。ただし台座を水平にして外部の振動が止まったことを確認してから使用してください。条件のない以前の説明は撤回します。"}, {"id": "pendulum-note", "content": "保管棚のラベルは青色です。"}]},
+        {"id": "retracted", "after": 6,
+          "expected": [],
+          "admissible": [{"id": "pendulum-note", "content": "保管棚のラベルは青色です。"}]},
+        {"id": "restored", "after": 7,
+          "expected": [{"id": "pendulum-restored", "content": "再点検により振り子の基準周期は五秒に復元されました。"}],
+          "admissible": [{"id": "pendulum-restored", "content": "再点検により振り子の基準周期は五秒に復元されました。"}, {"id": "pendulum-note", "content": "保管棚のラベルは青色です。"}]}
+      ]
+    }
+  ]
+}

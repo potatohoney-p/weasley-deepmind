@@ -18,13 +18,14 @@ jobs:
           node-version: "24"
           cache: npm
 
-      - name: Cache HuggingFace model
+      # npm ci clears node_modules, including Transformers.js's default cache.
+      - run: npm ci
+
+      - name: Cache Transformers.js model
         uses: actions/cache@v4
         with:
-          path: ~/.cache/huggingface
-          key: hf-e5-small-${{ runner.os }}
-
-      - run: npm ci
+          path: node_modules/@huggingface/transformers/.cache
+          key: transformers-e5-small-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Run local-embedding E2E
         env:
