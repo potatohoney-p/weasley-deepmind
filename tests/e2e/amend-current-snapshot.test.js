@@ -21,7 +21,10 @@ test('amend archives the locked current version after a concurrent writer commit
     await blocker.query("UPDATE agent_memory.fragments SET content = 'version one' WHERE id = $1", [id]);
     // Prime the blocker's transaction-local activity snapshot before the writer
     // starts. An observer reusing this transaction would remain stale.
-    await blocker.query('SELECT pid FROM pg_stat_activity');
+    // The idle writer connection must not retain a previous fragments query:
+    // wait events can be live even when the activity query text is cached.
+    await pool.query("SELECT 'amend observer priming'");
+    await blocker.query('SELECT pid, query FROM pg_stat_activity');
     pending = writer.update(id, { topic: 'changed' }, 'default', null, stale);
     // The other connection must really be waiting on this row, not just scheduled later.
     let blocked = false;
