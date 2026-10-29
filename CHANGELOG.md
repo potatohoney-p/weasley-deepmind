@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+- Keep the external NLI timeout active through JSON response consumption and clear its timer after transport errors, preventing stalled response bodies from hanging contradiction detection.
+
 ## [5.3.1] - 2026-07-27
 
 ### Fixed
