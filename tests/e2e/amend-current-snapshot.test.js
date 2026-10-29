@@ -19,17 +19,28 @@ test('amend archives the locked current version after a concurrent writer commit
     const stale = (await pool.query('SELECT * FROM agent_memory.fragments WHERE id = $1', [id])).rows[0];
     await blocker.query('BEGIN');
     await blocker.query("UPDATE agent_memory.fragments SET content = 'version one' WHERE id = $1", [id]);
+    // Prime the blocker's transaction-local activity snapshot before the writer
+    // starts. An observer reusing this transaction would remain stale.
+    await blocker.query('SELECT pid FROM pg_stat_activity');
     pending = writer.update(id, { topic: 'changed' }, 'default', null, stale);
     // The other connection must really be waiting on this row, not just scheduled later.
     let blocked = false;
     for (let i = 0; i < 200; i++) {
-      const result = await blocker.query(`SELECT 1 FROM pg_stat_activity
-        WHERE datname = current_database() AND pid != pg_backend_pid()
-          AND wait_event_type = 'Lock' AND query LIKE '%agent_memory.fragments%'`);
+      // Use an autocommit observer, not the transaction retaining the row lock.
+      // Identify our blocker explicitly so unrelated lock waits cannot satisfy it.
+      const result = await pool.query(`SELECT 1 FROM pg_stat_activity
+        WHERE datname = current_database()
+          AND $1 = ANY(pg_blocking_pids(pid))
+          AND wait_event_type = 'Lock' AND query LIKE '%agent_memory.fragments%'`, [blocker.processID]);
       if (result.rows.length) { blocked = true; break; }
       await new Promise(resolve => setTimeout(resolve, 10));
     }
     assert.ok(blocked, 'amend should wait for the concurrent row transaction');
+    const staleObservation = await blocker.query(`SELECT 1 FROM pg_stat_activity
+      WHERE datname = current_database() AND pid != pg_backend_pid()
+        AND wait_event_type = 'Lock' AND query LIKE '%agent_memory.fragments%'`);
+    assert.equal(staleObservation.rows.length, 0,
+      'the primed transaction-local activity snapshot cannot observe the later wait');
     await blocker.query('COMMIT');
     const result = await pending;
     assert.equal(result.content, 'version one');
