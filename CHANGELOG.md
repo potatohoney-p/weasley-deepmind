@@ -10,6 +10,9 @@
   Storage and mutations are synthetic; no models, live services or recovery claims.
 
 ### Fixed
+- Keyword-index maintenance resumes Redis SCAN across invocations instead of
+  repeatedly pruning only the first page. Each call handles one page, coalesces
+  duplicate keys, and prevents overlapping sweeps on the same index instance.
 - Context injection now applies the requested content-token budget to flat and
   structured responses using the existing cl100k_base tokenizer. Whole fragments
   are selected by importance/activation rank; a candidate that does not fit no

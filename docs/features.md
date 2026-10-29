@@ -116,3 +116,23 @@ durable failures propagate rather than injecting stale payloads. See
 ## Link read lifecycle
 
 `LinkStore` linked recall and RCA edge reads, and `LinkedFragmentLoader` attached previews, exclude `fragment_links.deleted_at IS NOT NULL` before limiting candidates. This does not remove the fragment itself from direct search, repair `linked_to` adjacency, or change key/agent/workspace policy. Validation and limits: [active-link-recall](validation/active-link-recall.md).
+
+### Keyword-index maintenance traversal
+
+`FragmentIndex.pruneKeywordIndexes()` processes one Redis SCAN page per
+maintenance invocation and retains the next cursor on that index instance.
+Nonzero cursors, including those returned with empty pages, resume on the next
+invocation; a completed cycle starts again at zero. A process restart also
+starts at zero. Overlapping calls on the same instance do not run duplicate
+maintenance, and repeated keys within a page are processed once. A thrown Redis
+operation leaves the cursor unchanged for retry; individual SCARD errors remain
+skipped, as before.
+
+This fixes starvation of keyword sets beyond the first SCAN page without
+turning a maintenance call into an unbounded full-keyspace loop. Redis COUNT is
+only a hint, so this is a one-page bound, not a hard key or latency bound. The
+existing 5,000-member trimming threshold and random eviction policy are
+unchanged. SCAN is not a snapshot, and concurrent writers or multiple processes
+can still race with pruning; this does not guarantee a strict concurrent size
+limit or exactly-once processing. Regression tests use the production class
+with a simulated Redis transport; they do not measure real-server performance.
