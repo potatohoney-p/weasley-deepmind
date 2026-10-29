@@ -236,7 +236,9 @@ async function runHotCacheSearch(includePeerAgents) {
   search.store = {
     searchByKeywords: async () => [],
     searchByTopic   : async () => [],
-    getByIds        : async () => [],
+    getByIds        : async (ids, agentId, _keyId, _groupKeyIds, opts = {}) => rows
+      .filter(row => ids.includes(row.id) && (opts.includePeerAgents || row.agent_id === agentId || row.agent_id === "default"))
+      .map(row => ({ ...row })),
     incrementAccess : () => {},
     touchLinked     : async () => {}
   };
@@ -433,7 +435,8 @@ describe("MemoryRecaller 기본 includeLinks 최종 병합 격리", () => {
     assert.deepEqual(idsOf(result), new Set(["base", "linked-own", "linked-global"]));
     assert.deepEqual(calls[0][4], {
       workspace         : "ws-a",
-      includePeerAgents : false
+      includePeerAgents : false,
+      includeSuperseded : false
     });
   });
 
@@ -453,7 +456,8 @@ describe("MemoryRecaller 기본 includeLinks 최종 병합 격리", () => {
     );
     assert.deepEqual(calls[0][4], {
       workspace         : "ws-a",
-      includePeerAgents : true
+      includePeerAgents : true,
+      includeSuperseded : false
     });
   });
 });

@@ -1,8 +1,152 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- Offline recall replay with a fresh query process, independently authored English,
+  Korean and Japanese correction/retraction fixtures, paired cold/stale-cache
+  reports and real cl100k content-token budgets. The production recall adapter
+  passes the safety gate while an explicit legacy-cache negative control fails.
+  Storage and mutations are synthetic; no models, live services or recovery claims.
+
+### Fixed
+- Context injection now applies the requested content-token budget to flat and
+  structured responses using the existing cl100k_base tokenizer. Whole fragments
+  are selected by importance/activation rank; a candidate that does not fit no
+  longer blocks smaller candidates. Mandatory anchors retain their existing
+  budget exemption and are included in reported token totals.
+- Context deduplicates anchor/core/working fragments before rendering text,
+  constructing structured categories, accounting tokens, or recording seen IDs.
+  Budget-excluded fragments remain available to a later recall.
+
+## [Unreleased]
+
+### Fixed
+- The integration test command now loads `.env.test` and disables Redis/cache
+  and default metrics consistently with the unit suite. Offline integration is
+  included in the existing no-DB CI job; DB-dependent cases retain their skips.
+- Integration fixtures now use cross-platform file URLs, isolate the narrative
+  episode's atomic storage boundary, and exercise session rotation with the test
+  key and an allowed origin instead of a late, ineffective auth-disable flag.
+  No production authentication behavior changed.
+
+## [Unreleased]
+
+### Fixed
+- Revalidate hot-cache recall candidates against durable rows before scope
+  selection, ranking and token budgeting. Superseded/deleted facts and outdated
+  amended content can no longer survive solely in a serialized Redis payload,
+  including after process restart or a later stale cache refill. Explicit history
+  reads retain superseded rows with current validity metadata. Validation uses a
+  bounded batch and preserves existing agent/key scope rules; durable-read errors
+  propagate instead of falling back to unverified cached content.
+
+## [Unreleased]
+
+### Fixed
+- Compare model-cache workflow paths through installed-package symlinks and
+  Windows junctions, even before the cache directory exists. Equivalent locations
+  no longer fail the offline check; genuinely different cache paths still fail.
+- Cache the installed Transformers.js model directory in the weekly local-embedding
+  workflow and restore it after `npm ci` so installation cannot erase restored
+  files. Scope the cache key to the OS and lockfile; correct the documented default
+  cache path and unsupported `HF_HOME` guidance. Offline checks verify the runtime
+  path, step ordering and filesystem cache reuse across fresh processes.
+
+## [Unreleased]
+
+### Fixed
+- Default recall no longer reintroduces superseded memories through one-hop links.
+  Both incoming and outgoing linked-neighbor queries exclude expired rows before
+  applying the result limit, and the final recall merge checks validity again.
+  `includeSuperseded: true` also applies to linked neighbors and retains their
+  `valid_to` metadata without relaxing key, agent or workspace isolation.
+
+## [Unreleased]
+
+### Fixed
+- Recall continuation cursors now restore their ranking anchor before search and final ranking, and serialize the exact anchor used for the first page. This prevents elapsed wall-clock time from changing page order for an unchanged candidate set with valid creation timestamps. Invalid cursor offsets or timestamps restart at the first page; pagination is not a snapshot of changing memory contents. Missing/invalid fragment creation timestamps retain their existing wall-clock scoring fallback, so the stable-order guarantee does not cover those fragments.
+
+## [Unreleased]
+
+### Fixed
+- L2.5 graph neighbor selection now deduplicates neighbors and orders by link weight before applying its limit, instead of truncating in fragment-ID order. Existing scope/validity filters and post-selection relation boosts are unchanged.
+
+## [Unreleased]
+
+### Fixed
+- Reject nonnumeric and nonfinite `link.weight` values before link writes or resolved-error importance updates, including dry runs. JSON numeric overflow and strings such as `"NaN"` previously reached PostgreSQL `REAL` weights and affected graph retrieval. Finite values and the omitted/null default of 1 are unchanged; existing persisted weights are not repaired.
+
+## [Unreleased]
+
+### Added
+- Text-only recall now searches the durable keyword index using up to five derived terms, including when embeddings are disabled or fail. Without semantic or reranker evidence, distinct keyword coverage takes priority before token trimming and final recall ranking, so older multi-term answers survive recent partial matches. Explicit keywords/topic and existing scope filters retain precedence.
+- Offline public-tool cases and PostgreSQL component acceptance cover provider failure, cold readers, old answers, corrections, tenant isolation and no-match queries. See `docs/operations/text-keyword-recall.md` for the bounded matching contract and reproducible checks.
+
+## Unreleased
+
+### Fixed
+- Topic forgetting now deletes every eligible owned fragment in one transaction, including superseded rows, instead of stopping after 200. Permanent memories remain protected unless `force=true`; topic dry-run returns counts without changing storage or cache. Link cleanup rolls back on failure, and only committed deletions are deindexed. Group read access does not expand deletion ownership. An explicit `id` takes precedence over `topic`, as documented by the tool schema.
+
+## [Unreleased]
+
+### Fixed
+- Temporal recall now honors explicit `includeSuperseded: true` through the search and database layers. Default recall still excludes expired fragments; tenant, workspace and time filters remain in force before ordering and limiting.
+
+## [Unreleased]
+
+### Fixed
+- Explicit fragment history now loads superseded source rows, stops before child reads for inaccessible sources, and applies the same agent/key visibility scope to successor rows. Ordinary ID reads remain current-only.
+
+## [Unreleased]
+
+### Fixed
+- Fix narrative reconstruction so soft-deleted fragment links no longer create causal chains or mark open incidents resolved. Active incoming and outgoing links are unchanged.
+
+## [Unreleased]
+
+### Fixed
+- Remove the unsupported batch-link timestamp assignment and preserve source/target pairing in batched link adjacency updates instead of introducing cross-pair neighbors.
+
+## [Unreleased]
+
+### Fixed
+- JSONL CLI import now supplies the required SHA-256 content hash and preserves exported creation timestamps in both normal and idempotent modes. Missing timestamps retain the database current-time fallback. Invalid content shapes are skipped before hashing. Input consumption starts only after database setup, preventing small files from draining before iteration.
+
+## [Unreleased]
+
+### Fixed
+- Publish asynchronous embedding results only while the fragment still has the captured content and no vector. Concurrent amendments, deletions, and completed workers no longer receive stale vectors or false readiness events. Batch completion counts now report rows actually updated. Changed pending rows remain eligible for the existing orphan/backfill scan; this is not an automatic immediate retry or version-history lock.
+
+## Unreleased — core-flow E2E schema preservation
+
+- Stop replaying legacy schema DDL after migrations; require the prepared scoped hash indexes without modifying them. Add isolated runtime regression coverage.
+
+## [Unreleased]
+
+### Fixed
+- Rehydrate session Working Memory context from current scoped durable rows instead of injecting stale Redis payloads after amendment, deletion or supersession.
+
+## Unreleased
+
+### Fixed
+- Exclude soft-deleted relationships from linked recall, RCA chains and attached previews before candidate limits. Fragment validity, scope policy and direct search behavior are unchanged.
+
+## Unreleased — reconsolidation audit integrity
+
+- Reconsolidation follow-up: reserve in-flight decay per link, start cooldown only after successful commit, and allow retry after failed or empty transactions.
+
+- Preserve actual locked pre-update link weight and confidence in reconsolidation history, including clamp boundaries; add transaction and migrated-PostgreSQL regressions.
+
+## Unreleased
+
+### Fixed
+- Keep the external NLI timeout active through JSON response consumption and clear its timer after transport errors, preventing stalled response bodies from hanging contradiction detection. Cancel unread non-success response bodies before returning the null fallback.
+
 ## [5.3.1] - 2026-07-27
 
 ### Fixed
+- Preserve long string reflect summaries by splitting oversized URL-free sentences before fragment creation, including Unicode-safe boundaries and normalization before redaction. URL-bearing sentences and single-fragment remember retain their existing truncation policy.
 - keywords-only recall에서 시맨틱 보조(L3kw) 결과가 정확 키워드 일치 파편을 랭킹에서 밀어내거나 tokenBudget 절단으로 소실시킬 수 있던 문제 수정 (#30). 정확 일치 파편에 절단 이전 랭킹 가산(`ranking.exactKeywordBoost`, 기본 0.35)을 적용하고, 절단을 슬롯 보장 방식(정확 일치 예산 50% 선점, 시맨틱 보조 25% 몫 보장, 잔여 경쟁)으로 확장했다. text/mixed 쿼리의 절단 동작은 변경 없다.
 - explanations의 `semantic_similarity` 사유가 `L3kw` 세그먼트 회수 파편에도 부여된다.
 
@@ -1501,3 +1645,7 @@ LLM_FALLBACKS='[
 - Quality improvements
 
 
+
+### Link write atomicity (unreleased)
+- Keep edge upserts and both adjacency updates in the same transaction. Adjacency
+  failures now roll back and reject the complete link operation, including batches.

@@ -8,12 +8,15 @@ write 경로별 lock 종류·격리 수준·재시도 정책을 한 페이지로
 
 |경로|진입점|lock 종류|격리/트랜잭션|재시도 정책|TOCTOU 가드|회귀 테스트|
 |-|-|-|-|-|-|-|
+|forget(topic)|`MemoryRememberer.forget` → `FragmentWriter.deleteByTopic`|대상 행을 id 순으로 `FOR UPDATE`; dryRun은 잠금 없음|단일 BEGIN/COMMIT, 호출 agent RLS, 명시적 owner key + agent/default 필터|자동 재시도 없음. 실패 시 전체 롤백, 성공 후 캐시 제거|잠근 행의 ttl_tier로 permanent 보호. 그룹 read 권한은 쓰기에 미적용. 선택 이후 INSERT는 다음 호출 대상|`tests/integration/topic-forget-lifecycle.test.js`|
+|amend|`FragmentWriter.update`|target row `SELECT ... FOR UPDATE`|single BEGIN/COMMIT; agent context before read|no automatic retry|rereads current archive/ownership inside transaction, not caller snapshot|`tests/unit/amend-current-snapshot.test.js`, `tests/e2e/amend-current-snapshot.test.js`|
 |remember (atomic)|`MemoryRememberer._rememberAtomic` (`lib/memory/processors/MemoryRememberer.js`)|`SELECT … api_keys FOR UPDATE` (row lock) → INSERT|단일 트랜잭션 BEGIN/COMMIT, `app.current_agent_id='system'`|호출자가 idempotencyKey로 안전 재시도. 트랜잭션 자체 자동 재시도 없음|quota 재검증을 동일 트랜잭션 안에서 수행. PolicyRules hard gate는 진입 직전 `_runPolicyGate`로 통일됨|`tests/unit/atomic-remember-policy-gate.test.js`, `tests/integration/toctou-remember-concurrency.test.js`|
 |remember (non-atomic)|`MemoryRememberer.remember` 본문|`QuotaChecker.check` 선제 검사 + INSERT|개별 쿼리. RLS는 호출자 agent_id 적용|호출자 책임|동시 요청이 드문 환경 전용. 다중 인스턴스에서는 atomic 사용 권고|`tests/unit/memory-manager-remember-tdz.test.js`|
 |batchRemember|`MemoryRememberer.batchRemember` → `BatchRememberProcessor`|`api_keys FOR UPDATE`로 quota Phase B 검증 → 24컬럼 × N행 multi-row INSERT|단일 트랜잭션. `ON CONFLICT (idempotency_key) DO NOTHING` 유지|chunk 단위 256KB 또는 500행 분할. chunk별 트랜잭션|Phase A 사전 quota check + Phase B 동일 트랜잭션 재검증|`tests/integration/batch-remember.test.js`|
 |consolidate.merge_duplicates|`MemoryConsolidator._mergeDuplicates`|advisory 없음. `queryWithAgentVector("system", …)`로 RLS 우회|개별 UPDATE/DELETE. `WHERE key_id = $X`로 키 범위 강제|cycle 단위 LIMIT 50으로 1회 실행, 미처리분은 다음 cycle에서 처리|GROUP BY (key_id, workspace, content_hash) + scope mismatch 어설션 + key_id 조건부 UPDATE/DELETE|`tests/unit/consolidator-merge-tenant-scope.test.js`|
 |consolidate.semantic_dedup|`MemoryConsolidator._semanticDedup`|advisory 없음|개별 쿼리|cycle 단위 LIMIT|topic·key_id 범위 안 KNN cos>=0.92|`tests/unit/semantic-dedup.test.js`|
 |consolidate.detect_contradictions|`MemoryConsolidator._detectContradictions`|advisory 없음|개별 쿼리|`resetCheckedPairs()`로 cycle 시작 시 추적 초기화|NLI + LLM 하이브리드. `pending_contradictions` 큐로 후처리 분리|`tests/unit/detect-supersessions.test.js`|
+|link.reconsolidate|`ReconsolidationEngine.reconsolidate`|active target `SELECT FOR UPDATE` before UPDATE|existing single transaction, audit INSERT and COMMIT|no automatic retry; process-local pending reservation and 60s cooldown after acknowledged COMMIT|audit old values come from locked current row, not inverse clamped delta|`tests/unit/reconsolidation-audit-snapshot.test.js`, `tests/e2e/reconsolidation-audit.test.js`|
 |link.createLinks|`LinkStore.createLinks` (`lib/memory/link/LinkStore.js`)|`pg_advisory_xact_lock` 1개 + multi-row INSERT|단일 트랜잭션|advisory 획득 실패 시 단건 fallback|`(from_id, to_id, relation_type)` UNIQUE로 중복 차단|`tests/unit/link-store.test.js`|
 |link.autoLinkSessionFragments|`SessionLinker.autoLinkSessionFragments`|sortedKey 사전식 정렬로 deadlock 방지|개별 쿼리|`wouldCreateCycle` 캐시로 동일 cycle 내 재계산 회피|cycle detection 사전 검사|`tests/integration/session-linker-deadlock.test.js`|
 |reflect|`MemoryReflector.reflect` → `BatchRememberProcessor.process`|상속(batchRemember)|상속|상속|상속 + idempotencyKey 권장|`tests/integration/reflect-large-payload.test.js`|
@@ -69,3 +72,19 @@ read 경로는 write 경로와 달리 row-level lock을 사용하지 않는다. 
 |`LLM_CONCURRENCY`|JSON|chainKey 또는 provider name 기준 limit override|
 |`LLM_CHAIN_TIMEOUT_MS`|—|chain deadline. `0`이면 무제한|
 |`WEASLEY_DEEPMIND_METRICS_DEFAULT`|`on`|`off`이면 prom-client 카운터 noop (테스트 환경 권장)|
+
+## Batched link adjacency
+
+`LinkStore.createLinks` preserves the positional pairing of `fromId` and `toId`
+when updating `fragments.linked_to` in both directions. A batch containing
+`(a, b)` and `(c, d)` must not connect the two components. Existing neighbors
+are retained and repeated edges are deduplicated. The upsert uses only columns
+defined by the migrated schema; fragment links have no `accessed_at` column. Regression coverage is in
+`tests/unit/batch-link-adjacency.test.js` and the PostgreSQL lifecycle test
+`tests/e2e/batch-link-adjacency.test.js`.
+
+This does not change transaction boundaries: edge insertion commits before the
+two best-effort adjacency updates. It does not repair previously polluted arrays
+or guarantee atomic edge/adjacency updates under failures or concurrent writers.
+Caller scope, advisory-lock ordering requirements, and relation semantics are
+unchanged.

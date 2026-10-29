@@ -870,7 +870,7 @@ async 사용 지침: 대량(수십~200건) 일괄 저장에서 호출자 대기�
 | 이름 | 타입 | 필수 | 설명 |
 |------|------|------|------|
 | keywords | string[] | - | 키워드 검색 (L1->L2) |
-| text | string | - | 자연어 쿼리 (L3 시맨틱) |
+| text | string | - | 자연어 쿼리 (keywords/topic 미지정 시 L2 키워드 검색, 임베딩 활성 시 L3 시맨틱 병행) |
 | topic | string | - | 주제 필터 |
 | type | string | - | 타입 필터 (episode 제외. episode는 text/topic으로 검색) |
 | tokenBudget | number | - | 최대 반환 토큰. 기본 1000. |
@@ -905,9 +905,12 @@ async 사용 지침: 대량(수십~200건) 일괄 저장에서 호출자 대기�
 | 이름 | 타입 | 필수 | 설명 |
 |------|------|------|------|
 | id | string | - | 삭제할 파편 ID |
-| topic | string | - | 해당 주제 전체 삭제 |
+| topic | string | - | id 미지정 시 해당 주제의 소유 파편 전체 삭제. superseded 파편 포함 |
 | force | boolean | - | permanent 파편 강제 삭제. 기본 false. |
 | agentId | string | - | 에이전트 ID |
+| dryRun | boolean | - | 삭제 없이 미리 보기. topic 요청은 matched_count / would_delete_count / protected_count / linked_count 반환 |
+
+topic 삭제는 해당 API 키와 요청 agentId 또는 default 에이전트 범위에 적용된다. 그룹 조회 권한은 삭제 소유권을 확장하지 않는다. workspace 필터는 없으며 모든 workspace에 적용된다. 명시적 삭제는 파편과 그 버전 이력·연결을 영구 제거하지만, 보호된 파편과 무관한 이력은 유지한다. 먼저 dryRun으로 영향을 확인할 수 있다. 실제 삭제와 링크 정리는 하나의 트랜잭션이며, 커밋된 파편만 캐시에서 제거한다.
 
 타 테넌트(다른 API 키) 소유 파편을 삭제 시도하면 `"Fragment not found or no permission"` 오류가 반환된다. master key는 전체 파편에 접근 가능하다.
 
@@ -918,7 +921,7 @@ async 사용 지침: 대량(수십~200건) 일괄 저장에서 호출자 대기�
 | fromId | string | O | 시작 파편 ID |
 | toId | string | O | 대상 파편 ID |
 | relationType | string | - | related(기본), caused_by, resolved_by, part_of, contradicts |
-| weight | number | - | 관계 가중치 (0-1, 기본 1) |
+| weight | number | - | 유한한 숫자 관계 가중치 (권장 0-1, 기본 1). 숫자 문자열·NaN·무한대는 dryRun에서도 거부 |
 | agentId | string | - | 에이전트 ID |
 
 fromId 또는 toId가 타 테넌트 소유 파편인 경우 `"Fragment not found or no permission"` 오류가 반환된다.
@@ -966,7 +969,7 @@ summary 또는 sessionId 중 하나 이상 필수.
 
 | 이름 | 타입 | 필수 | 설명 |
 |------|------|------|------|
-| tokenBudget | number | - | 기본 2000 |
+| tokenBudget | number | - | 기본 2000. flat/structured 공통 cl100k_base 주입 내용 예산. 필수 anchor는 초과해도 포함되며 totalTokens에 반영. JSON/섹션 헤더와 보조 learning 메타데이터는 제외. |
 | types | string[] | - | 기본: preference, error, procedure |
 | sessionId | string | - | 워킹 메모리 로드용 |
 | structured | boolean | - | 계층 구조 반환. 기본 false. |

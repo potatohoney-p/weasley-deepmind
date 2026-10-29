@@ -3,6 +3,10 @@
 작성자: Weasley Open Source
 작성일: 2026-07-16
 
+Offline correction/retraction and token-budget checks are now reproducible through
+the [synthetic recall evaluation](offline-recall-evaluation.md). It supplements
+the live semantic smoke checks below; it does not evaluate paraphrase or LLM quality.
+
 ## 1. text recall 0건 회복 (P1)
 
 각 쌍은 의미가 동일한 패러프레이즈다. 저장 문장(A)을 키에 remember한 뒤 질의(B)로

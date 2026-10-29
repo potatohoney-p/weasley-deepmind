@@ -320,14 +320,14 @@ API 키의 일일 호출 제한을 변경한다. 마스터 키 인증 필요.
 | 이름 | 타입 | 필수 | 설명 |
 |------|------|------|------|
 | keywords | string[] | - | 키워드 검색 (L1→L2). text 미지정 시 keywords(+contextText) 합성 텍스트로 L3 시맨틱 보조 검색이 병렬 수행되어 저장 keywords에 없는 용어도 content 기반 회수된다 (`semanticSearch.keywordFallback`으로 제어, searchPath에 `L3kw:N` 세그먼트). |
-| text | string | - | 자연어 쿼리 (L3 시맨틱) |
+| text | string | - | 자연어 쿼리. keywords/topic 미지정 시 최대 5개 추출 용어로 저장 키워드를 검색하며, 임베딩 활성 시 L3 시맨틱도 병행한다. [일치 범위](operations/text-keyword-recall.md) 참고. |
 | topic | string | - | 주제 필터 |
 | type | string | - | 타입 필터 (fact, decision, error, preference, procedure, relation, episode) |
 | tokenBudget | number | - | 최대 반환 토큰. 기본 1000. |
 | includeLinks | boolean | - | 연결된 파편 포함 (1-hop, resolved_by/caused_by 우선). 기본 true. |
 | linkRelationType | string | - | 연결 파편 관계 유형 필터 (related, caused_by, resolved_by, part_of, contradicts) |
 | threshold | number | - | similarity 임계값 (0~1) |
-| includeSuperseded | boolean | - | 만료(superseded) 파편 포함. 기본 false. |
+| includeSuperseded | boolean | - | 만료(superseded) 파편 포함. 1-hop 연결 파편에도 적용되며 기본 false. 연결된 과거 파편의 `valid_to`를 유지하고 key, agent, workspace 격리는 그대로 적용한다. |
 | includePeerAgents | boolean | - | true 시 같은 키/workspace 스코프 내 다른 agentId 파편 포함(멀티에이전트 협업용). 키·workspace 경계는 유지. 기본 false. |
 | asOf | string | - | ISO 8601. 특정 시점 기준 유효 파편만. |
 | excludeSeen | boolean | - | context()에서 이미 주입된 파편 제외. 기본 true. |
@@ -668,6 +668,12 @@ violations 있는 경우 (soft gate — 저장됨):
 
 ## MCP 도구 — forget
 
+`id`가 있으면 `topic`보다 우선한다. topic 삭제는 요청 API 키 소유이면서 요청 agentId 또는 default 에이전트에 속한 모든 파편에 적용한다. superseded 파편과 모든 workspace를 포함한다. 그룹 조회 권한은 다른 키의 삭제 권한을 부여하지 않는다. master 키는 키 필터만 해제하며 에이전트 범위는 유지한다.
+
+응답은 `{success: true, deleted, protected}`이다. `protected`는 force=false일 때 범위 내 permanent 파편 수다. topic dryRun은 `{success: true, dryRun: true, simulated: {topic, matched_count, would_delete_count, protected_count, linked_count}}`를 반환한다. linked_count는 삭제 예정 파편에 닿는 고유 링크 행 수이며 soft-deleted 링크도 포함한다. 미리 보기는 파편·버전·링크·캐시를 변경하지 않으며 동시 쓰기에 대한 예약이 아니다.
+
+명시적 forget은 영구 삭제다. 삭제 파편의 버전 이력은 기존 스키마 CASCADE로 제거되며 보호된 파편과 무관한 이력은 유지한다. topic 삭제는 대상 행을 잠그고 링크 정리와 함께 하나의 트랜잭션으로 커밋 또는 롤백한다. 대상 선택 이후 삽입된 행은 다음 호출이 필요할 수 있다. 캐시 제거는 커밋 이후 best-effort이며 분산 트랜잭션을 보장하지 않는다. 임베딩 제공자는 필요하지 않다.
+
 파편 기억 삭제. id 또는 topic 중 하나는 필수. permanent 계층 파편은 force 옵션이 필요.
 
 ### 파라미터
@@ -694,7 +700,7 @@ violations 있는 경우 (soft gate — 저장됨):
 | toId | string | O | 대상 파편 ID |
 | relationType | string | - | 관계 유형 (related, caused_by, resolved_by, part_of, contradicts). 기본 related. |
 | agentId | string | - | 에이전트 ID |
-| weight | number | - | 관계 가중치 (0-1, 기본 1) |
+| weight | number | - | 유한한 숫자 관계 가중치 (권장 0-1, 기본 1). 숫자 문자열·NaN·무한대는 dryRun에서도 거부 |
 | dryRun | boolean | - | true 설정 시 실제 링크 생성 없이 사이클 여부·소유권 검사 결과만 반환. |
 
 ---
@@ -729,7 +735,7 @@ violations 있는 경우 (soft gate — 저장됨):
 
 | 이름 | 타입 | 필수 | 설명 |
 |------|------|------|------|
-| summary | string \| string[] | - | 세션 개요 파편 목록. 배열 권장. 항목 1개 = 사실 1건 (1~2문장). |
+| summary | string \| string[] | - | 세션 개요 파편 목록. 배열 권장. 항목 1개 = 사실 1건 (1~2문장). 문자열 입력의 URL 없는 긴 문장은 뒷부분을 버리지 않고 길이 제한에 맞춰 분할한다. URL 포함 문장은 문맥 없는 URL 파편이 생기지 않도록 기존 단일 파편 절단 정책을 유지한다. 공백은 정규화될 수 있으며 PII 마스킹을 분할 전에 적용한다. |
 | sessionId | string | - | 세션 ID. 전달 시 같은 세션의 파편만 종합하여 reflect 수행. |
 | decisions | string[] | - | 기술/아키텍처 결정 목록. 항목 1개 = 결정 1건. |
 | errors_resolved | string[] | - | 해결된 에러 목록. '원인: X → 해결: Y' 형식 권장. |
@@ -844,6 +850,8 @@ Core Memory + Working Memory + session_reflect를 분리 로드한다. 세션 �
 ## MCP 도구 — fragment_history
 
 파편의 전체 변경 이력 조회. amend로 수정된 이전 버전과 superseded_by 체인을 반환한다.
+
+명시한 ID가 대체된 파편이어도 이력을 조회합니다. 응답은 `{ current, versions, superseded_by_chain }`이며 `current`는 요청한 ID의 저장 행입니다. 현재 유효 여부는 `valid_to`로 구분합니다. 직접 연결된 후속 파편에도 동일한 에이전트·키 가시성 범위를 적용하며, 일반 recall과 ID 조회는 현재 유효 파편만 반환합니다.
 
 ### 파라미터
 
