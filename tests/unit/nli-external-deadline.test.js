@@ -85,10 +85,28 @@ test("malformed JSON retains null fallback", async () => {
   assert.equal(await boundedCall(() => classifyNLI("old", "new")), null);
 });
 
-test("non-success response retains null fallback without consuming body", async () => {
-  handler = (_req, res) => { res.writeHead(503); res.flushHeaders(); };
-  assert.equal(await boundedCall(() => classifyNLI("old", "new")), null);
-});
+for (const streaming of [false, true]) {
+  test(`non-success response closes its ${streaming ? "streaming" : "stalled"} body before test cleanup`, async () => {
+    let markClosed;
+    const closed = new Promise(resolve => { markClosed = resolve; });
+    handler = (_req, res) => {
+      let interval;
+      res.on("close", () => { clearInterval(interval); markClosed(); });
+      res.writeHead(503);
+      res.flushHeaders();
+      if (streaming) {
+        res.write("unavailable");
+        interval = setInterval(() => res.write("still unavailable"), 20);
+      }
+    };
+    assert.equal(await boundedCall(async () => {
+      assert.equal(await classifyNLI("old", "new"), null);
+      // Observe client cancellation before boundedCall forcibly closes sockets.
+      await closed;
+      return "closed";
+    }), "closed");
+  });
+}
 
 test("transport rejection clears the deadline instead of aborting later", async () => {
   let signal;
