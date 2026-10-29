@@ -1506,3 +1506,7 @@ LLM_FALLBACKS='[
 - Quality improvements
 
 
+
+### Link write atomicity (unreleased)
+- Keep edge upserts and both adjacency updates in the same transaction. Adjacency
+  failures now roll back and reject the complete link operation, including batches.

@@ -9,6 +9,7 @@ mock.module("../../lib/tools/db.js", {
     getPrimaryPool: () => ({}),
     withTransaction: async (_pool, fn) => fn({ query: async (sql, params) => {
       transactionQueries.push({ sql, params });
+      if (sql.includes("UPDATE agent_memory.fragments")) updates.push({ sql, params });
       if (sql.includes("INSERT INTO")) {
         if (failInsert) throw new Error("fixture insert failure");
         return { rows: [{ id: "edge-a" }, { id: "edge-b" }] };
@@ -29,8 +30,7 @@ test("batch adjacency binds zipped pairs in both directions with caller scope", 
   assert.deepEqual(await new LinkStore().createLinks(pairs, "fixture-agent"), ["edge-a", "edge-b"]);
   assert.equal(updates.length, 2);
   for (const update of updates) {
-    assert.equal(update.agent, "fixture-agent");
-    assert.equal(update.mode, "write");
+    assert.ok(transactionQueries.some(q => q.sql.includes("app.current_agent_id = 'fixture-agent'")));
     assert.match(update.sql, /unnest\(\$1::text\[\], \$2::text\[\]\)/);
     assert.match(update.sql, /WHERE pair\.from_id = f\.id/);
     assert.match(update.sql, /SELECT unnest\(f\.linked_to\)/);
