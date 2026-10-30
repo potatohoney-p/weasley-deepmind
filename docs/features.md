@@ -116,3 +116,12 @@ durable failures propagate rather than injecting stale payloads. See
 ## Link read lifecycle
 
 `LinkStore` linked recall and RCA edge reads, and `LinkedFragmentLoader` attached previews, exclude `fragment_links.deleted_at IS NOT NULL` before limiting candidates. This does not remove the fragment itself from direct search, repair `linked_to` adjacency, or change key/agent/workspace policy. Validation and limits: [active-link-recall](validation/active-link-recall.md).
+
+## Quota usage snapshots
+
+`QuotaChecker.getUsage` returns an independently mutable scalar snapshot on both
+database reads and cache hits. Editing or freezing the returned object cannot
+change cached counts, limits, or the decision made by a later `check` call.
+The existing ten-second TTL, explicit invalidation, and near-limit database check
+are unchanged. This is object-ownership isolation, not fresh-read or concurrent
+quota-reservation semantics. Regression: `tests/unit/quota-usage-snapshot.test.js`.
