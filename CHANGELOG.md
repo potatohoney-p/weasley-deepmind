@@ -10,6 +10,8 @@
   Storage and mutations are synthetic; no models, live services or recovery claims.
 
 ### Fixed
+- Quota usage results no longer share mutable objects with the internal cache,
+  so caller edits cannot change later usage responses or quota-check decisions.
 - Context injection now applies the requested content-token budget to flat and
   structured responses using the existing cl100k_base tokenizer. Whole fragments
   are selected by importance/activation rank; a candidate that does not fit no
