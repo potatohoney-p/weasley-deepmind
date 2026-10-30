@@ -116,3 +116,16 @@ durable failures propagate rather than injecting stale payloads. See
 ## Link read lifecycle
 
 `LinkStore` linked recall and RCA edge reads, and `LinkedFragmentLoader` attached previews, exclude `fragment_links.deleted_at IS NOT NULL` before limiting candidates. This does not remove the fragment itself from direct search, repair `linked_to` adjacency, or change key/agent/workspace policy. Validation and limits: [active-link-recall](validation/active-link-recall.md).
+
+## Cyclic causal history
+
+`HistoryReconstructor` traverses natural roots first, then uncovered causal source
+IDs so stored rootless cycles and self-loops remain represented in
+`causal_chains`. Each traversal visits a node once; distinct natural roots keep
+their existing shared-tail behavior. The fallback representative follows input
+link order: `root_id` is a traversal start, not proof of an acyclic causal origin.
+This is evidence preservation, not cycle repair, strongly connected component
+decomposition, or a change to the existing resolution heuristic. Query scope,
+link deletion filters and event-to-fragment projection are unchanged. Regression:
+`tests/unit/history-causal-components.test.js` exercises production reconstruction
+with synthetic timeline/link boundaries; it does not validate live storage.
