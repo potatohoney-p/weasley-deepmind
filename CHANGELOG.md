@@ -10,6 +10,9 @@
   Storage and mutations are synthetic; no models, live services or recovery claims.
 
 ### Fixed
+- Embedding batch recovery validates provider input indexes before isolating a
+  row. Out-of-range or unsafe indexes use the existing per-row fallback instead
+  of repeatedly sending an unchanged batch.
 - Context injection now applies the requested content-token budget to flat and
   structured responses using the existing cl100k_base tokenizer. Whole fragments
   are selected by importance/activation rank; a candidate that does not fit no
