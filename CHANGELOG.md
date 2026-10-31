@@ -10,6 +10,9 @@
   Storage and mutations are synthetic; no models, live services or recovery claims.
 
 ### Fixed
+- Stale-memory warnings defer judgment for unparseable selected timestamps or
+  non-finite clocks instead of publishing stale metadata with a non-finite age.
+  Valid timestamp precedence and the inclusive age threshold are unchanged.
 - Context injection now applies the requested content-token budget to flat and
   structured responses using the existing cl100k_base tokenizer. Whole fragments
   are selected by importance/activation rank; a candidate that does not fit no
