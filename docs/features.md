@@ -116,3 +116,12 @@ durable failures propagate rather than injecting stale payloads. See
 ## Link read lifecycle
 
 `LinkStore` linked recall and RCA edge reads, and `LinkedFragmentLoader` attached previews, exclude `fragment_links.deleted_at IS NOT NULL` before limiting candidates. This does not remove the fragment itself from direct search, repair `linked_to` adjacency, or change key/agent/workspace policy. Validation and limits: [active-link-recall](validation/active-link-recall.md).
+
+## Embedding batch error recovery
+
+`EmbeddingWorker` isolates a provider-reported `input[N]` only when N is a safe
+integer within the current batch. Every recursive retry therefore removes one
+row. Missing, out-of-range and unsafe indexes use the existing per-row retry
+and dead-letter path instead of retrying the same batch indefinitely.
+Tests inject provider/Redis/database boundaries; they do not assert live
+provider error formats, queue durability or exactly-once delivery.
