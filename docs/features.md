@@ -116,3 +116,12 @@ durable failures propagate rather than injecting stale payloads. See
 ## Link read lifecycle
 
 `LinkStore` linked recall and RCA edge reads, and `LinkedFragmentLoader` attached previews, exclude `fragment_links.deleted_at IS NOT NULL` before limiting candidates. This does not remove the fragment itself from direct search, repair `linked_to` adjacency, or change key/agent/workspace policy. Validation and limits: [active-link-recall](validation/active-link-recall.md).
+
+### Stale-warning date validity
+
+Recall emits age-based stale warnings only when the selected verification timestamp
+(or creation timestamp when verification is absent) and the ranking-independent
+current clock are finite. An invalid verification timestamp does not fall back to
+an older creation timestamp: the age is unknown, so judgment is deferred. Valid
+Date objects and date strings retain the existing inclusive whole-day threshold.
+This is a response correctness guard, not stored-date repair or freshness proof.
