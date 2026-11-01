@@ -116,3 +116,12 @@ durable failures propagate rather than injecting stale payloads. See
 ## Link read lifecycle
 
 `LinkStore` linked recall and RCA edge reads, and `LinkedFragmentLoader` attached previews, exclude `fragment_links.deleted_at IS NOT NULL` before limiting candidates. This does not remove the fragment itself from direct search, repair `linked_to` adjacency, or change key/agent/workspace policy. Validation and limits: [active-link-recall](validation/active-link-recall.md).
+
+### Reranker candidate timestamps
+
+Reranking formats valid candidate creation dates as UTC date prefixes. Unparseable,
+out-of-range or unsupported timestamp values use `[Date: unknown]` instead of
+throwing before inference. The existing recency policy remains unchanged: unknown
+dates use the current time for their boost. Candidates are not modified, and an
+external service failure still retains the original order and cooldown behavior.
+This does not repair stored dates or prove timestamp freshness.

@@ -10,6 +10,9 @@
   Storage and mutations are synthetic; no models, live services or recovery claims.
 
 ### Fixed
+- Reranking treats malformed candidate dates as unknown rather than throwing
+  before inference or service-failure fallback. Valid date prefixes and the
+  existing unknown-date recency policy are preserved.
 - Context injection now applies the requested content-token budget to flat and
   structured responses using the existing cl100k_base tokenizer. Whole fragments
   are selected by importance/activation rank; a candidate that does not fit no
