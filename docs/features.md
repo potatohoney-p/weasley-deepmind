@@ -116,3 +116,15 @@ durable failures propagate rather than injecting stale payloads. See
 ## Link read lifecycle
 
 `LinkStore` linked recall and RCA edge reads, and `LinkedFragmentLoader` attached previews, exclude `fragment_links.deleted_at IS NOT NULL` before limiting candidates. This does not remove the fragment itself from direct search, repair `linked_to` adjacency, or change key/agent/workspace policy. Validation and limits: [active-link-recall](validation/active-link-recall.md).
+
+## External reranker score contract
+
+The external reranker accepts a dense `scores` array matching the candidate count,
+or an indexed array covering each candidate exactly once. Scores must be finite
+numbers; negative and greater-than-one finite provider scores remain supported.
+Missing, duplicate, out-of-range or non-numeric scores make the whole response a
+failure. Existing fallback preserves the original array/order without applying
+`topK`, and the existing three-failure cooldown/fallback policy still applies.
+This does not validate score calibration, provider relevance, candidate dates or
+the in-process model output. Local HTTP regression fixtures are not live-provider
+acceptance or retrieval-quality benchmarks.
