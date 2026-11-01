@@ -116,3 +116,12 @@ durable failures propagate rather than injecting stale payloads. See
 ## Link read lifecycle
 
 `LinkStore` linked recall and RCA edge reads, and `LinkedFragmentLoader` attached previews, exclude `fragment_links.deleted_at IS NOT NULL` before limiting candidates. This does not remove the fragment itself from direct search, repair `linked_to` adjacency, or change key/agent/workspace policy. Validation and limits: [active-link-recall](validation/active-link-recall.md).
+
+### Quota cache invalidation during reads
+
+`invalidateUsageCache(keyId)` and `clearUsageCache()` also invalidate pending
+cache fills. A database read already in progress still returns its snapshot to
+its original caller, but cannot overwrite a newer cache value or warm the cache
+after invalidation. Other keys retain their cache behavior, and active-read
+tracking is removed on success or failure. This is a process-local cache fence,
+not cross-process coherence or an atomic quota reservation.
