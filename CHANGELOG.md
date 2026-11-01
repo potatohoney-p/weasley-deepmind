@@ -10,6 +10,9 @@
   Storage and mutations are synthetic; no models, live services or recovery claims.
 
 ### Fixed
+- External reranker output must supply one finite numeric score per candidate.
+  Malformed dense/indexed payloads retain the original candidate ranking and
+  participate in the existing failure cooldown instead of injecting NaN or zeros.
 - Context injection now applies the requested content-token budget to flat and
   structured responses using the existing cl100k_base tokenizer. Whole fragments
   are selected by importance/activation rank; a candidate that does not fit no
