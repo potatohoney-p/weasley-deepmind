@@ -10,6 +10,9 @@
   Storage and mutations are synthetic; no models, live services or recovery claims.
 
 ### Fixed
+- Memory evaluator shutdown callers share the active loop drain; repeated stops
+  no longer return before evaluation finishes, and starts during draining cannot
+  launch overlapping consumers. Explicit restart is supported after awaited stop.
 - Context injection now applies the requested content-token budget to flat and
   structured responses using the existing cl100k_base tokenizer. Whole fragments
   are selected by importance/activation rank; a candidate that does not fit no
