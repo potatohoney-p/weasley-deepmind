@@ -15,7 +15,8 @@ and ignore ID-less snapshots. Do not fall back to stale contents after a durable
 read failure, or mark any result seen when hydration fails.
 
 Each SELECT contains at most 30 IDs. Continue past missing or ineligible candidates
-until the existing result/character cap or the candidate list ends. This bounds
+until the existing result cap or the candidate list ends. Oversized rows are skipped
+without truncation so older fitting rows can still use the character budget. This bounds
 individual queries, not total Redis list size, candidate scan or worst-case latency.
 No Redis mutation, schema, permissions, provider or API parameter changes.
 
@@ -43,8 +44,9 @@ The tests execute production context and reader code with synthetic storage; the
 are not live Redis/PostgreSQL/RLS or model-quality/performance evidence. A durable
 read overlapping mutation is not a linearizable snapshot of the whole context.
 Core/anchor/learning loading, seen-ID writes and Redis list maintenance are unchanged.
-The existing 3,200-character Working Memory cap is preserved, including stopping
-at an oversized current item. General content-token budgeting remains separate.
+The existing 3,200-character Working Memory cap is preserved. Oversized current
+items are skipped, not used as an end-of-candidates sentinel. General content-token
+budgeting remains separate.
 Current anchors are excluded from Working Memory and remain the anchor loader's
 responsibility. Cache-only/ID-less memories are no longer injected. Context can
 now fail when durable hydration is unavailable instead of returning stale facts.
@@ -70,3 +72,24 @@ live model execution are not validated. Hosted CI is separate from local evidenc
 A second scratch composition run explicitly migrates only that legacy ID-less
 Working Memory expectation to exclusion: 2,317 passed / 2 skips / 0 failures.
 This adapted result does not erase the recorded raw compatibility failure.
+
+## Oversized-candidate starvation regression (2026-11-02)
+
+A durable amendment can make the newest session candidate exceed 3,200 characters.
+Previously this ended the loader, so even a short older current memory disappeared
+from both response shapes and was unavailable to the ranked content-token selector.
+The same starvation occurred after a partial fill or across hydration batches.
+
+The loader now skips a whole item that exceeds the remaining character allowance
+and continues in newest-ID order. It does not truncate content or relax validity,
+workspace, agent, anchor, ten-result, or final token-budget checks. The full cached
+candidate list can now be scanned when many rows are oversized; queries remain
+bounded to 30 IDs, but this is not a total work or latency bound. A later durable
+read error still rejects the context and does not mark partial results seen.
+
+The eight tests in `context-working-memory-budget.test.js` execute production
+`ContextBuilder` with synthetic durable storage. On main `762f5c7`: seven fail and
+one passes. With this change: all eight pass; the complete working-memory test
+group passes 22 tests. Cases cover flat/structured responses, partial allowance,
+exact character-cap equality, later SELECT batches, count/order limits, all-oversized input and read failure.
+No live Redis/PostgreSQL or model-quality claims follow from these unit results.
