@@ -116,3 +116,15 @@ durable failures propagate rather than injecting stale payloads. See
 ## Link read lifecycle
 
 `LinkStore` linked recall and RCA edge reads, and `LinkedFragmentLoader` attached previews, exclude `fragment_links.deleted_at IS NOT NULL` before limiting candidates. This does not remove the fragment itself from direct search, repair `linked_to` adjacency, or change key/agent/workspace policy. Validation and limits: [active-link-recall](validation/active-link-recall.md).
+
+## RRF ID hydration
+
+`mergeRRF` in `lib/memory/read/FragmentSearch.js` retains contributions from ID-only layers and copies the
+first content-bearing candidate metadata when it becomes available. Later layers
+do not replace that document or its importance. Input `_rrfScore` fields are not
+trusted; fusion computes the score. The text pipeline still excludes IDs with no
+content-bearing match and applies the existing importance cutoff.
+
+Regression: `tests/unit/rrf-id-hydration.test.js` covers all full-document layer
+positions, empty content, metadata precedence, immutable inputs and the offline
+text-search fusion/cutoff path. No live retrieval-quality claim is made.
