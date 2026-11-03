@@ -10,6 +10,9 @@
   Storage and mutations are synthetic; no models, live services or recovery claims.
 
 ### Fixed
+- CLI export now respects output backpressure, waits for file completion or stdout
+  write callbacks, and reports sink/database failures without skipping pool cleanup.
+  Invalid date/limit arguments are rejected before opening the output file.
 - Context injection now applies the requested content-token budget to flat and
   structured responses using the existing cl100k_base tokenizer. Whole fragments
   are selected by importance/activation rank; a candidate that does not fit no

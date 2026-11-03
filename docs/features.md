@@ -33,6 +33,22 @@ weasley-deepmind의 주요 모듈을 한 페이지로 정리한 ledger. 새 모�
 |`SearchSideEffects` (`lib/memory/read/SearchSideEffects.js`)|검색 결과 배열 + ctx|searchEventId, co_retrieved 업데이트, EMA 갱신|DB 장애 시 soft fail|—|`weasley_deepmind_search_event_total`|migration-027|
 |`PgVectorStore` / `SqliteVecStore` (`lib/storage/`)|SQL 문 + 파라미터|rows 배열|연결 오류 시 throw; SqliteVecStore는 미구현 스텁|`WEASLEY_DEEPMIND_STORAGE`|—|—|
 
+## CLI export output lifecycle
+
+`weasley-deepmind export` streams JSONL through a backpressure-aware pipeline.
+File success is reported after the writable stream finishes; stdout success waits
+for write callbacks without ending or destroying the caller-owned stdout stream.
+Open, write, finalization, premature-close and database errors set a failing exit
+code, suppress the success summary and release the database pool. Invalid existing
+`--since`/`--limit` values are rejected before opening the database or output file.
+Filters, LIMIT/OFFSET pagination and JSON/JSONL bytes are unchanged.
+
+This is not an atomic backup replacement or a crash-durability guarantee: output
+files can still be truncated or partial on failure, and no fsync is added. The JSON
+array mode still collects all rows in memory. Backpressure bounds queued JSONL
+writes, not individual row size or database batches. In-flight database queries
+are not cancelled, and concurrent source mutations are not a snapshot.
+
 ## Hot-cache recall consistency
 
 `FragmentSearch` treats Redis hot payloads as candidate hints. Before ranking or
