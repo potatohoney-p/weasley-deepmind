@@ -10,6 +10,9 @@
   Storage and mutations are synthetic; no models, live services or recovery claims.
 
 ### Fixed
+- NLI classification rejects malformed HTTP/model assessments before contradiction
+  decisions: all three finite numeric probabilities in [0, 1] and a known label
+  are required. Invalid results use the existing null fallback.
 - Context injection now applies the requested content-token budget to flat and
   structured responses using the existing cl100k_base tokenizer. Whole fragments
   are selected by importance/activation rank; a candidate that does not fit no
