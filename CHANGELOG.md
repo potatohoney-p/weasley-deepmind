@@ -10,6 +10,10 @@
   Storage and mutations are synthetic; no models, live services or recovery claims.
 
 ### Fixed
+- Embedding-worker stop callers now share the active batch drain instead of
+  replacing each other's completion callback. Start calls during draining are
+  ignored, preventing overlapping queue polls; explicitly restart after awaiting
+  stop. Scheduled retries are still cancelled and active I/O is not interrupted.
 - Context injection now applies the requested content-token budget to flat and
   structured responses using the existing cl100k_base tokenizer. Whole fragments
   are selected by importance/activation rank; a candidate that does not fit no
