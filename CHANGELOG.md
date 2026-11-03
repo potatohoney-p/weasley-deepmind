@@ -10,6 +10,11 @@
   Storage and mutations are synthetic; no models, live services or recovery claims.
 
 ### Fixed
+- Japanese local morphology now loads dictionaries from the resolved kuromoji
+  dependency instead of assuming package-local node_modules. File URLs are
+  converted to native paths, preserving spaces, non-ASCII names, percent signs
+  and hash characters. Hoisted dependencies retain full tokenization rather
+  than silently falling back to whitespace splitting.
 - Context injection now applies the requested content-token budget to flat and
   structured responses using the existing cl100k_base tokenizer. Whole fragments
   are selected by importance/activation rank; a candidate that does not fit no
