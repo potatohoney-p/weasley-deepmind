@@ -115,6 +115,8 @@ async function main() {
   try {
     const mod = await COMMANDS[cmd]();
     await mod.default(args);
+    // Commands may return after cleanup with a failing exit code.
+    if (process.exitCode) return;
   } catch (err) {
     console.error(`[${cmd}] ${err.message}`);
     if (args.verbose) {
