@@ -10,6 +10,13 @@
   Storage and mutations are synthetic; no models, live services or recovery claims.
 
 ### Fixed
+- Remember post-processing and morphology backfill only mark a fragment indexed
+  after every valid token has a non-null embedding in the durable dictionary.
+  Partial provider recovery, swallowed INSERT failures, unavailable embeddings
+  and tokenizer errors keep work pending for the existing backfill retry. Recall
+  still uses its existing best-effort vectors; successful empty tokenization is
+  a no-op. Completion adds one batch verification read, not a transactional
+  snapshot with the later flag update.
 - Context injection now applies the requested content-token budget to flat and
   structured responses using the existing cl100k_base tokenizer. Whole fragments
   are selected by importance/activation rank; a candidate that does not fit no

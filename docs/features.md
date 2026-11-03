@@ -21,7 +21,7 @@ weasley-deepmind의 주요 모듈을 한 페이지로 정리한 ledger. 새 모�
 |`CaseRewardBackprop` (`lib/memory/signals/CaseRewardBackprop.js`)|case_event outcome|case_events DAG 보상|case_id 없는 fragment는 skip|`WEASLEY_DEEPMIND_CASE_BACKPROP_ENABLED`|`weasley_deepmind_case_reward_total`|migration-027|
 |`EmbeddingWorker` (`lib/memory/embedding/EmbeddingWorker.js`)|orphan fragment 배치|embedding INSERT, morpheme INSERT|external embedding provider 장애 시 row 단위 dead-letter|`EMBEDDING_PROVIDER`, `EMBEDDING_DIMENSIONS`, `BATCH_DATABASE_URL`|`weasley_deepmind_embedding_jobs_total`, batch pool|`scripts/post-migrate-flexible-embedding-dims.js`|
 |`EmbeddingCache` (`lib/memory/embedding/EmbeddingCache.js`)|텍스트 hash|cache hit/miss|Redis 장애 시 noop|`CACHE_ENABLED`, `CACHE_DB_TTL`|`weasley_deepmind_embedding_cache_*`|—|
-|`MorphemeIndex` (`lib/memory/embedding/MorphemeIndex.js`)|fragment 텍스트|morpheme 토큰 + 임베딩|형태소 분석 실패 시 fragment의 `morpheme_indexed=false` 유지|`MORPHEME_PROVIDER`, `MORPHEME_TIMEOUT_MS`|`weasley_deepmind_morpheme_index_*`|migration-035|
+|`MorphemeIndex` (`lib/memory/embedding/MorphemeIndex.js`)|fragment 텍스트|morpheme 토큰 + 임베딩|토큰화 오류, 부분 등록, DB 실패 시 `morpheme_indexed=false` 유지; remember/backfill은 전체 유효 토큰의 영속 embedding 존재 확인 후 완료|`MORPHEME_PROVIDER`, `MORPHEME_TIMEOUT_MS`|`weasley_deepmind_morpheme_index_*`|migration-035|
 |`NLIClassifier` (`lib/memory/signals/NLIClassifier.js`)|premise/hypothesis 텍스트 쌍|entail / contradict / neutral 라벨|NLI 서비스 미도달 시 LLM fallback 또는 soft skip|`NLI_SERVICE_URL`, `NLI_TIMEOUT_MS`|`weasley_deepmind_nli_total`|—|
 |`AutoReflect` (`lib/memory/processors/AutoReflect.js`)|long session events|reflect 파편 자동 생성|LLM 응답 파싱 실패 시 skip|`GEMINI_TIMEOUT_MS`, `AUTOREFLECT_ENABLED`|`weasley_deepmind_autoreflect_total`|—|
 |`RecallSuggestionEngine` (`lib/memory/read/RecallSuggestionEngine.js`)|recall 응답 메타|`_meta.suggestion.recommendedTool` 권고|graph 신호 부재 시 suggestion 미발행|—|`weasley_deepmind_recall_suggestion_total`|—|
@@ -116,3 +116,26 @@ durable failures propagate rather than injecting stale payloads. See
 ## Link read lifecycle
 
 `LinkStore` linked recall and RCA edge reads, and `LinkedFragmentLoader` attached previews, exclude `fragment_links.deleted_at IS NOT NULL` before limiting candidates. This does not remove the fragment itself from direct search, repair `linked_to` adjacency, or change key/agent/workspace policy. Validation and limits: [active-link-recall](validation/active-link-recall.md).
+
+## Durable morpheme completion
+
+Remember post-processing and the existing five-minute morphology backfill use
+`getOrRegisterEmbeddings(morphemes, { requireComplete: true })`. After normal
+best-effort registration, one batched dictionary read verifies that every unique
+valid token has a non-null stored embedding before updating `morpheme_indexed`.
+Generated in-memory vectors, partial single-item recovery and swallowed INSERT
+errors alone do not certify completion. Missing data or a failed verification
+read keeps the fragment pending. A later backfill can retry only missing tokens
+through the existing registration path. Tokenizer exceptions also stay pending;
+a successful empty tokenization needs no registration.
+
+Recall keeps the default best-effort vector return contract, without the extra
+verification read. Remember still does not wait for morphology in its response
+path, and its existing drain includes verification. No schema, provider, retry
+schedule or permissions change is required.
+
+This does not repair flags already set by older code. The verification read and
+fragment flag update are separate operations, not an atomic snapshot against
+concurrent fragment edits or dictionary removal. It does not promise eventual
+completion during a persistent outage, retry fairness, provider cancellation or
+successful retokenization when the tokenizer itself returns a fallback result.
