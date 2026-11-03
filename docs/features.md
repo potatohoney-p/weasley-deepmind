@@ -116,3 +116,18 @@ durable failures propagate rather than injecting stale payloads. See
 ## Link read lifecycle
 
 `LinkStore` linked recall and RCA edge reads, and `LinkedFragmentLoader` attached previews, exclude `fragment_links.deleted_at IS NOT NULL` before limiting candidates. This does not remove the fragment itself from direct search, repair `linked_to` adjacency, or change key/agent/workspace policy. Validation and limits: [active-link-recall](validation/active-link-recall.md).
+
+## Embedding-worker lifecycle
+
+`EmbeddingWorker.stop()` cancels the next scheduled poll and returns the same
+active-batch promise to every concurrent stop caller. It settles after that
+batch finishes or its failure is logged. `start()` is a no-op while the worker is
+running or draining; await `stop()` and call `start()` again to restart. A start
+attempt during draining is not queued for later. Failed batches retain the
+existing exponential retry delay while running, and success resets the delay.
+
+Ownership is per worker instance and covers the scheduled queue polling path.
+It does not cancel queue, provider, database or retry-sleep work, impose a
+shutdown deadline, serialize `processOrphanFragments()` calls, or coordinate
+separate worker instances/processes. Queue delivery and persistence semantics
+are unchanged. Tests use the production worker with synthetic external services.
