@@ -116,3 +116,20 @@ durable failures propagate rather than injecting stale payloads. See
 ## Link read lifecycle
 
 `LinkStore` linked recall and RCA edge reads, and `LinkedFragmentLoader` attached previews, exclude `fragment_links.deleted_at IS NOT NULL` before limiting candidates. This does not remove the fragment itself from direct search, repair `linked_to` adjacency, or change key/agent/workspace policy. Validation and limits: [active-link-recall](validation/active-link-recall.md).
+
+## HTTP embedding-worker shutdown reference
+
+The HTTP server, scheduler and health handler share one mutable worker reference.
+The scheduler populates it after its asynchronous import; shutdown reads its
+current value when collecting drain promises rather than copying null during
+startup. An initialized embedding worker's `stop()` promise therefore joins the
+existing all-settled drain with a 30-second deadline before session and database
+cleanup. SIGTERM, SIGINT and the fatal-error path use the same reference.
+
+This repairs reference wiring, not the worker's internal drain semantics. It
+does not await unfinished scheduler initialization, prevent late startup after
+shutdown has already collected workers, serialize repeated shutdown calls, or
+drain independent orphan work and asynchronous graph-link listeners. A drain
+rejection or the existing deadline still allows cleanup to continue. Tests run
+the real server entrypoint with synthetic HTTP, scheduler and storage boundaries;
+no live-service or lossless process-termination guarantee is claimed.

@@ -99,8 +99,8 @@ const rateLimiter = new DualRateLimiter({
 });
 setInterval(() => rateLimiter.cleanup(), 5 * 60_000).unref();
 
-/** EmbeddingWorker 인스턴스 (서버 시작 후 초기화) */
-let globalEmbeddingWorker = null;
+/** Shared reference populated asynchronously by startSchedulers. */
+const embeddingWorkerRef = { current: null };
 
 const ADMIN_BASE = "/v1/internal/model/nothing";
 
@@ -325,10 +325,8 @@ server.listen(PORT, HOST, () => {
     }).catch(() => {});
   }
 
-  const embeddingWorkerRef = { current: null };
   startSchedulers({ globalEmbeddingWorkerRef: embeddingWorkerRef });
   setWorkerRefs({ embeddingWorkerRef });
-  globalEmbeddingWorker = embeddingWorkerRef.current;
 
   /** Reranker 사전 로드 (비차단 — 실패해도 서버 시작 중단 없음) */
   preloadReranker().catch(() => {});
@@ -370,8 +368,9 @@ async function gracefulShutdown(signal, { exitCode = 0 } = {}) {
     drainPromises.push(MemoryManager.getInstance().drainMorpheme());
   } catch { /* MemoryManager 미초기화 시 skip */ }
 
-  if (globalEmbeddingWorker) {
-    const embeddingDrain = globalEmbeddingWorker.stop();
+  const embeddingWorker = embeddingWorkerRef.current;
+  if (embeddingWorker) {
+    const embeddingDrain = embeddingWorker.stop();
     if (embeddingDrain) drainPromises.push(embeddingDrain);
   }
 
