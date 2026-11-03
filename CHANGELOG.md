@@ -10,6 +10,10 @@
   Storage and mutations are synthetic; no models, live services or recovery claims.
 
 ### Fixed
+- HTTP shutdown reads the scheduler's live embedding-worker reference instead
+  of a null snapshot captured before asynchronous initialization. An initialized
+  worker now participates in the existing drain deadline before sessions and
+  database resources close, including signal and fatal-error shutdown paths.
 - Context injection now applies the requested content-token budget to flat and
   structured responses using the existing cl100k_base tokenizer. Whole fragments
   are selected by importance/activation rank; a candidate that does not fit no
