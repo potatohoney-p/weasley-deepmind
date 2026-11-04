@@ -10,6 +10,11 @@
   Storage and mutations are synthetic; no models, live services or recovery claims.
 
 ### Fixed
+- Validate complete, unique, in-range result indices before returning an external
+  embedding batch. Missing or repeated indices no longer shift vectors onto other
+  texts before fragment-cache writes, durable publication or morpheme registration.
+  Malformed batches use each caller's existing failure/fallback path; valid
+  shuffled responses retain input order and normalization.
 - Context injection now applies the requested content-token budget to flat and
   structured responses using the existing cl100k_base tokenizer. Whole fragments
   are selected by importance/activation rank; a candidate that does not fit no
