@@ -10,6 +10,11 @@
   Storage and mutations are synthetic; no models, live services or recovery claims.
 
 ### Fixed
+- Rolling feedback Precision@5 now measures each session's latest five judgments
+  before averaging across sessions. Older positive judgments no longer fill newer
+  negative slots. Equal timestamps use feedback ID order; sufficiency still covers
+  all sampled-session feedback within 30 days. This is a feedback proxy, not ranked
+  fragment retrieval precision.
 - Context injection now applies the requested content-token budget to flat and
   structured responses using the existing cl100k_base tokenizer. Whole fragments
   are selected by importance/activation rank; a candidate that does not fit no

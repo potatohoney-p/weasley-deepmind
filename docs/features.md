@@ -17,6 +17,7 @@ weasley-deepmind의 주요 모듈을 한 페이지로 정리한 ledger. 새 모�
 |`FragmentWriter` (`lib/memory/write/FragmentWriter.js`)|fragment 객체|insert/update id|RLS 거부, content_hash 충돌, `validation_warnings` 누적 후 INSERT|`WEASLEY_DEEPMIND_SCHEMA`|`weasley_deepmind_fragment_writes_total`|core schema|
 |`MemoryConsolidator` (`lib/memory/consolidate/MemoryConsolidator.js`)|cycle trigger|stage 결과 22항목 + per-stage timing|stage별 query error는 stage 결과에 잡힘, 다음 stage 진행|`WEASLEY_DEEPMIND_CONSOLIDATE_*`, `WEASLEY_DEEPMIND_CONSOLIDATE_TIMEOUT_MS`|`weasley_deepmind_consolidation_stage_ms`|해당 없음 (로직 전용)|
 |`ReconsolidationEngine` (`lib/memory/link/ReconsolidationEngine.js`)|tool_feedback 누적|link weight 갱신|fragment_links 부재, search_event_id 무효|`WEASLEY_DEEPMIND_RECONSOLIDATION_ENABLED`|`weasley_deepmind_link_weight_*`|migration-027|
+|`EvaluationMetrics` (`lib/memory/signals/EvaluationMetrics.js`)|30-day tool feedback, recent session limit|macro-average latest-five feedback relevance, full-session sufficiency, sample count|no samples or database failure returns null rates; feedback proxy is not ranked retrieval precision|—|`memory_stats.evaluation.rolling_precision_at_5`|—|
 |`SpreadingActivation` (`lib/memory/signals/SpreadingActivation.js`)|contextText + 시드 파편|ema_activation boost|graph 부재 시 noop|`ENABLE_SPREADING_ACTIVATION`|`weasley_deepmind_spreading_activation_total`|migration-027|
 |`CaseRewardBackprop` (`lib/memory/signals/CaseRewardBackprop.js`)|case_event outcome|case_events DAG 보상|case_id 없는 fragment는 skip|`WEASLEY_DEEPMIND_CASE_BACKPROP_ENABLED`|`weasley_deepmind_case_reward_total`|migration-027|
 |`EmbeddingWorker` (`lib/memory/embedding/EmbeddingWorker.js`)|orphan fragment 배치|embedding INSERT, morpheme INSERT|external embedding provider 장애 시 row 단위 dead-letter|`EMBEDDING_PROVIDER`, `EMBEDDING_DIMENSIONS`, `BATCH_DATABASE_URL`|`weasley_deepmind_embedding_jobs_total`, batch pool|`scripts/post-migrate-flexible-embedding-dims.js`|
@@ -116,3 +117,30 @@ durable failures propagate rather than injecting stale payloads. See
 ## Link read lifecycle
 
 `LinkStore` linked recall and RCA edge reads, and `LinkedFragmentLoader` attached previews, exclude `fragment_links.deleted_at IS NOT NULL` before limiting candidates. This does not remove the fragment itself from direct search, repair `linked_to` adjacency, or change key/agent/workspace policy. Validation and limits: [active-link-recall](validation/active-link-recall.md).
+
+
+## Rolling feedback precision
+
+`memory_stats` retains `evaluation.rolling_precision_at_5` for compatibility.
+For each selected session, it measures the relevant fraction of the newest five
+feedback records (or all available records when fewer than five exist), then
+averages session fractions with equal weight. Records are limited to the last
+30 days and ordered by `created_at DESC, id DESC`. The session limit chooses the
+most recently active sessions; tied activity timestamps use `session_id ASC`.
+Anonymous feedback is excluded. `sufficient_rate` still uses every eligible
+feedback record within each selected session before the same equal-weight average.
+
+This is an implicit **latest-five feedback proxy**. It does not measure the top
+five ranked fragments from a recall, and it is not an unbiased or per-user quality
+estimate. Feedback includes the existing set of tool names and session grouping;
+no new attribution, filtering, or learned thresholds are introduced. A change in
+this reported value after upgrading may reflect corrected measurement rather
+than a change in retrieval quality. Empty samples and unavailable databases retain
+null rates and zero sampled sessions. The query ranks all eligible 30-day feedback
+before limiting sessions; no production latency or large-volume benchmark is claimed.
+
+`tests/e2e/rolling-precision.test.js` executes the production aggregation against
+PostgreSQL using an isolated temporary feedback table. Its cases cover older
+positive feedback, timestamp ties, short sessions, equal session weighting,
+window selection, and the 30-day cutoff. It skips only when `DATABASE_URL` is
+absent; connection or query errors in a configured run fail the test.
