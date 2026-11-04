@@ -116,3 +116,12 @@ durable failures propagate rather than injecting stale payloads. See
 ## Link read lifecycle
 
 `LinkStore` linked recall and RCA edge reads, and `LinkedFragmentLoader` attached previews, exclude `fragment_links.deleted_at IS NOT NULL` before limiting candidates. This does not remove the fragment itself from direct search, repair `linked_to` adjacency, or change key/agent/workspace policy. Validation and limits: [active-link-recall](validation/active-link-recall.md).
+
+## Linked recall query filters
+
+`MemoryRecaller` forwards explicit `caseId`, `resolutionStatus`, `phase` and
+`affect` filters to `LinkStore` and checks them again with `SearchScope` before
+merging neighbors. Both link directions apply the predicates before the shared
+neighbor limit, so unrelated rows cannot consume that limit. Scalar and array
+`affect` values retain their existing search semantics. See
+[validation and limits](validation/linked-recall-query-filters.md).
