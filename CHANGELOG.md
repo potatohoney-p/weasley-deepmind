@@ -10,6 +10,10 @@
   Storage and mutations are synthetic; no models, live services or recovery claims.
 
 ### Fixed
+- Linked recall now honors explicit case, resolution, phase and affect filters
+  before the neighbor limit and final ranking/token budget. Incoming and outgoing
+  neighbors retain those fields for the final scope check. Existing unfiltered,
+  history, agent, key and workspace behavior is unchanged.
 - Context injection now applies the requested content-token budget to flat and
   structured responses using the existing cl100k_base tokenizer. Whole fragments
   are selected by importance/activation rank; a candidate that does not fit no
