@@ -116,3 +116,13 @@ durable failures propagate rather than injecting stale payloads. See
 ## Link read lifecycle
 
 `LinkStore` linked recall and RCA edge reads, and `LinkedFragmentLoader` attached previews, exclude `fragment_links.deleted_at IS NOT NULL` before limiting candidates. This does not remove the fragment itself from direct search, repair `linked_to` adjacency, or change key/agent/workspace policy. Validation and limits: [active-link-recall](validation/active-link-recall.md).
+
+
+## Graph recall query filters
+
+`FragmentSearch` forwards case, resolution, phase and affect filters to the L2.5
+`GraphNeighborSearch` stage. Both link directions filter before the shared
+weight-ranked cap and preserve those columns for the existing `SearchScope`
+check before RRF. Unfiltered selection, active-edge/current-fragment gates,
+deduplication and relation boosts remain unchanged. This is separate from later
+linked expansion. See [validation and limits](validation/graph-recall-query-filters.md).
