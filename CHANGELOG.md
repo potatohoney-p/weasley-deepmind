@@ -10,6 +10,10 @@
   Storage and mutations are synthetic; no models, live services or recovery claims.
 
 ### Fixed
+- Idempotent JSONL imports now skip duplicates identified by any applicable
+  database uniqueness constraint, including idempotency keys and content hashes
+  when restored rows have new or generated IDs. Existing rows are not changed.
+  Ordinary imports and non-uniqueness database failures retain their error counts.
 - Context injection now applies the requested content-token budget to flat and
   structured responses using the existing cl100k_base tokenizer. Whole fragments
   are selected by importance/activation rank; a candidate that does not fit no

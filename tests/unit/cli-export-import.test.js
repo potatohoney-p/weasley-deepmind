@@ -100,7 +100,7 @@ describe("M6: import.js", () => {
       fileURLToPath(new URL("../../lib/cli/import.js", import.meta.url)),
       "utf8"
     );
-    assert.ok(src.includes("ON CONFLICT (id) DO NOTHING"), "idempotent 모드에 ON CONFLICT DO NOTHING이 있어야 함");
+    assert.ok(src.includes("ON CONFLICT DO NOTHING"), "idempotent 모드에 ON CONFLICT DO NOTHING이 있어야 함");
     assert.ok(src.includes("skipped++"), "중복 시 skipped 카운터 증가 로직이 있어야 함");
   });
 

@@ -116,3 +116,18 @@ durable failures propagate rather than injecting stale payloads. See
 ## Link read lifecycle
 
 `LinkStore` linked recall and RCA edge reads, and `LinkedFragmentLoader` attached previews, exclude `fragment_links.deleted_at IS NOT NULL` before limiting candidates. This does not remove the fragment itself from direct search, repair `linked_to` adjacency, or change key/agent/workspace policy. Validation and limits: [active-link-recall](validation/active-link-recall.md).
+
+## CLI import duplicate identities
+
+`import --idempotent` uses PostgreSQL `ON CONFLICT DO NOTHING` without a
+primary-ID-only target. Applicable unique constraints decide whether a row is
+inserted or skipped: the current schema covers IDs, content hashes and
+idempotency keys. This also supports repeating JSONL inputs that omit IDs.
+Skipped rows are never updated, and distinct valid rows later in the file still
+import. Plain imports continue to count duplicate violations as errors. CHECK
+constraints and other database failures remain errors even in idempotent mode.
+
+The existing direct-DB import scope and per-row commit behavior are unchanged.
+This is not a transactional restore, tenant migration, overwritten-content
+reconciliation, retry policy or complete backup round-trip guarantee. Dry-run
+validates input only and does not query the database for duplicates.
