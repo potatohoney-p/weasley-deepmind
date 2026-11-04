@@ -50,7 +50,7 @@ for (const idempotent of [false, true]) {
           FragmentWriter.prototype._prepareInsertRow(rows[index]).contentHash);
         assert.equal(params[dateIndex], rows[index].created_at ?? null);
         assert.match(sql, new RegExp(`COALESCE\\(\\$${dateIndex + 1}::timestamptz, NOW\\(\\)\\)`));
-        assert.equal(sql.includes('ON CONFLICT (id) DO NOTHING'), idempotent);
+        assert.equal(sql.includes('ON CONFLICT DO NOTHING'), idempotent);
       }
       assert.deepEqual(JSON.parse(log.mock.calls[0].arguments[0]),
         { imported: 3, skipped: 0, errors: 0, dryRun: false, lines: 3 });
