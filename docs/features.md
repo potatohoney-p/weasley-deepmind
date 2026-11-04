@@ -116,3 +116,11 @@ durable failures propagate rather than injecting stale payloads. See
 ## Link read lifecycle
 
 `LinkStore` linked recall and RCA edge reads, and `LinkedFragmentLoader` attached previews, exclude `fragment_links.deleted_at IS NOT NULL` before limiting candidates. This does not remove the fragment itself from direct search, repair `linked_to` adjacency, or change key/agent/workspace policy. Validation and limits: [active-link-recall](validation/active-link-recall.md).
+
+## Reflection episode workspace
+
+`ReflectProcessor` forwards its resolved workspace to the narrative episode's
+`remember` call as well as ordinary reflection fragments. Explicit workspace wins
+over the API key's default; absent both, the existing global behavior remains.
+Existing rows, content deduplication and reflection input selection are unchanged.
+See [validation and limits](validation/reflect-episode-workspace.md).

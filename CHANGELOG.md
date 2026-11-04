@@ -10,6 +10,10 @@
   Storage and mutations are synthetic; no models, live services or recovery claims.
 
 ### Fixed
+- Reflection narrative episodes now receive the same resolved workspace as the
+  other reflection fragments, including the API key's default workspace. Newly
+  inserted scoped episodes no longer become global memories by omission. Existing
+  rows and content-deduplication behavior are unchanged.
 - Context injection now applies the requested content-token budget to flat and
   structured responses using the existing cl100k_base tokenizer. Whole fragments
   are selected by importance/activation rank; a candidate that does not fit no
