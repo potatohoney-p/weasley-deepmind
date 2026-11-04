@@ -116,3 +116,13 @@ durable failures propagate rather than injecting stale payloads. See
 ## Link read lifecycle
 
 `LinkStore` linked recall and RCA edge reads, and `LinkedFragmentLoader` attached previews, exclude `fragment_links.deleted_at IS NOT NULL` before limiting candidates. This does not remove the fragment itself from direct search, repair `linked_to` adjacency, or change key/agent/workspace policy. Validation and limits: [active-link-recall](validation/active-link-recall.md).
+
+
+## External embedding batch identity
+
+`generateBatchEmbeddings` requires one result for each input in an HTTP chunk,
+with unique integer indices from zero through the chunk length minus one. It
+orders validated results before normalization, rather than sorting an incomplete
+or ambiguous response. Malformed responses reject the complete call; the fragment
+worker and morpheme registrar retain their existing single-item fallback paths.
+See [validation and limits](validation/embedding-batch-identity.md).
