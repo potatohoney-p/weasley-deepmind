@@ -10,6 +10,9 @@
   Storage and mutations are synthetic; no models, live services or recovery claims.
 
 ### Fixed
+- Text recall retains matching graph neighbors under case, resolution, phase and
+  affect filters. Filter before the shared neighbor cap and preserve scope
+  metadata through SQL projection into RRF; unfiltered graph ranking is unchanged.
 - Context injection now applies the requested content-token budget to flat and
   structured responses using the existing cl100k_base tokenizer. Whole fragments
   are selected by importance/activation rank; a candidate that does not fit no
