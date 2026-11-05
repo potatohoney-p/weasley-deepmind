@@ -116,3 +116,12 @@ durable failures propagate rather than injecting stale payloads. See
 ## Link read lifecycle
 
 `LinkStore` linked recall and RCA edge reads, and `LinkedFragmentLoader` attached previews, exclude `fragment_links.deleted_at IS NOT NULL` before limiting candidates. This does not remove the fragment itself from direct search, repair `linked_to` adjacency, or change key/agent/workspace policy. Validation and limits: [active-link-recall](validation/active-link-recall.md).
+
+## Temporal candidate filter parity
+
+`FragmentSearch._searchTemporal` forwards the existing topic, type, minimum
+importance, anchor and affect filters to `FragmentReader.searchByTimeRange`.
+Predicates apply before date ordering and the 30-candidate cap; an empty affect
+set matches nothing. This covers both fallback and text/RRF temporal input,
+without changing other layers or graph expansion. See
+[validation and limits](validation/temporal-query-filters.md).
