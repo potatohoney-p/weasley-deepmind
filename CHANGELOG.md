@@ -10,6 +10,10 @@
   Storage and mutations are synthetic; no models, live services or recovery claims.
 
 ### Fixed
+- Time-range recall now forwards topic, type, minimum importance, anchor and
+  affect filters to the temporal candidate query before its 30-row cap. Newer
+  mismatches no longer displace older matches through this branch. Empty affect
+  arrays match no candidates; existing date, scope and history behavior remains.
 - Context injection now applies the requested content-token budget to flat and
   structured responses using the existing cl100k_base tokenizer. Whole fragments
   are selected by importance/activation rank; a candidate that does not fit no
